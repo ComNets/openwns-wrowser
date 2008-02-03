@@ -1,0 +1,169 @@
+<ui version="4.0" >
+ <class>Widgets_ParameterGraphControl</class>
+ <widget class="QWidget" name="Widgets_ParameterGraphControl" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>341</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="simulationParameterLabel" >
+       <property name="text" >
+        <string>Simulation Parameter:</string>
+       </property>
+       <property name="buddy" >
+        <cstring>simulationParameter</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="simulationParameter" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="xyTab" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="xaxis" >
+      <attribute name="title" >
+       <string>X-Axis</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QRadioButton" name="xUseParameterValue" >
+         <property name="text" >
+          <string>Parameter Value</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="xUseProbeEntry" >
+         <property name="text" >
+          <string>Probe Entry</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="ProbeGraphControl" native="1" name="xProbesControl" />
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="xProbeEntryLabel" >
+           <property name="text" >
+            <string>Probe Entry:</string>
+           </property>
+           <property name="buddy" >
+            <cstring>xProbeEntry</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="xProbeEntry" />
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="yaxis" >
+      <attribute name="title" >
+       <string>Y-Axis</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QRadioButton" name="yUseParameterValue" >
+         <property name="text" >
+          <string>Parameter Value</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="yUseProbeEntry" >
+         <property name="text" >
+          <string>Probe Entry</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="ProbeGraphControl" native="1" name="yProbesControl" />
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="yProbeEntryLabel" >
+           <property name="text" >
+            <string>Probe Entry:</string>
+           </property>
+           <property name="buddy" >
+            <cstring>yProbeEntry</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="yProbeEntry" />
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ProbeGraphControl</class>
+   <extends>QWidget</extends>
+   <header>Widgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

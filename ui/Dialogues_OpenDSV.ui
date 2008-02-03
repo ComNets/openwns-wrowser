@@ -1,0 +1,304 @@
+<ui version="4.0" >
+ <class>Dialogues_OpenDSV</class>
+ <widget class="QDialog" name="Dialogues_OpenDSV" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>343</width>
+    <height>177</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>0</hsizetype>
+    <vsizetype>0</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>DSV Import</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <layout class="QGridLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item row="2" column="0" >
+      <widget class="QLabel" name="directoryColumnLabel" >
+       <property name="text" >
+        <string>Name of directory column</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>directoryColumnEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <widget class="QLineEdit" name="delimiterEdit" >
+       <property name="toolTip" >
+        <string>The character separating the values in the DSV file</string>
+       </property>
+       <property name="whatsThis" >
+        <string>The character separating the values in the DSV file.</string>
+       </property>
+       <property name="text" >
+        <string>,</string>
+       </property>
+       <property name="maxLength" >
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1" >
+      <widget class="QLineEdit" name="directoryColumnEdit" >
+       <property name="toolTip" >
+        <string>Caption of the  column containing the simulation run</string>
+       </property>
+       <property name="whatsThis" >
+        <string>This contains the caption of the columns containing the directory of the simulation run. The value of "Append to directory" is appended to this.</string>
+       </property>
+       <property name="text" >
+        <string>id</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" >
+      <widget class="QLabel" name="fileNameLabel" >
+       <property name="text" >
+        <string>File</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>fileNameEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" >
+      <widget class="QLabel" name="subDirectoryLabel" >
+       <property name="text" >
+        <string>Append to directory</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>subDirectoryEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" >
+      <widget class="QLineEdit" name="subDirectoryEdit" >
+       <property name="toolTip" >
+        <string>The subdirectory in a simulation run directory containing the results</string>
+       </property>
+       <property name="whatsThis" >
+        <string>The directory containing the results of a simulation run is derived from the value of the directory column appended by this value.</string>
+       </property>
+       <property name="text" >
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" >
+      <widget class="QLabel" name="delimiterLabel" >
+       <property name="text" >
+        <string>Delimiter</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>delimiterEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" >
+      <widget class="QLineEdit" name="fileNameEdit" />
+     </item>
+     <item row="0" column="2" >
+      <widget class="QPushButton" name="openButton" >
+       <property name="text" >
+        <string>Open...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="3" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>131</width>
+         <height>31</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="okButton" >
+       <property name="text" >
+        <string>OK</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton" >
+       <property name="text" >
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>fileNameEdit</tabstop>
+  <tabstop>openButton</tabstop>
+  <tabstop>delimiterEdit</tabstop>
+  <tabstop>directoryColumnEdit</tabstop>
+  <tabstop>subDirectoryEdit</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>okButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialogues_OpenDSV</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>251</x>
+     <y>163</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>96</x>
+     <y>176</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialogues_OpenDSV</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>332</x>
+     <y>163</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>179</x>
+     <y>176</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fileNameEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>176</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>211</x>
+     <y>156</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>delimiterEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>196</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>227</x>
+     <y>158</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>directoryColumnEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>191</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>213</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>subDirectoryEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>155</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>191</x>
+     <y>143</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

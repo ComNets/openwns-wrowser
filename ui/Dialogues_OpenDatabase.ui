@@ -1,0 +1,368 @@
+<ui version="4.0" >
+ <class>Dialogues_OpenDatabase</class>
+ <widget class="QDialog" name="Dialogues_OpenDatabase" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>325</width>
+    <height>233</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>0</hsizetype>
+    <vsizetype>0</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>Connect to database</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <layout class="QGridLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item row="1" column="2" >
+      <widget class="QLabel" name="portLabel" >
+       <property name="text" >
+        <string>Port</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>portEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1" >
+      <widget class="QLineEdit" name="passwordEdit" >
+       <property name="echoMode" >
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" >
+      <widget class="QLabel" name="databaseLabel" >
+       <property name="text" >
+        <string>Database</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>databaseEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <widget class="QLineEdit" name="hostEdit" />
+     </item>
+     <item row="2" column="1" >
+      <widget class="QLineEdit" name="databaseEdit" />
+     </item>
+     <item row="0" column="0" >
+      <widget class="QLabel" name="databaseTypeLabel" >
+       <property name="text" >
+        <string>Database Type</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>databaseTypeCombo</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" >
+      <widget class="QLabel" name="hostLabel" >
+       <property name="text" >
+        <string>Host</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>hostEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2" colspan="2" >
+      <widget class="QPushButton" name="databaseOpenButton" >
+       <property name="text" >
+        <string>Open...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" >
+      <widget class="QLabel" name="userLabel" >
+       <property name="text" >
+        <string>User</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>userEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" >
+      <widget class="QLabel" name="passwordLabel" >
+       <property name="text" >
+        <string>Password</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>passwordEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" >
+      <widget class="QLineEdit" name="userEdit" />
+     </item>
+     <item row="5" column="0" >
+      <widget class="QLabel" name="uriLabel" >
+       <property name="text" >
+        <string>URI</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy" >
+        <cstring>uriEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3" >
+      <widget class="QLineEdit" name="portEdit" />
+     </item>
+     <item row="6" column="0" colspan="4" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1" >
+      <widget class="QComboBox" name="databaseTypeCombo" />
+     </item>
+     <item row="5" column="1" colspan="3" >
+      <widget class="ValidStateMarkingLineEdit" name="uriEdit" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>131</width>
+         <height>31</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="okButton" >
+       <property name="text" >
+        <string>OK</string>
+       </property>
+       <property name="default" >
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton" >
+       <property name="text" >
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ValidStateMarkingLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>Widgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>databaseTypeCombo</tabstop>
+  <tabstop>hostEdit</tabstop>
+  <tabstop>portEdit</tabstop>
+  <tabstop>databaseEdit</tabstop>
+  <tabstop>databaseOpenButton</tabstop>
+  <tabstop>userEdit</tabstop>
+  <tabstop>passwordEdit</tabstop>
+  <tabstop>uriEdit</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>okButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialogues_OpenDatabase</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>233</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>96</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialogues_OpenDatabase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>314</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>179</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>hostEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>112</x>
+     <y>51</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>186</x>
+     <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>databaseEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>129</x>
+     <y>84</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>199</x>
+     <y>207</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>129</x>
+     <y>105</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>213</x>
+     <y>205</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>passwordEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>115</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>164</x>
+     <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>portEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>252</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>171</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uriEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>okButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>102</x>
+     <y>166</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>222</x>
+     <y>206</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
