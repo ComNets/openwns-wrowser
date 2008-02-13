@@ -300,6 +300,9 @@ class LineGraph(Graph, Observing):
             self.labels.append(label)
         self.canvas.axes.set_xlabel("\n".join(xLabels))
         self.canvas.axes.set_ylabel("\n".join(yLabels))
+        ymin, ymax = self.canvas.axes.get_ylim()
+        if ymin > 0:
+            self.canvas.axes.set_ylim(0, ymax)
         self.setGrid(*self.figureConfig.grid)
         self.legendModel.updateLinesNLabels(self.lines, self.labels)
 
