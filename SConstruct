@@ -2,10 +2,9 @@ import SCons
 import sys
 import os
 import string
-import wnsrc
 
-def registerPyuicBuilder(env):
-    pyuic_build_str =  os.path.join(wnsrc.pathToSandbox, 'default', 'bin', 'pyuic4') + ' $SOURCE  -o $TARGET';
+def registerPyuicBuilder(env, pyuic):
+    pyuic_build_str =  pyuic + ' $SOURCE  -o $TARGET';
     pyuic_builder = Builder(action = [pyuic_build_str],
                             src_suffix = '.ui',
                             prefix = '',
@@ -15,23 +14,33 @@ def registerPyuicBuilder(env):
 def CheckPyQt4(context):
     context.Message('Checking for PyQt4...')
     result = False
-    for path in sys.path:
-	if os.path.exists(os.path.join(path, "PyQt4")):
-	    result = True
+    try:
+        from PyQt4 import QtGui
+        result = True
+    except:
+        pass
     context.Result(result)
     return result
 
 env = Environment()
+env["ENV"]["PATH"] = os.environ["PATH"]
 
-env["ENV"]["PYTHONPATH"] = os.path.join(wnsrc.pathToSandbox, 'default', 'lib', 'python2.4', 'site-packages') + os.pathsep + os.environ["PYTHONPATH"]
+pyuic = 'pyuic4'
+
+try:
+    import wnsrc
+    pyuic = os.path.join(wnsrc.pathToSandbox, 'default', 'bin', 'pyuic4')
+    env["ENV"]["PYTHONPATH"] = os.path.join(wnsrc.pathToSandbox, 'default', 'lib', 'python2.4', 'site-packages') + os.pathsep + os.environ["PYTHONPATH"]
+except:
+    pass
+
 
 conf = Configure(env, custom_tests = {'CheckPyQt4' : CheckPyQt4}, conf_dir = ".sconf_temp", log_file = ".sconf.log")
 
 if not conf.CheckPyQt4():
-    print "Not building Wrowser because PyQt4 is not installed!"
-    Exit(0) # we do not want to abort building the testbed
+    print "Warning: Cannot find PyQt4. This means you may not be able to start the Wrowser!"
 
-registerPyuicBuilder(env)
+registerPyuicBuilder(env, pyuic)
 
 pyuic_src_files = ['ui/Windows_Main.ui',
                    'ui/Dialogues_ColumnSelect.ui',
