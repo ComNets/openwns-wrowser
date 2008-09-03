@@ -53,6 +53,7 @@
       <string>&amp;New</string>
      </property>
      <addaction name="actionNewLogEval" />
+     <addaction name="actionNewTimeSeries" />
      <addaction name="actionNewXDF" />
      <addaction name="actionNewLRE" />
      <addaction name="actionNewBatchMeans" />
@@ -135,6 +136,11 @@
   <action name="actionNewLogEval" >
    <property name="text" >
     <string>LogEval</string>
+   </property>
+  </action>
+  <action name="actionNewTimeSeries" >
+   <property name="text" >
+    <string>TimeSeries</string>
    </property>
   </action>
   <action name="actionNewLRE" >
