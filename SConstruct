@@ -29,7 +29,7 @@ pyuic = 'pyuic4'
 
 try:
     import wnsrc
-    pyuic = os.path.join(wnsrc.pathToSandbox, 'default', 'bin', 'pyuic4')
+    pyuic = 'pyuic4'
     env["ENV"]["PYTHONPATH"] = os.path.join(wnsrc.pathToSandbox, 'default', 'lib', 'python2.4', 'site-packages') + os.pathsep + os.environ["PYTHONPATH"]
 except:
     pass

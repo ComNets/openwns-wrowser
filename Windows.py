@@ -156,6 +156,12 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         figureWindow.show()
 
     @QtCore.pyqtSignature("")
+    def on_actionNewTimeSeries_triggered(self):
+        figureWindow = TimeSeriesFigure(self.campaigns, self.menuFigure, self.workspace)
+        self.workspace.addWindow(figureWindow)
+        figureWindow.show()
+
+    @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
         figureWindow = XDFFigure(self.campaigns, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
@@ -491,6 +497,40 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
         probeNames = self.probeGraphControl.probeNames()
 
         probeDataAcquirer = dataacquisition.Probe.LogEval()
+        probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
+
+        parameterNames = list(campaign.getChangingParameterNames())
+
+        scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
+                                                        parameterNames = parameterNames)
+
+        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+
+        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                progressNotify = progressDialogue.setCurrentAndMaximum,
+                                                progressReset = progressDialogue.reset)
+
+        return graphs
+
+class TimeSeriesFigure(ProbeFigure, LineGraphs):
+
+    def __init__(self, campaigns, menu, *qwidgetArgs):
+        ProbeFigure.__init__(self, campaigns, menu, "TimeSeries Probe Figure", *qwidgetArgs)
+        LineGraphs.__init__(self)
+        self.graph.figureConfig.title = "TimeSeries Probe Figure"
+
+    @staticmethod
+    def getProbeTypes():
+        import pywns.Probe
+        return [pywns.Probe.TimeSeriesProbe]
+
+    def getGraphs(self):
+        dataacquisition = pywns.probeselector.dataacquisition
+        campaign = self.campaigns.draw
+
+        probeNames = self.probeGraphControl.probeNames()
+
+        probeDataAcquirer = dataacquisition.Probe.TimeSeries()
         probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
 
         parameterNames = list(campaign.getChangingParameterNames())
