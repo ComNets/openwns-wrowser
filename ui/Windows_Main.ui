@@ -14,11 +14,20 @@
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >
-    <property name="margin" >
-     <number>9</number>
-    </property>
     <property name="spacing" >
      <number>6</number>
+    </property>
+    <property name="leftMargin" >
+     <number>9</number>
+    </property>
+    <property name="topMargin" >
+     <number>9</number>
+    </property>
+    <property name="rightMargin" >
+     <number>9</number>
+    </property>
+    <property name="bottomMargin" >
+     <number>9</number>
     </property>
    </layout>
   </widget>
@@ -28,7 +37,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -75,8 +84,9 @@
     <addaction name="actionOpenDirectory" />
     <addaction name="actionCloseDataSource" />
     <addaction name="separator" />
-    <addaction name="actionRefresh" />
+    <addaction name="actionView_Scenario" />
     <addaction name="separator" />
+    <addaction name="actionRefresh" />
     <addaction name="actionQuit" />
    </widget>
    <addaction name="menuFile" />
@@ -181,6 +191,11 @@
   <action name="actionRefresh" >
    <property name="text" >
     <string>&amp;Refresh</string>
+   </property>
+  </action>
+  <action name="actionView_Scenario" >
+   <property name="text" >
+    <string>View &amp;Scenario</string>
    </property>
   </action>
  </widget>

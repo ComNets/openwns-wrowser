@@ -7,9 +7,38 @@ import pywns.probeselector.Errors
 import Dialogues
 import Widgets
 import Models
+import scenario.plotterFactory
 from Tools import Observable, Observing
 
 import Debug
+
+
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
+import matplotlib.figure
+from PyQt4 import QtGui, QtCore
+
+class FigureCanvas(FigureCanvasQTAgg):
+    """This class implements a QT Widget on which you can draw using the
+    MATLAB(R)-style commands provided by matplotlib
+    """
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        self.fig = matplotlib.figure.Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        self.axes.hold(False)
+
+        FigureCanvasQTAgg.__init__(self, self.fig)
+
+        FigureCanvasQTAgg.setSizePolicy(self,
+                                   QtGui.QSizePolicy.Expanding,
+                                   QtGui.QSizePolicy.Expanding)
+        FigureCanvasQTAgg.updateGeometry(self)
+
+    def sizeHint(self):
+        w, h = self.get_width_height()
+        return QtCore.QSize(w, h)
+
+    def minimumSizeHint(self):
+        return QtCore.QSize(10, 10)
 
 from ui.Windows_Main_ui import Ui_Windows_Main
 class Main(QtGui.QMainWindow, Ui_Windows_Main):
@@ -35,6 +64,37 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
+
+    @QtCore.pyqtSignature("")
+    def on_actionView_Scenario_triggered(self):
+        
+        filename = QtGui.QFileDialog.getOpenFileName(
+            self.workspace,
+            "Open File",
+            os.getcwd(),
+            "Config Files (*.py)")
+
+        globals = {}
+        exec("import sys",globals)
+        exec("sys.path.append('/home/dbn/src/wns/openWNS--main--1.0/sandbox/dbg/lib/PyConfig')", globals)
+
+        file = open(str(filename), "r")
+        content = file.read()
+        file.close()
+
+        exec(content,globals)
+
+        p = scenario.plotterFactory.create(globals)
+        if p is not None:
+            canvas = FigureCanvas(self.workspace)
+            self.workspace.addWindow(canvas)
+            p.plotScenario(canvas)
+            canvas.showMaximized()
+        else:
+            QtGui.QMessageBox.critical(self,
+                                       "No scenario found",
+                                       "Make sure the scenario is accessible in the global namespace via a variable named 'scenario'")
+
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDatabase_triggered(self):
