@@ -7,15 +7,18 @@ import pywns.probeselector.Errors
 import Dialogues
 import Widgets
 import Models
-import scenario.plotterFactory
 from Tools import Observable, Observing
-
 import Debug
-
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
 import matplotlib.figure
 from PyQt4 import QtGui, QtCore
+
+disableScenario = False
+try:
+    import scenario.plotterFactory
+except:
+    disableScenario = True
 
 class FigureCanvas(FigureCanvasQTAgg):
     """This class implements a QT Widget on which you can draw using the
@@ -65,6 +68,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
 
+        global disableScenario
+        if disableScenario:
+            self.actionView_Scenario.setEnabled(False)
+
     @QtCore.pyqtSignature("")
     def on_actionView_Scenario_triggered(self):
         
@@ -76,7 +83,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         globals = {}
         exec("import sys",globals)
-        exec("sys.path.append('/home/dbn/src/wns/openWNS--main--1.0/sandbox/dbg/lib/PyConfig')", globals)
+        filepath = os.path.dirname(str(filename))
+        exec("sys.path.append('%s')" % filepath, globals)
 
         file = open(str(filename), "r")
         content = file.read()
