@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>472</height>
+    <width>297</width>
+    <height>665</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -14,75 +14,175 @@
   </property>
   <layout class="QVBoxLayout" >
    <item>
-    <widget class="QTabWidget" name="tabWidget" >
+    <widget class="QToolBox" name="toolBox" >
      <property name="currentIndex" >
-      <number>0</number>
+      <number>1</number>
      </property>
-     <widget class="QWidget" name="winner" >
-      <attribute name="title" >
-       <string>LTE</string>
+     <widget class="QWidget" name="scanPage" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>279</width>
+        <height>587</height>
+       </rect>
+      </property>
+      <attribute name="label" >
+       <string>Scan Scenario</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
-        <layout class="QVBoxLayout" >
-         <item>
-          <widget class="QCheckBox" name="includeBS" >
-           <property name="text" >
-            <string>Include Base Stations</string>
-           </property>
-           <property name="checked" >
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="includeRN" >
-           <property name="text" >
-            <string>Include Relay Nodes</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QTabWidget" name="tabWidget" >
+         <property name="currentIndex" >
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="winner" >
+          <attribute name="title" >
+           <string>LTE</string>
+          </attribute>
+          <layout class="QVBoxLayout" >
+           <item>
+            <layout class="QVBoxLayout" >
+             <item>
+              <layout class="QGridLayout" >
+               <item row="0" column="0" >
+                <widget class="QLabel" name="tileWidthLabel" >
+                 <property name="text" >
+                  <string>TileWidth</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2" >
+                <widget class="QLineEdit" name="tileWidth" >
+                 <property name="text" >
+                  <string>10</string>
+                 </property>
+                 <property name="maxLength" >
+                  <number>32766</number>
+                 </property>
+                 <property name="alignment" >
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" colspan="2" >
+                <widget class="QLabel" name="pwrLabel" >
+                 <property name="text" >
+                  <string>Power per sub-band</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2" >
+                <widget class="QLineEdit" name="powerPerSubBand" >
+                 <property name="text" >
+                  <string>2.83 dBm</string>
+                 </property>
+                 <property name="frame" >
+                  <bool>true</bool>
+                 </property>
+                 <property name="alignment" >
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" >
+               <item>
+                <widget class="QCheckBox" name="includeBS" >
+                 <property name="text" >
+                  <string>Include Base Stations</string>
+                 </property>
+                 <property name="checked" >
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="includeRN" >
+                 <property name="text" >
+                  <string>Include Relay Nodes</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="scanWinnerButton" >
+               <property name="text" >
+                <string>Scan</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="wifi" >
+          <attribute name="title" >
+           <string>WiFi</string>
+          </attribute>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="resultPage" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>279</width>
+        <height>587</height>
+       </rect>
+      </property>
+      <attribute name="label" >
+       <string>View Results</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="QLabel" name="resultFileLabel" >
+         <property name="text" >
+          <string>Select a file to plot</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <layout class="QGridLayout" >
-         <item row="0" column="0" >
-          <widget class="QLabel" name="tileWidthLabel" >
+        <widget class="QListWidget" name="fileList" />
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <item>
+          <widget class="QLabel" name="label" >
+           <property name="toolTip" >
+            <string>If simulator output does not contain a value at a given point, this value is used</string>
+           </property>
            <property name="text" >
-            <string>TileWidth</string>
+            <string>Fill Value</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="2" >
-          <widget class="QLineEdit" name="tileWidth" >
+         <item>
+          <widget class="QLineEdit" name="fillValueLineEdit" >
+           <property name="toolTip" >
+            <string>If simulator output does not contain a value at a given point, this value is used</string>
+           </property>
            <property name="text" >
-            <string>10</string>
-           </property>
-           <property name="maxLength" >
-            <number>32766</number>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2" >
-          <widget class="QLabel" name="pwrLabel" >
-           <property name="text" >
-            <string>Power per sub-band</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2" >
-          <widget class="QLineEdit" name="powerPerSubBand" >
-           <property name="text" >
-            <string>2.83 dBm</string>
-           </property>
-           <property name="frame" >
-            <bool>true</bool>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <string>0</string>
            </property>
           </widget>
          </item>
@@ -96,24 +196,12 @@
          <property name="sizeHint" >
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>261</height>
           </size>
          </property>
         </spacer>
        </item>
-       <item>
-        <widget class="QPushButton" name="scanWinnerButton" >
-         <property name="text" >
-          <string>Scan</string>
-         </property>
-        </widget>
-       </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="wifi" >
-      <attribute name="title" >
-       <string>WiFi</string>
-      </attribute>
      </widget>
     </widget>
    </item>

@@ -60,8 +60,8 @@ class ConfigInspector:
         """
 
         classname = self.getNodeType(node)
-        
-        if classname in ['BS', 'BaseStation']:
+
+        if classname in ['BS', 'BaseStation', 'Station']:
             return 0
 
         if classname in ['MS', 'UserTerminal']:

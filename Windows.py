@@ -92,7 +92,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         if p is not None:
             self.viewScenarioCanvas = FigureCanvas(self.workspace)
             self.workspace.addWindow(self.viewScenarioCanvas)
-            p.plotScenario(self.viewScenarioCanvas)
+            p.plotScenario(self.viewScenarioCanvas, '', 0.0)
             self.viewScenarioCanvas.showMaximized()
         else:
             QtGui.QMessageBox.critical(self,
@@ -109,7 +109,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionView_Scenario.setEnabled(False)
         self.actionCloseDataSource.setEnabled(True)
 
-    def updateScenarioView(self):
+    def updateScenarioView(self, fileToPlot, fillValue):
         if self.viewScenarioCanvas is not None:
             inspector = scenario.inspect.ConfigInspector(self.viewScenarioFilename)
 
@@ -117,7 +117,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
             self.viewScenarioCanvas.clear()
 
-            p.plotScenario(self.viewScenarioCanvas)
+            p.plotScenario(self.viewScenarioCanvas, fileToPlot, fillValue)
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDatabase_triggered(self):
@@ -384,6 +384,40 @@ class ViewScenario(QtGui.QDockWidget):
             self.inspector = configInspector
             self.mainWindow = mainWindow
             self.setupUi(self)
+            self.updateFileList()
+            
+        @QtCore.pyqtSignature("")
+        def on_fileList_itemSelectionChanged(self):
+            self.update()
+
+        def updateFileList(self):
+            import pywns.Probe
+            self.fileList.clear()
+
+            if os.path.exists(self.workingDir + '/output/'):
+                self.viewScenarioProbes = pywns.Probe.readAllProbes(self.workingDir + '/output/')
+            else:
+                self.viewScenarioProves = {}
+
+            doNotShowThese = []
+            for k,v in self.viewScenarioProbes.items():
+                if v.probeType is not 'Table':
+                    doNotShowThese.append(k)
+            for k in doNotShowThese:
+                self.viewScenarioProbes.pop(k)
+
+            self.fileList.addItems(self.viewScenarioProbes.keys())
+
+        def update(self):
+            if self.fileList.currentItem() is not None:
+                fileToPlot = str(self.fileList.currentItem().text())
+                path = os.path.join(self.workingDir, 'output', fileToPlot)
+                fillValue = float(self.fillValueLineEdit.text())
+                self.mainWindow.updateScenarioView(path, fillValue)
+
+
+        def on_fillValueLineEdit_textChanged(self):
+            self.update()
 
         @QtCore.pyqtSignature("bool")
         def on_scanWinnerButton_clicked(self, checked):
@@ -435,7 +469,8 @@ class ViewScenario(QtGui.QDockWidget):
                                            "An error occured when executing the simulator")
                 
             else:
-                self.mainWindow.updateScenarioView()
+                self.updateFileList()
+                self.update()
 
     def __init__(self, configFilename, configInspector, parent, *args):
         QtGui.QDockWidget.__init__(self, "View Scenario", parent, *args)

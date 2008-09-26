@@ -43,13 +43,17 @@ class GenericPlotter:
         canvas.axes.add_patch(Polygon(zip(xs, ys), **kwargs))
 
 
-    def loadImage(self):
-        filename = "output/Scanner_RxPwr_BSID0"
-        what= "_mean.m"
+    def loadImage(self, fileToPlot, fillValue):
+        baseFilename = '_'.join(fileToPlot.split("_")[:-1])
+        what= '_' + fileToPlot.split("_")[-1]
 
         try:
-            map_raw = load(filename + what, comments='%')
-            trials_raw = load(filename + '_trials.m', comments='%')
+            filename = baseFilename + what
+            trialFilename = baseFilename + '_trials.m'
+            print "Loading %s" % filename
+            map_raw = load(filename, comments='%')
+            print "Loading %s" % trialFilename
+            trials_raw = load(trialFilename, comments='%')
         except IOError:
             return None
 
@@ -63,16 +67,20 @@ class GenericPlotter:
         maxY = max(map_parsed['y'])
 
         print "The map is (%dx%d)" % (numXEntries+1, numYEntries+1)
-        map = ones((numXEntries+1, numYEntries+1)) * (-174)
+        map = ones((numXEntries+1, numYEntries+1)) * fillValue
         
         for i in xrange(len(map_parsed['x'])):
             xIndex = int(numXEntries * (map_parsed['x'][i] - minX) / (maxX-minX))
             yIndex = int(numYEntries * (map_parsed['y'][i] - minY) / (maxY-minY))
+
+            # Mirror the indexes
+            #xIndex = numXEntries - xIndex
+            #yIndex = numYEntries - yIndex
             map[xIndex][yIndex] = map_parsed['z'][i]
 
         return map
 
-    def plotScenario(self, canvas):
+    def plotScenario(self, canvas, fileToPlot, fillValue):
         """this method should be implemented in any class that derives
 from ScenarioFrame to plot special scenarios"""
         axes = canvas.axes
@@ -84,7 +92,7 @@ from ScenarioFrame to plot special scenarios"""
 
         groupcolors = { 1 : 'b', 2:'r', 3:'g', 4:'y', 5:'m', 6:'c' }
 
-        shapes = { 0 : '^', 1 : 'o', 2 : 's'}
+        shapes = { 0 : '^', 1 : 'o', 2 : 's', 3: 'x'}
 
         for n in self.inspector.getNodes():
             if self.inspector.hasMobility(n):
@@ -98,15 +106,16 @@ from ScenarioFrame to plot special scenarios"""
                 y=random.randint(-10,10)
                 axes.text(pos.x + x, pos.y + y, n.name)
 
-        map = self.loadImage()
+        map = self.loadImage(fileToPlot, fillValue)
         if map is not None:
-            axes.imshow(map,
-                        extent= (scenarioSize[0], scenarioSize[2],
-                                 scenarioSize[1], scenarioSize[3])
-                        )
+            im = axes.imshow(map,
+                             origin = 'lower',
+                             extent= (scenarioSize[0], scenarioSize[2],
+                                      scenarioSize[1], scenarioSize[3])
+                             )
+            canvas.fig.colorbar(im)
 
         axes.set_xlim(scenarioSize[0], scenarioSize[2])
         axes.set_ylim(scenarioSize[1], scenarioSize[3])
-
 
         canvas.draw()
