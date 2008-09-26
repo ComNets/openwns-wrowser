@@ -1,0 +1,124 @@
+<ui version="4.0" >
+ <class>Widgets_ViewScenario</class>
+ <widget class="QWidget" name="Widgets_ViewScenario" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>334</width>
+    <height>472</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QTabWidget" name="tabWidget" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="winner" >
+      <attribute name="title" >
+       <string>LTE</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <item>
+        <layout class="QVBoxLayout" >
+         <item>
+          <widget class="QCheckBox" name="includeBS" >
+           <property name="text" >
+            <string>Include Base Stations</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="includeRN" >
+           <property name="text" >
+            <string>Include Relay Nodes</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" >
+         <item row="0" column="0" >
+          <widget class="QLabel" name="tileWidthLabel" >
+           <property name="text" >
+            <string>TileWidth</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" >
+          <widget class="QLineEdit" name="tileWidth" >
+           <property name="text" >
+            <string>10</string>
+           </property>
+           <property name="maxLength" >
+            <number>32766</number>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2" >
+          <widget class="QLabel" name="pwrLabel" >
+           <property name="text" >
+            <string>Power per sub-band</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2" >
+          <widget class="QLineEdit" name="powerPerSubBand" >
+           <property name="text" >
+            <string>2.83 dBm</string>
+           </property>
+           <property name="frame" >
+            <bool>true</bool>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="scanWinnerButton" >
+         <property name="text" >
+          <string>Scan</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="wifi" >
+      <attribute name="title" >
+       <string>WiFi</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -14,11 +14,10 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
 import matplotlib.figure
 from PyQt4 import QtGui, QtCore
 
+import scenario.plotterFactory
+import scenario.inspect
+
 disableScenario = False
-try:
-    import scenario.plotterFactory
-except:
-    disableScenario = True
 
 class FigureCanvas(FigureCanvasQTAgg):
     """This class implements a QT Widget on which you can draw using the
@@ -42,6 +41,11 @@ class FigureCanvas(FigureCanvasQTAgg):
 
     def minimumSizeHint(self):
         return QtCore.QSize(10, 10)
+
+    def clear(self):
+        self.fig.clear()
+        self.axes = self.fig.add_subplot(111)
+        self.axes.hold(False)
 
 from ui.Windows_Main_ui import Ui_Windows_Main
 class Main(QtGui.QMainWindow, Ui_Windows_Main):
@@ -74,35 +78,46 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionView_Scenario_triggered(self):
-        
-        filename = QtGui.QFileDialog.getOpenFileName(
-            self.workspace,
-            "Open File",
-            os.getcwd(),
-            "Config Files (*.py)")
 
-        globals = {}
-        exec("import sys",globals)
-        filepath = os.path.dirname(str(filename))
-        exec("sys.path.append('%s')" % filepath, globals)
+        self.viewScenarioFilename = str(QtGui.QFileDialog.getOpenFileName(
+                self.workspace,
+                "Open File",
+                os.getcwd(),
+                "Config Files (*.py)"))
 
-        file = open(str(filename), "r")
-        content = file.read()
-        file.close()
+        inspector = scenario.inspect.ConfigInspector(self.viewScenarioFilename)
 
-        exec(content,globals)
+        p = scenario.plotterFactory.create(inspector)
 
-        p = scenario.plotterFactory.create(globals)
         if p is not None:
-            canvas = FigureCanvas(self.workspace)
-            self.workspace.addWindow(canvas)
-            p.plotScenario(canvas)
-            canvas.showMaximized()
+            self.viewScenarioCanvas = FigureCanvas(self.workspace)
+            self.workspace.addWindow(self.viewScenarioCanvas)
+            p.plotScenario(self.viewScenarioCanvas)
+            self.viewScenarioCanvas.showMaximized()
         else:
             QtGui.QMessageBox.critical(self,
                                        "No scenario found",
                                        "Make sure the scenario is accessible in the global namespace via a variable named 'scenario'")
 
+        self.viewScenarioWidget = ViewScenario(self.viewScenarioFilename, inspector, self)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
+
+        self.actionOpenDatabase.setEnabled(False)
+        self.actionOpenCampaignDatabase.setEnabled(False)
+        self.actionOpenDSV.setEnabled(False)
+        self.actionOpenDirectory.setEnabled(False)
+        self.actionView_Scenario.setEnabled(False)
+        self.actionCloseDataSource.setEnabled(True)
+
+    def updateScenarioView(self):
+        if self.viewScenarioCanvas is not None:
+            inspector = scenario.inspect.ConfigInspector(self.viewScenarioFilename)
+
+            p = scenario.plotterFactory.create(inspector)
+
+            self.viewScenarioCanvas.clear()
+
+            p.plotScenario(self.viewScenarioCanvas)
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDatabase_triggered(self):
@@ -199,6 +214,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.simulationParameters.close()
         if hasattr(self, "directoryNavigation"):
             self.directoryNavigation.close()
+        if hasattr(self, "viewScenarioWidget"):
+            self.viewScenarioWidget.close()
         for window in self.workspace.windowList():
             window.close()
         self.campaigns = Observable()
@@ -208,6 +225,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionOpenDirectory.setEnabled(True)
         self.actionCloseDataSource.setEnabled(False)
         self.actionNewParameter.setEnabled(True)
+        self.actionView_Scenario.setEnabled(True)
         self.menuNew.setEnabled(False)
 
     @QtCore.pyqtSignature("")
@@ -352,6 +370,77 @@ class SimulationParameters(QtGui.QDockWidget):
         self.internalWidget = self.__class__.Widget(campaigns)
         self.setWidget(self.internalWidget)
 
+
+class ViewScenario(QtGui.QDockWidget):
+
+    from ui.Widgets_ViewScenario_ui import Ui_Widgets_ViewScenario
+    import scenario.generic
+    class ViewScenarioWidget(QtGui.QWidget, Ui_Widgets_ViewScenario):
+        
+        def __init__(self, configFilename, configInspector, mainWindow, *args):
+            QtGui.QWidget.__init__(self, *args)
+            self.configFilename = configFilename
+            self.workingDir = os.path.dirname(self.configFilename)
+            self.inspector = configInspector
+            self.mainWindow = mainWindow
+            self.setupUi(self)
+
+        @QtCore.pyqtSignature("bool")
+        def on_scanWinnerButton_clicked(self, checked):
+            print "Starting Simulation"
+            print str(self.powerPerSubBand.text())
+            import subprocess
+            import shutil
+            import os
+
+            thisDir = os.path.dirname(__file__)
+            shutil.copyfile(os.path.join(thisDir, 'scenario', 'template_WinnerScanner.py'),
+                            os.path.join(self.workingDir, 'xyz.py'))
+
+            file = open(os.path.join(self.workingDir, 'xyz.py'), "a")
+            file.write('powerPerSubBand = "%s"\n' % str(self.powerPerSubBand.text()))
+            file.write('tileWidth = "%s"\n' % str(self.tileWidth.text()))
+            (xmin,ymin,xmax,ymax) = self.inspector.getSize()
+
+            file.write('xMin = %f\n' % ( xmin ))
+            file.write('xMax = %f\n' % ( xmax ))
+            file.write('yMin = %f\n' % ( ymin ))
+            file.write('yMax = %f\n' % ( ymax ))
+
+            file.write('baseStations = []\n\n')
+            for n in self.inspector.getNodes():
+                if self.inspector.hasMobility(n):
+                    if self.inspector.getNodeTypeId(n) == 0:
+                        m = self.inspector.getMobility(n)
+                        file.write("bsPosition = rise.scenario.Nodes.RAP()\n")
+                        file.write("bsPosition.position = wns.Position(%f,%f,%f)\n" % (m.coords.x, m.coords.y, m.coords.z))
+                        file.write("baseStations.append( bsPosition )\n\n")
+
+            file.write('builder = ScannerScenarioBuilder(maxSimTime=100, scenarioSize=(xMin,yMin,xMax,yMax), tileWidth = tileWidth, powerPerSubBand=powerPerSubBand)\n')
+            file.write('for bs in baseStations:\n')
+            file.write('    builder.createBaseStation(bs)\n\n')
+            file.write('builder.finalizeScenario()\n')
+            file.write('WNS = builder.getSimulator()\n')
+            file.close()
+
+            currentpath = os.getcwd()
+            os.chdir(self.workingDir)
+            retcode = subprocess.call(["./wns-core", "-f", "xyz.py"])
+            os.remove(os.path.join(self.workingDir, 'xyz.py'))
+            os.chdir(currentpath)
+
+            if retcode != 0:
+                QtGui.QMessageBox.critical(self,
+                                           "An error occured",
+                                           "An error occured when executing the simulator")
+                
+            else:
+                self.mainWindow.updateScenarioView()
+
+    def __init__(self, configFilename, configInspector, parent, *args):
+        QtGui.QDockWidget.__init__(self, "View Scenario", parent, *args)
+        self.internalWidget = self.__class__.ViewScenarioWidget(configFilename, configInspector, parent, self)
+        self.setWidget(self.internalWidget)
 
 class DirectoryNavigation(QtGui.QDockWidget):
 

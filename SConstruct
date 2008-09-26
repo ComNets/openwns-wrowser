@@ -55,7 +55,8 @@ pyuic_src_files = ['ui/Windows_Main.ui',
                    'ui/Widgets_Graph.ui',
                    'ui/Widgets_TableGraph.ui',
                    'ui/Widgets_ProbeGraphControl.ui',
-                   'ui/Widgets_ParameterGraphControl.ui']
+                   'ui/Widgets_ParameterGraphControl.ui',
+		   'ui/Widgets_ViewScenario.ui']
 
 for srcfile in pyuic_src_files:
     env.Pyuic(srcfile)

@@ -19,3 +19,4 @@ ui/Windows_Figure_ui.py
 ui/Windows_Main_ui.py
 ui/Windows_ProbeInfo_ui.py
 ui/Windows_SimulationParameters_ui.py
+ui/Widgets_ViewScenario_ui.py
