@@ -16,7 +16,7 @@
    <item>
     <widget class="QToolBox" name="toolBox" >
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="scanPage" >
       <property name="geometry" >
@@ -24,7 +24,7 @@
         <x>0</x>
         <y>0</y>
         <width>279</width>
-        <height>587</height>
+        <height>583</height>
        </rect>
       </property>
       <attribute name="label" >
@@ -55,7 +55,7 @@
                <item row="0" column="2" >
                 <widget class="QLineEdit" name="tileWidth" >
                  <property name="text" >
-                  <string>10</string>
+                  <string>1</string>
                  </property>
                  <property name="maxLength" >
                   <number>32766</number>
@@ -75,13 +75,27 @@
                <item row="1" column="2" >
                 <widget class="QLineEdit" name="powerPerSubBand" >
                  <property name="text" >
-                  <string>2.83 dBm</string>
+                  <string>2.83</string>
                  </property>
                  <property name="frame" >
                   <bool>true</bool>
                  </property>
                  <property name="alignment" >
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3" >
+                <widget class="QLabel" name="label_2" >
+                 <property name="text" >
+                  <string>dBm</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3" >
+                <widget class="QLabel" name="label_3" >
+                 <property name="text" >
+                  <string>m</string>
                  </property>
                 </widget>
                </item>
@@ -147,7 +161,7 @@
         <x>0</x>
         <y>0</y>
         <width>279</width>
-        <height>587</height>
+        <height>583</height>
        </rect>
       </property>
       <attribute name="label" >
@@ -195,11 +209,18 @@
          </property>
          <property name="sizeHint" >
           <size>
-           <width>20</width>
-           <height>261</height>
+           <width>261</width>
+           <height>151</height>
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="redrawButton" >
+         <property name="text" >
+          <string>Redraw</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

@@ -4,6 +4,9 @@ import rise.Mobility
 import openwns.simulator
 import os
 
+class SimulatorConfigNotFound:
+    pass
+
 class ConfigInspector:
 
     def __init__(self, configurationFile):
@@ -22,14 +25,17 @@ class ConfigInspector:
         exec(content,self.config)
         os.chdir(currentdir)
 
+        self.simulator = self.getSimulator()
+
     def getSimulator(self):
         for k,v in self.config.items():
             if isinstance(v, openwns.simulator.OpenWNS):
                 return v
-        return None
+
+        raise SimulatorConfigNotFound
 
     def getNodes(self):
-        sim = self.getSimulator()
+        sim = self.simulator
         return sim.nodes
 
     def hasMobility(self, node):

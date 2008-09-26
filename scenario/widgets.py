@@ -47,10 +47,13 @@ class ViewScenario(QtGui.QDockWidget):
             self.mainWindow = mainWindow
             self.setupUi(self)
             self.updateFileList()
-            
-        @QtCore.pyqtSignature("")
-        def on_fileList_itemSelectionChanged(self):
-            self.update()
+
+            self.fillValueLineEdit.setValidator(QtGui.QDoubleValidator(self))
+            self.powerPerSubBand.setValidator(QtGui.QDoubleValidator(self))
+
+        @QtCore.pyqtSignature("bool")
+        def on_redrawButton_clicked(self, checked):
+            self.update()            
 
         def updateFileList(self):
             import pywns.Probe
@@ -77,10 +80,6 @@ class ViewScenario(QtGui.QDockWidget):
                 fillValue = float(self.fillValueLineEdit.text())
                 self.mainWindow.updateScenarioView(path, fillValue)
 
-
-        def on_fillValueLineEdit_textChanged(self):
-            self.update()
-
         @QtCore.pyqtSignature("bool")
         def on_scanWinnerButton_clicked(self, checked):
             print "Starting Simulation"
@@ -94,7 +93,7 @@ class ViewScenario(QtGui.QDockWidget):
                             os.path.join(self.workingDir, 'xyz.py'))
 
             file = open(os.path.join(self.workingDir, 'xyz.py'), "a")
-            file.write('powerPerSubBand = "%s"\n' % str(self.powerPerSubBand.text()))
+            file.write('powerPerSubBand = "%s dBm"\n' % str(self.powerPerSubBand.text()))
             file.write('tileWidth = "%s"\n' % str(self.tileWidth.text()))
             (xmin,ymin,xmax,ymax) = self.inspector.getSize()
 

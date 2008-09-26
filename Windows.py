@@ -49,28 +49,30 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 os.getcwd(),
                 "Config Files (*.py)"))
 
-        p = scenario.plotterFactory.create(self.viewScenarioFilename)
+        try:
+            p = scenario.plotterFactory.create(self.viewScenarioFilename)
+        except scenario.plotterFactory.InvalidConfig:
+            QtGui.QMessageBox.critical(self,
+                                       "No scenario found",
+                                       "Could not find any scenario in this file.\n\nMake sure you have an instance of openwns.simulator.OpenWNS in the global namespace of your configuration file")
+            p = None
 
         if p is not None:
             self.viewScenarioCanvas = scenario.widgets.FigureCanvas(self.workspace)
             self.workspace.addWindow(self.viewScenarioCanvas)
             p.plotScenario(self.viewScenarioCanvas, '', 0.0)
             self.viewScenarioCanvas.showMaximized()
-        else:
-            QtGui.QMessageBox.critical(self,
-                                       "No scenario found",
-                                       "Make sure the scenario is accessible in the global namespace via a variable named 'scenario'")
 
-        self.viewScenarioWidget = scenario.widgets.ViewScenario(self.viewScenarioFilename, self)
+            self.viewScenarioWidget = scenario.widgets.ViewScenario(self.viewScenarioFilename, self)
 
-        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
 
-        self.actionOpenDatabase.setEnabled(False)
-        self.actionOpenCampaignDatabase.setEnabled(False)
-        self.actionOpenDSV.setEnabled(False)
-        self.actionOpenDirectory.setEnabled(False)
-        self.actionView_Scenario.setEnabled(False)
-        self.actionCloseDataSource.setEnabled(True)
+            self.actionOpenDatabase.setEnabled(False)
+            self.actionOpenCampaignDatabase.setEnabled(False)
+            self.actionOpenDSV.setEnabled(False)
+            self.actionOpenDirectory.setEnabled(False)
+            self.actionView_Scenario.setEnabled(False)
+            self.actionCloseDataSource.setEnabled(True)
 
     def updateScenarioView(self, fileToPlot, fillValue):
         if self.viewScenarioCanvas is not None:
