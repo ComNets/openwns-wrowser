@@ -1,5 +1,10 @@
 from PyQt4 import QtCore, QtGui
 
-def create(scenarioInspector):
-    from generic import GenericPlotter
-    return GenericPlotter(scenarioInspector)
+import generic
+import inspect
+
+def create(scenarioFilename):
+    
+    inspector = inspect.ConfigInspector(scenarioFilename)
+
+    return generic.GenericPlotter(inspector)
