@@ -4,6 +4,7 @@ import matplotlib.figure
 import os
 
 import inspect
+import threads
 
 class FigureCanvas(FigureCanvasQTAgg):
     """This class implements a QT Widget on which you can draw using the
@@ -45,6 +46,12 @@ class ViewScenario(QtGui.QDockWidget):
             self.workingDir = os.path.dirname(self.configFilename)
             self.inspector = inspect.ConfigInspector(self.configFilename)
             self.mainWindow = mainWindow
+            self.simulationThread = threads.SimulationThread(self)
+            self.progressTimeout = QtCore.QTimer(self)
+            self.progressTimeout.setInterval(1000)
+
+            QtCore.QObject.connect(self.simulationThread, QtCore.SIGNAL("finished()"), self, QtCore.SLOT("on_simulationThread_finished()"))
+            QtCore.QObject.connect(self.progressTimeout, QtCore.SIGNAL("timeout()"), self, QtCore.SLOT("on_progressTimeout_timeout()"))
             self.setupUi(self)
             self.updateFileList()
 
@@ -78,60 +85,42 @@ class ViewScenario(QtGui.QDockWidget):
                 fileToPlot = str(self.fileList.currentItem().text())
                 path = os.path.join(self.workingDir, 'output', fileToPlot)
                 fillValue = float(self.fillValueLineEdit.text())
-                self.mainWindow.updateScenarioView(path, fillValue)
+                includeContour = self.contourPlotCheckBox.isChecked()
+                self.mainWindow.updateScenarioView(path, fillValue, includeContour)
 
         @QtCore.pyqtSignature("bool")
         def on_scanWinnerButton_clicked(self, checked):
-            print "Starting Simulation"
-            print str(self.powerPerSubBand.text())
-            import subprocess
-            import shutil
-            import os
+            if not self.simulationThread.isRunning():
+                self.scanWinnerButton.setEnabled(False)
+                self.scanWinnerButton.setText("Scanning ( 0.00 % )")
+                self.simulationThread.start()
+                self.progressTimeout.start()
+            else:
+                QtGui.QMessageBox.critical(self,
+                                           "An error occured",
+                                           "There is already a simulation running.")
 
-            thisDir = os.path.dirname(__file__)
-            shutil.copyfile(os.path.join(thisDir, 'template_WinnerScanner.py'),
-                            os.path.join(self.workingDir, 'xyz.py'))
+        @QtCore.pyqtSignature("")
+        def on_simulationThread_finished(self):
+            self.scanWinnerButton.setEnabled(True)
+            self.progressTimeout.stop()
+            self.scanWinnerButton.setText("Scan")
 
-            file = open(os.path.join(self.workingDir, 'xyz.py'), "a")
-            file.write('powerPerSubBand = "%s dBm"\n' % str(self.powerPerSubBand.text()))
-            file.write('tileWidth = "%s"\n' % str(self.tileWidth.text()))
-            (xmin,ymin,xmax,ymax) = self.inspector.getSize()
-
-            file.write('xMin = %f\n' % ( xmin ))
-            file.write('xMax = %f\n' % ( xmax ))
-            file.write('yMin = %f\n' % ( ymin ))
-            file.write('yMax = %f\n' % ( ymax ))
-
-            file.write('baseStations = []\n\n')
-            for n in self.inspector.getNodes():
-                if self.inspector.hasMobility(n):
-                    if self.inspector.getNodeTypeId(n) == 0:
-                        m = self.inspector.getMobility(n)
-                        file.write("bsPosition = rise.scenario.Nodes.RAP()\n")
-                        file.write("bsPosition.position = wns.Position(%f,%f,%f)\n" % (m.coords.x, m.coords.y, m.coords.z))
-                        file.write("baseStations.append( bsPosition )\n\n")
-
-            file.write('builder = ScannerScenarioBuilder(maxSimTime=100, scenarioSize=(xMin,yMin,xMax,yMax), tileWidth = tileWidth, powerPerSubBand=powerPerSubBand)\n')
-            file.write('for bs in baseStations:\n')
-            file.write('    builder.createBaseStation(bs)\n\n')
-            file.write('builder.finalizeScenario()\n')
-            file.write('WNS = builder.getSimulator()\n')
-            file.close()
-
-            currentpath = os.getcwd()
-            os.chdir(self.workingDir)
-            retcode = subprocess.call(["./wns-core", "-f", "xyz.py"])
-            os.remove(os.path.join(self.workingDir, 'xyz.py'))
-            os.chdir(currentpath)
-
-            if retcode != 0:
+            if self.simulationThread.success:
+                self.updateFileList()
+                self.update()
+            else:
                 QtGui.QMessageBox.critical(self,
                                            "An error occured",
                                            "An error occured when executing the simulator")
-                
-            else:
-                self.updateFileList()
-                self.update()
+
+        @QtCore.pyqtSignature("")
+        def on_progressTimeout_timeout(self):
+            if os.path.exists('output/progress'):
+                progressFile = open('output/progress')
+                progress = float(progressFile.read()) * 100
+                progressFile.close()
+                self.scanWinnerButton.setText("Scan in progress ( %.2f %%)" % progress)
 
     def __init__(self, configFilename, parent, *args):
         QtGui.QDockWidget.__init__(self, "View Scenario", parent, *args)

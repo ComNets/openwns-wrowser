@@ -46,7 +46,6 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
     def __init__(self, maxSimTime, scenarioSize, tileWidth, powerPerSubBand):
         self.maxSimTime = maxSimTime
         self.scenarioSize = scenarioSize
-        print self.scenarioSize
         self.powerPerSubBand = powerPerSubBand
         self.rxpProbeName = "Scanner_RxPwr"
         self.sinrProbeName = "Scanner_SINR"
@@ -100,7 +99,6 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
                 #            break
                 
                 #    if (mobilityObstructions is None or not inObstacle):
-                print "Adding waypoint at t=%s" % str(t)
                 mobility.addWaypoint(t, wns.Position(float(ii)/scale + xMin, float(jj)/scale + yMin, 1.5))
 
                 #inObstacle = False

@@ -60,7 +60,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         if p is not None:
             self.viewScenarioCanvas = scenario.widgets.FigureCanvas(self.workspace)
             self.workspace.addWindow(self.viewScenarioCanvas)
-            p.plotScenario(self.viewScenarioCanvas, '', 0.0)
+            p.plotScenario(self.viewScenarioCanvas, '', 0.0, False)
             self.viewScenarioCanvas.showMaximized()
 
             self.viewScenarioWidget = scenario.widgets.ViewScenario(self.viewScenarioFilename, self)
@@ -74,13 +74,13 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.actionView_Scenario.setEnabled(False)
             self.actionCloseDataSource.setEnabled(True)
 
-    def updateScenarioView(self, fileToPlot, fillValue):
+    def updateScenarioView(self, fileToPlot, fillValue, includeContour):
         if self.viewScenarioCanvas is not None:
             p = scenario.plotterFactory.create(self.viewScenarioFilename)
 
             self.viewScenarioCanvas.clear()
 
-            p.plotScenario(self.viewScenarioCanvas, fileToPlot, fillValue)
+            p.plotScenario(self.viewScenarioCanvas, fileToPlot, fillValue, includeContour)
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDatabase_triggered(self):

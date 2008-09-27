@@ -80,7 +80,7 @@ class GenericPlotter:
 
         return map
 
-    def plotScenario(self, canvas, fileToPlot, fillValue):
+    def plotScenario(self, canvas, fileToPlot, fillValue, includeContour):
         """this method should be implemented in any class that derives
 from ScenarioFrame to plot special scenarios"""
         axes = canvas.axes
@@ -114,6 +114,13 @@ from ScenarioFrame to plot special scenarios"""
                                       scenarioSize[1], scenarioSize[3])
                              )
             canvas.fig.colorbar(im)
+
+            if includeContour:
+                cs = axes.contour(map,
+                                  extent= (scenarioSize[0], scenarioSize[2],
+                                           scenarioSize[1], scenarioSize[3])
+                                  )
+                axes.clabel(cs)
 
         axes.set_xlim(scenarioSize[0], scenarioSize[2])
         axes.set_ylim(scenarioSize[1], scenarioSize[3])
