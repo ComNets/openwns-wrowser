@@ -58,20 +58,20 @@ class GenericPlotter:
             return None
 
         map_parsed = rec.fromrecords(map_raw, names = 'x,y,z')
-        numXEntries = len(unique(map_parsed['x']))
-        minX = min(map_parsed['x'])
-        maxX = max(map_parsed['x'])
+        self.numXEntries = len(unique(map_parsed['x']))
+        self.minX = min(map_parsed['x'])
+        self.maxX = max(map_parsed['x'])
 
-        numYEntries = len(unique(map_parsed['y']))
-        minY = min(map_parsed['y'])
-        maxY = max(map_parsed['y'])
+        self.numYEntries = len(unique(map_parsed['y']))
+        self.minY = min(map_parsed['y'])
+        self.maxY = max(map_parsed['y'])
 
-        print "The map is (%dx%d)" % (numXEntries+1, numYEntries+1)
-        map = ones((numXEntries+1, numYEntries+1)) * fillValue
+        print "The map is (%dx%d)" % (self.numXEntries+1, self.numYEntries+1)
+        map = ones((self.numXEntries+1, self.numYEntries+1)) * fillValue
         
         for i in xrange(len(map_parsed['x'])):
-            xIndex = int(numXEntries * (map_parsed['x'][i] - minX) / (maxX-minX))
-            yIndex = int(numYEntries * (map_parsed['y'][i] - minY) / (maxY-minY))
+            xIndex = int(self.numXEntries * (map_parsed['x'][i] - self.minX) / (self.maxX-self.minX))
+            yIndex = int(self.numYEntries * (map_parsed['y'][i] - self.minY) / (self.maxY-self.minY))
 
             # Mirror the indexes
             #xIndex = numXEntries - xIndex
@@ -124,5 +124,48 @@ from ScenarioFrame to plot special scenarios"""
 
         axes.set_xlim(scenarioSize[0], scenarioSize[2])
         axes.set_ylim(scenarioSize[1], scenarioSize[3])
+
+        canvas.draw()
+
+    def plotCut(self, canvas, fileToPlot, fillValue, x1, y1, x2, y2):
+
+        map = self.loadImage(fileToPlot, fillValue)
+
+        axes = canvas.axes
+        axes.hold(True)
+
+        x1Index = int(self.numXEntries * (x1 - self.minX) / (self.maxX-self.minX))
+        y1Index = int(self.numYEntries * (y1 - self.minY) / (self.maxY-self.minY))
+        x2Index = int(self.numXEntries * (x2 - self.minX) / (self.maxX-self.minX))
+        y2Index = int(self.numYEntries * (y2 - self.minY) / (self.maxY-self.minY))
+
+        print "Coordinates (%d,%d,%d,%d)" % (x1Index, y1Index, x2Index, y2Index)
+        print map.shape
+
+        dx = x2Index - x1Index
+        dy = y2Index - y1Index
+
+        x=[]
+        y=[]
+        length = (dx**2 + dy**2)**0.5
+        scanned = 0
+        xold = None
+        yold = None
+        while scanned < length:
+            candX = int(x1Index + dx * scanned/length)
+            candY = int(y1Index + dy * scanned/length)
+            if xold is None or yold is None or xold!=candX or yold!=candY:
+                xold = candX
+                yold = candY
+                x.append(candX)
+                y.append(candY)
+            scanned = scanned + 0.01
+
+        values = []
+        for i in xrange(len(x)):
+            values.append(map[x[i]][y[i]])
+
+
+        axes.plot(values)
 
         canvas.draw()

@@ -64,6 +64,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.viewScenarioCanvas.showMaximized()
 
             self.viewScenarioWidget = scenario.widgets.ViewScenario(self.viewScenarioFilename, self)
+            self.viewScenarioCanvas.registerMotionEventHandler(self.viewScenarioWidget.internalWidget.on_motionEvent)
+            self.viewScenarioCanvas.registerButtonPressEventHandler(self.viewScenarioWidget.internalWidget.on_buttonPressEvent)
 
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
 
@@ -81,6 +83,14 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.viewScenarioCanvas.clear()
 
             p.plotScenario(self.viewScenarioCanvas, fileToPlot, fillValue, includeContour)
+
+    def updateCutPlot(self, fileToPlot, fillValue, x1, y1, x2, y2):
+        if self.viewScenarioCanvas is not None:
+            p = scenario.plotterFactory.create(self.viewScenarioFilename)
+
+            self.viewScenarioCanvas.clear()
+
+            p.plotCut(self.viewScenarioCanvas, fileToPlot, fillValue, x1, y1, x2, y2)
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDatabase_triggered(self):

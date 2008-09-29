@@ -34,6 +34,13 @@ class FigureCanvas(FigureCanvasQTAgg):
         self.axes = self.fig.add_subplot(111)
         self.axes.hold(False)
 
+    def registerMotionEventHandler(self, callable):
+        #self.axes.set_picker(True)
+        self.fig.canvas.mpl_connect('motion_notify_event', callable)
+
+    def registerButtonPressEventHandler(self, callable):
+        self.fig.canvas.mpl_connect('button_press_event', callable)
+
 class ViewScenario(QtGui.QDockWidget):
 
     from ui.Widgets_ViewScenario_ui import Ui_Widgets_ViewScenario
@@ -121,6 +128,47 @@ class ViewScenario(QtGui.QDockWidget):
                 progress = float(progressFile.read()) * 100
                 progressFile.close()
                 self.scanWinnerButton.setText("Scan in progress ( %.2f %%)" % progress)
+
+        def on_p1PickerButton_clicked(self):
+            if self.p1PickerButton.isChecked():
+                self.p2PickerButton.setChecked(False)
+
+        def on_p2PickerButton_clicked(self):
+            if self.p2PickerButton.isChecked():
+                self.p1PickerButton.setChecked(False)
+
+        def on_motionEvent(self, event):
+            if self.p1PickerButton.isChecked():
+                print "Picked 1 " + str(event)
+                if event.xdata is not None and event.ydata is not None:
+                    self.x1LineEdit.setText(str("%.2f" % event.xdata))
+                    self.y1LineEdit.setText(str("%.2f" % event.ydata))
+
+            if self.p2PickerButton.isChecked():
+                print "Picked 2 " + str(event)
+                if event.xdata is not None and event.ydata is not None:
+                    self.x2LineEdit.setText(str("%.2f" % event.xdata))
+                    self.y2LineEdit.setText(str("%.2f" % event.ydata))
+
+        def on_buttonPressEvent(self, event):
+            self.p1PickerButton.setChecked(False)
+            self.p2PickerButton.setChecked(False)
+
+        @QtCore.pyqtSignature("bool")
+        def on_mapCutPlotPushbutton_clicked(self, checked):
+            if self.fileList.currentItem() is not None:
+                fileToPlot = str(self.fileList.currentItem().text())
+                path = os.path.join(self.workingDir, 'output', fileToPlot)
+                fillValue = float(self.fillValueLineEdit.text())
+                x1 = float(self.x1LineEdit.text())
+                y1 = float(self.y1LineEdit.text())
+                x2 = float(self.x2LineEdit.text())
+                y2 = float(self.y2LineEdit.text())
+                self.mainWindow.updateCutPlot(path, fillValue, x1, y1, x2, y2)
+            else:
+                QtGui.QMessageBox.critical(self,
+                                           "An error occured",
+                                           "You need to select a map data source first on the Map Plotting tab")
 
     def __init__(self, configFilename, parent, *args):
         QtGui.QDockWidget.__init__(self, "View Scenario", parent, *args)
