@@ -67,15 +67,12 @@ class GenericPlotter:
         self.maxY = max(map_parsed['y'])
 
         print "The map is (%dx%d)" % (self.numYEntries+1, self.numXEntries+1)
-        map = ones((self.numYEntries+1, self.numXEntries+1)) * fillValue
-        
-        for i in xrange(len(map_parsed['x'])):
-            xIndex = int(self.numXEntries * (map_parsed['x'][i] - self.minX) / (self.maxX-self.minX))
-            yIndex = int(self.numYEntries * (map_parsed['y'][i] - self.minY) / (self.maxY-self.minY))
+        map = ones((self.numYEntries, self.numXEntries)) * fillValue
 
-            # Mirror the indexes
-            #xIndex = numXEntries - xIndex
-            #yIndex = numYEntries - yIndex
+        for i in xrange(len(map_parsed['x'])):
+            xIndex = int(floor((self.numXEntries-1) * (map_parsed['x'][i] - self.minX) / (self.maxX-self.minX)))
+            yIndex = int(floor((self.numYEntries-1) * (map_parsed['y'][i] - self.minY) / (self.maxY-self.minY)))
+
             map[yIndex][xIndex] = map_parsed['z'][i]
 
         return map
