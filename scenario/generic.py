@@ -131,38 +131,41 @@ from ScenarioFrame to plot special scenarios"""
         axes = canvas.axes
         axes.hold(True)
 
-        x1Index = int(self.numXEntries * (x1 - self.minX) / (self.maxX-self.minX))
-        y1Index = int(self.numYEntries * (y1 - self.minY) / (self.maxY-self.minY))
-        x2Index = int(self.numXEntries * (x2 - self.minX) / (self.maxX-self.minX))
-        y2Index = int(self.numYEntries * (y2 - self.minY) / (self.maxY-self.minY))
+        x1Index = self.numXEntries * (x1 - self.minX) / (self.maxX-self.minX)
+        y1Index = self.numYEntries * (y1 - self.minY) / (self.maxY-self.minY)
+        x2Index = self.numXEntries * (x2 - self.minX) / (self.maxX-self.minX)
+        y2Index = self.numYEntries * (y2 - self.minY) / (self.maxY-self.minY)
 
         print "Coordinates (%d,%d,%d,%d)" % (x1Index, y1Index, x2Index, y2Index)
-        print map.shape
 
-        dx = x2Index - x1Index
-        dy = y2Index - y1Index
+        lenX = x2Index - x1Index
+        lenY = y2Index - y1Index
 
-        x=[]
-        y=[]
-        length = (dx**2 + dy**2)**0.5
-        scanned = 0
-        xold = None
-        yold = None
-        while scanned < length:
-            candX = int(x1Index + dx * scanned/length)
-            candY = int(y1Index + dy * scanned/length)
-            if xold is None or yold is None or xold!=candX or yold!=candY:
-                xold = candX
-                yold = candY
-                x.append(candX)
-                y.append(candY)
-            scanned = scanned + 0.01
+        length = (lenX**2 + lenY**2)**0.5
+        
+        # line equation r = b + m * i
+        b = zeros(2)
+        b[0] = x1Index
+        b[1] = y1Index
 
-        values = []
-        for i in xrange(len(x)):
-            values.append(map[y[i]][x[i]])
+        m = zeros(2)
+        m[0] = lenX
+        m[1] = lenY
 
+        x = []
+        y = []
+        d = []
+        for i in arange(0, 1, 0.001):
+            offset = m * i
+            r = b + offset
 
-        axes.plot(values)
+            x.append(r[0])
+            y.append(r[1])
+            travelled = (offset[0]**2 + offset[1]**2)**0.5
+            d.append( travelled )
+
+        from scipy import ndimage
+        values = ndimage.map_coordinates(map, [y,x])
+        axes.plot(d, values)
 
         canvas.draw()

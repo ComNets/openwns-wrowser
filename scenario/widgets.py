@@ -139,13 +139,11 @@ class ViewScenario(QtGui.QDockWidget):
 
         def on_motionEvent(self, event):
             if self.p1PickerButton.isChecked():
-                print "Picked 1 " + str(event)
                 if event.xdata is not None and event.ydata is not None:
                     self.x1LineEdit.setText(str("%.2f" % event.xdata))
                     self.y1LineEdit.setText(str("%.2f" % event.ydata))
 
             if self.p2PickerButton.isChecked():
-                print "Picked 2 " + str(event)
                 if event.xdata is not None and event.ydata is not None:
                     self.x2LineEdit.setText(str("%.2f" % event.xdata))
                     self.y2LineEdit.setText(str("%.2f" % event.ydata))
