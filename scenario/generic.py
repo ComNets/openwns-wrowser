@@ -66,8 +66,8 @@ class GenericPlotter:
         self.minY = min(map_parsed['y'])
         self.maxY = max(map_parsed['y'])
 
-        print "The map is (%dx%d)" % (self.numXEntries+1, self.numYEntries+1)
-        map = ones((self.numXEntries+1, self.numYEntries+1)) * fillValue
+        print "The map is (%dx%d)" % (self.numYEntries+1, self.numXEntries+1)
+        map = ones((self.numYEntries+1, self.numXEntries+1)) * fillValue
         
         for i in xrange(len(map_parsed['x'])):
             xIndex = int(self.numXEntries * (map_parsed['x'][i] - self.minX) / (self.maxX-self.minX))
@@ -76,7 +76,7 @@ class GenericPlotter:
             # Mirror the indexes
             #xIndex = numXEntries - xIndex
             #yIndex = numYEntries - yIndex
-            map[xIndex][yIndex] = map_parsed['z'][i]
+            map[yIndex][xIndex] = map_parsed['z'][i]
 
         return map
 
@@ -163,7 +163,7 @@ from ScenarioFrame to plot special scenarios"""
 
         values = []
         for i in xrange(len(x)):
-            values.append(map[x[i]][y[i]])
+            values.append(map[y[i]][x[i]])
 
 
         axes.plot(values)
