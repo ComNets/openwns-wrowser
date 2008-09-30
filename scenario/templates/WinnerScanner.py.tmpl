@@ -43,14 +43,15 @@ class MS(wns.Node.Node):
 
 class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
 
-    def __init__(self, maxSimTime, scenarioSize, tileWidth, powerPerSubBand):
+    def __init__(self, maxSimTime, scenarioSize, xBins, yBins, powerPerSubBand):
         self.maxSimTime = maxSimTime
         self.scenarioSize = scenarioSize
         self.powerPerSubBand = powerPerSubBand
         self.rxpProbeName = "Scanner_RxPwr"
         self.sinrProbeName = "Scanner_SINR"
         self.numBS = 0
-        self.tileWidth = tileWidth
+        self.xBins = xBins
+        self.yBins = yBins
 
         self.simulator = wns.WNS.WNS()
         self.simulator.maxSimTime = maxSimTime
@@ -92,7 +93,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
             for jj in xrange(int(yMax-yMin)*scale):
                 waypoint = [float(ii)/scale + xMin, float(jj)/scale + yMin, 0]
                 # check if position is within an obstacle
-                #if mobilityObstructions is not None:
+                # if mobilityObstructions is not None:
                 #    for obstacle in mobilityObstructions:
                 #        if obstacle.containsPoint(waypoint):
                 #            inObstacle = True
@@ -109,8 +110,8 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         # Create a table generator for the evaluation
         width = self.scenarioSize[2] - self.scenarioSize[0]
         height = self.scenarioSize[3] - self.scenarioSize[1]
-        table = Table(axis1 = 'rise.scenario.mobility.x', minValue1 = self.scenarioSize[0], maxValue1 = self.scenarioSize[2], resolution1 = width,
-                      axis2 = 'rise.scenario.mobility.y', minValue2 = self.scenarioSize[1], maxValue2 = self.scenarioSize[3], resolution2 = height,
+        table = Table(axis1 = 'rise.scenario.mobility.x', minValue1 = self.scenarioSize[0], maxValue1 = self.scenarioSize[2], resolution1 = self.xBins,
+                      axis2 = 'rise.scenario.mobility.y', minValue2 = self.scenarioSize[1], maxValue2 = self.scenarioSize[3], resolution2 = self.yBins,
                       values = ['mean', 'max', 'trials'],
                       formats = ['MatlabReadable']
                       )
@@ -135,3 +136,24 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
                                resolution = 60))
         sep.appendChildren(table)
 
+baseStations=[]
+
+#for $bsp in $baseStations
+bsPosition = rise.scenario.Nodes.RAP()
+bsPosition.position = wns.Position($bsp.x, $bsp.y, $bsp.z)
+baseStations.append(bsPosition)
+#end for
+
+builder = ScannerScenarioBuilder(maxSimTime=100,
+                                 scenarioSize=($scenario.xMin, $scenario.yMin, $scenario.xMax, $scenario.yMax),
+                                 xBins = $numXBins,
+                                 yBins = $numYBins,
+                                 powerPerSubBand = "$powerPerSubBand dBm")
+
+for bs in baseStations:
+    builder.createBaseStation(bs)
+
+builder.finalizeScenario()
+
+WNS = builder.getSimulator()
+WNS.masterLogger.enabled = False

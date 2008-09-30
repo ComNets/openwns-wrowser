@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>665</height>
+    <width>410</width>
+    <height>605</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -16,15 +16,15 @@
    <item>
     <widget class="QToolBox" name="toolBox" >
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="scanPage" >
       <property name="geometry" >
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>296</width>
-        <height>583</height>
+        <width>392</width>
+        <height>491</height>
        </rect>
       </property>
       <attribute name="label" >
@@ -42,37 +42,75 @@
           </attribute>
           <layout class="QVBoxLayout" >
            <item>
-            <layout class="QVBoxLayout" >
+            <layout class="QHBoxLayout" >
              <item>
-              <layout class="QGridLayout" >
-               <item row="0" column="0" >
+              <layout class="QVBoxLayout" >
+               <item>
                 <widget class="QLabel" name="tileWidthLabel" >
                  <property name="text" >
-                  <string>TileWidth</string>
+                  <string>Bins</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="2" >
-                <widget class="QLineEdit" name="tileWidth" >
-                 <property name="text" >
-                  <string>1</string>
-                 </property>
-                 <property name="maxLength" >
-                  <number>32766</number>
-                 </property>
-                 <property name="alignment" >
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0" colspan="2" >
+               <item>
                 <widget class="QLabel" name="pwrLabel" >
                  <property name="text" >
                   <string>Power per sub-band</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="2" >
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" >
+               <item>
+                <layout class="QHBoxLayout" >
+                 <item>
+                  <widget class="QLabel" name="label_3" >
+                   <property name="text" >
+                    <string>x</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="xBinsEdit" >
+                   <property name="toolTip" >
+                    <string>The x-axis will be devided in x bins, i.e. the resulting table probe has x rows in x direction.</string>
+                   </property>
+                   <property name="text" >
+                    <string>100</string>
+                   </property>
+                   <property name="maxLength" >
+                    <number>32766</number>
+                   </property>
+                   <property name="alignment" >
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_9" >
+                   <property name="text" >
+                    <string>y</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="yBinsEdit" >
+                   <property name="toolTip" >
+                    <string>The y-axis will be devided in y bins, i.e. the resulting table probe has y rows in y direction.</string>
+                   </property>
+                   <property name="layoutDirection" >
+                    <enum>Qt::RightToLeft</enum>
+                   </property>
+                   <property name="text" >
+                    <string>100</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <widget class="QLineEdit" name="powerPerSubBand" >
                  <property name="text" >
                   <string>2.83</string>
@@ -85,64 +123,68 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3" >
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" >
+               <item>
+                <widget class="QLabel" name="label_10" >
+                 <property name="text" >
+                  <string>int</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QLabel" name="label_2" >
                  <property name="text" >
                   <string>dBm</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="3" >
-                <widget class="QLabel" name="label_3" >
-                 <property name="text" >
-                  <string>m</string>
-                 </property>
-                </widget>
-               </item>
               </layout>
              </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" >
              <item>
-              <layout class="QVBoxLayout" >
-               <item>
-                <widget class="QCheckBox" name="includeBS" >
-                 <property name="text" >
-                  <string>Include Base Stations</string>
-                 </property>
-                 <property name="checked" >
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="includeRN" >
-                 <property name="text" >
-                  <string>Include Relay Nodes</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <spacer>
-               <property name="orientation" >
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" >
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="scanWinnerButton" >
+              <widget class="QCheckBox" name="includeBS" >
                <property name="text" >
-                <string>Scan</string>
+                <string>Include Base Stations</string>
+               </property>
+               <property name="checked" >
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="includeRN" >
+               <property name="text" >
+                <string>Include Relay Nodes</string>
                </property>
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="scanWinnerButton" >
+             <property name="text" >
+              <string>Scan</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -160,7 +202,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>320</width>
+        <width>566</width>
         <height>551</height>
        </rect>
       </property>
@@ -242,6 +284,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>132</width>
+        <height>148</height>
+       </rect>
+      </property>
       <attribute name="label" >
        <string>Map Cut Plotting</string>
       </attribute>

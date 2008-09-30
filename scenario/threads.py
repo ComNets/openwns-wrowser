@@ -8,44 +8,41 @@ class SimulationThread(QtCore.QThread):
 
     def run(self):
 
-        print str(self.parent.powerPerSubBand.text())
-        import subprocess
-        import shutil
+        # Choose template
         import os
+        import subprocess
 
         thisDir = os.path.dirname(__file__)
-        shutil.copyfile(os.path.join(thisDir, 'template_WinnerScanner.py'),
-                        os.path.join(self.parent.workingDir, 'xyz.py'))
+        templateFilename = os.path.join(thisDir, 'templates', 'WinnerScanner.py.tmpl')
 
-        file = open(os.path.join(self.parent.workingDir, 'xyz.py'), "a")
-        file.write('powerPerSubBand = "%s dBm"\n' % str(self.parent.powerPerSubBand.text()))
-        file.write('tileWidth = "%s"\n' % str(self.parent.tileWidth.text()))
-        (xmin,ymin,xmax,ymax) = self.parent.inspector.getSize()
+        # Create configuration using the template system
+        import Cheetah.Template
+        import templates.datamodel
 
-        file.write('xMin = %f\n' % ( xmin ))
-        file.write('xMax = %f\n' % ( xmax ))
-        file.write('yMin = %f\n' % ( ymin ))
-        file.write('yMax = %f\n' % ( ymax ))
-
-        file.write('baseStations = []\n\n')
+        bsPositions = []
         for n in self.parent.inspector.getNodes():
             if self.parent.inspector.hasMobility(n):
                 if self.parent.inspector.getNodeTypeId(n) == 0:
                     m = self.parent.inspector.getMobility(n)
-                    file.write("bsPosition = rise.scenario.Nodes.RAP()\n")
-                    file.write("bsPosition.position = wns.Position(%f,%f,%f)\n" % (m.coords.x, m.coords.y, m.coords.z))
-                    file.write("baseStations.append( bsPosition )\n\n")
+                    bsPositions.append(templates.datamodel.BSPosition(m.coords.x, m.coords.y, m.coords.z))
 
-        file.write('builder = ScannerScenarioBuilder(maxSimTime=100, scenarioSize=(xMin,yMin,xMax,yMax), tileWidth = tileWidth, powerPerSubBand=powerPerSubBand)\n')
-        file.write('for bs in baseStations:\n')
-        file.write('    builder.createBaseStation(bs)\n\n')
-        file.write('builder.finalizeScenario()\n')
-        file.write('WNS = builder.getSimulator()\n')
-        file.close()
+        content = {}
+        content["powerPerSubBand"] = str(self.parent.powerPerSubBand.text())
+        content["numXBins"] = int(self.parent.xBinsEdit.text())
+        content["numYBins"] = int(self.parent.yBinsEdit.text())
+        content["scenario"] = templates.datamodel.Scenario(*self.parent.inspector.getSize())
+        content["baseStations"] = bsPositions
 
+        t = Cheetah.Template.Template(file=templateFilename, searchList=[content])
+
+        output = file(os.path.join(self.parent.workingDir, 'xyz.py'), "w")
+        output.write(t.respond())
+        output.close()
+
+        # Execute the simulation
         currentpath = os.getcwd()
         os.chdir(self.parent.workingDir)
-        self.retcode = subprocess.call(["./wns-core", "-y", "WNS.masterLogger.enabled = False", "-f", "xyz.py"])
+        self.retcode = subprocess.call(["./wns-core", "-f", "xyz.py"])
         if self.retcode == 0:
             self.success = True
             os.remove(os.path.join(self.parent.workingDir, 'xyz.py'))

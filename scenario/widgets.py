@@ -64,6 +64,8 @@ class ViewScenario(QtGui.QDockWidget):
 
             self.fillValueLineEdit.setValidator(QtGui.QDoubleValidator(self))
             self.powerPerSubBand.setValidator(QtGui.QDoubleValidator(self))
+            self.xBinsEdit.setValidator(QtGui.QIntValidator(self))
+            self.yBinsEdit.setValidator(QtGui.QIntValidator(self))
 
         @QtCore.pyqtSignature("bool")
         def on_redrawButton_clicked(self, checked):
