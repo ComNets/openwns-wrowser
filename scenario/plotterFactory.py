@@ -1,17 +1,16 @@
 from PyQt4 import QtCore, QtGui
 
-import wnsrc
-wnsrc.wnsrc.setPathToPyConfig('dbg')
-import rise.scenario.Hexagonal
-import rise.scenario.Manhattan
+import generic
+import inspect
 
-def create(configurationDict):
-    for v in configurationDict.values():
-        if isinstance(v, rise.scenario.Hexagonal.Hexagonal):
-            from hexagonal import ScenarioPlotter
-            return ScenarioPlotter(v)
-        if isinstance(v, rise.scenario.Manhattan.Manhattan):
-            from manhattan import ScenarioPlotter
-            return ScenarioPlotter(v)
+class InvalidConfig:
+    pass
 
-    return None
+def create(scenarioFilename):
+    
+    try:
+        inspector = inspect.ConfigInspector(scenarioFilename)
+    except inspect.SimulatorConfigNotFound:
+        raise InvalidConfig()
+
+    return generic.GenericPlotter(inspector)

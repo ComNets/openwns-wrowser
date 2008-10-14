@@ -11,37 +11,9 @@ from Tools import Observable, Observing
 import Debug
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
-import matplotlib.figure
-from PyQt4 import QtGui, QtCore
 
-disableScenario = False
-try:
-    import scenario.plotterFactory
-except:
-    disableScenario = True
-
-class FigureCanvas(FigureCanvasQTAgg):
-    """This class implements a QT Widget on which you can draw using the
-    MATLAB(R)-style commands provided by matplotlib
-    """
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        self.fig = matplotlib.figure.Figure(figsize=(width, height), dpi=dpi)
-        self.axes = self.fig.add_subplot(111)
-        self.axes.hold(False)
-
-        FigureCanvasQTAgg.__init__(self, self.fig)
-
-        FigureCanvasQTAgg.setSizePolicy(self,
-                                   QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
-        FigureCanvasQTAgg.updateGeometry(self)
-
-    def sizeHint(self):
-        w, h = self.get_width_height()
-        return QtCore.QSize(w, h)
-
-    def minimumSizeHint(self):
-        return QtCore.QSize(10, 10)
+import scenario.plotterFactory
+import scenario.widgets
 
 from ui.Windows_Main_ui import Ui_Windows_Main
 class Main(QtGui.QMainWindow, Ui_Windows_Main):
@@ -68,41 +40,57 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
 
-        global disableScenario
-        if disableScenario:
-            self.actionView_Scenario.setEnabled(False)
-
     @QtCore.pyqtSignature("")
     def on_actionView_Scenario_triggered(self):
-        
-        filename = QtGui.QFileDialog.getOpenFileName(
-            self.workspace,
-            "Open File",
-            os.getcwd(),
-            "Config Files (*.py)")
 
-        globals = {}
-        exec("import sys",globals)
-        filepath = os.path.dirname(str(filename))
-        exec("sys.path.append('%s')" % filepath, globals)
+        self.viewScenarioFilename = str(QtGui.QFileDialog.getOpenFileName(
+                self.workspace,
+                "Open File",
+                os.getcwd(),
+                "Config Files (*.py)"))
 
-        file = open(str(filename), "r")
-        content = file.read()
-        file.close()
-
-        exec(content,globals)
-
-        p = scenario.plotterFactory.create(globals)
-        if p is not None:
-            canvas = FigureCanvas(self.workspace)
-            self.workspace.addWindow(canvas)
-            p.plotScenario(canvas)
-            canvas.showMaximized()
-        else:
+        try:
+            p = scenario.plotterFactory.create(self.viewScenarioFilename)
+        except scenario.plotterFactory.InvalidConfig:
             QtGui.QMessageBox.critical(self,
                                        "No scenario found",
-                                       "Make sure the scenario is accessible in the global namespace via a variable named 'scenario'")
+                                       "Could not find any scenario in this file.\n\nMake sure you have an instance of openwns.simulator.OpenWNS in the global namespace of your configuration file")
+            p = None
 
+        if p is not None:
+            self.viewScenarioCanvas = scenario.widgets.FigureCanvas(self.workspace)
+            self.workspace.addWindow(self.viewScenarioCanvas)
+            p.plotScenario(self.viewScenarioCanvas, '', 0.0, False)
+            self.viewScenarioCanvas.showMaximized()
+
+            self.viewScenarioWidget = scenario.widgets.ViewScenario(self.viewScenarioFilename, self)
+            self.viewScenarioCanvas.registerMotionEventHandler(self.viewScenarioWidget.internalWidget.on_motionEvent)
+            self.viewScenarioCanvas.registerButtonPressEventHandler(self.viewScenarioWidget.internalWidget.on_buttonPressEvent)
+
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
+
+            self.actionOpenDatabase.setEnabled(False)
+            self.actionOpenCampaignDatabase.setEnabled(False)
+            self.actionOpenDSV.setEnabled(False)
+            self.actionOpenDirectory.setEnabled(False)
+            self.actionView_Scenario.setEnabled(False)
+            self.actionCloseDataSource.setEnabled(True)
+
+    def updateScenarioView(self, fileToPlot, fillValue, includeContour):
+        if self.viewScenarioCanvas is not None:
+            p = scenario.plotterFactory.create(self.viewScenarioFilename)
+
+            self.viewScenarioCanvas.clear()
+
+            p.plotScenario(self.viewScenarioCanvas, fileToPlot, fillValue, includeContour)
+
+    def updateCutPlot(self, fileToPlot, fillValue, x1, y1, x2, y2):
+        if self.viewScenarioCanvas is not None:
+            p = scenario.plotterFactory.create(self.viewScenarioFilename)
+
+            self.viewScenarioCanvas.clear()
+
+            p.plotCut(self.viewScenarioCanvas, fileToPlot, fillValue, x1, y1, x2, y2)
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDatabase_triggered(self):
@@ -199,6 +187,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.simulationParameters.close()
         if hasattr(self, "directoryNavigation"):
             self.directoryNavigation.close()
+        if hasattr(self, "viewScenarioWidget"):
+            self.viewScenarioWidget.close()
         for window in self.workspace.windowList():
             window.close()
         self.campaigns = Observable()
@@ -208,6 +198,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionOpenDirectory.setEnabled(True)
         self.actionCloseDataSource.setEnabled(False)
         self.actionNewParameter.setEnabled(True)
+        self.actionView_Scenario.setEnabled(True)
         self.menuNew.setEnabled(False)
 
     @QtCore.pyqtSignature("")
