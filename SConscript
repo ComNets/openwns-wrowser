@@ -59,8 +59,3 @@ pyuic_src_files = ['ui/Windows_Main.ui',
 
 for srcfile in pyuic_src_files:
     wrowserEnv.Pyuic(srcfile)
-
-env.Alias("install-python", ".")
-env.Default("install-python")
-env.Alias("docu", [])
-env.Alias("install-docu", [])
