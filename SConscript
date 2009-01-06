@@ -59,3 +59,5 @@ pyuic_src_files = ['ui/Windows_Main.ui',
 
 for srcfile in pyuic_src_files:
     wrowserEnv.Pyuic(srcfile)
+
+wrowserEnv.Default(Dir('.'))
