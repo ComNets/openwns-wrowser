@@ -27,14 +27,6 @@ env["ENV"]["PATH"] = os.environ["PATH"]
 
 pyuic = 'pyuic4'
 
-try:
-    import wnsrc
-    pyuic = os.path.join(wnsrc.pathToSandbox, 'default', 'bin', 'pyuic4')
-    env["ENV"]["PYTHONPATH"] = os.path.join(wnsrc.pathToSandbox, 'default', 'lib', 'python2.4', 'site-packages') + os.pathsep + os.environ["PYTHONPATH"]
-except:
-    pass
-
-
 conf = Configure(env, custom_tests = {'CheckPyQt4' : CheckPyQt4}, conf_dir = ".sconf_temp", log_file = ".sconf.log")
 
 if not conf.CheckPyQt4():
@@ -59,7 +51,7 @@ pyuic_src_files = ['ui/Windows_Main.ui',
 		   'ui/Widgets_ViewScenario.ui']
 
 for srcfile in pyuic_src_files:
-    env.Pyuic(srcfile)
+    env.Pyuic(source=srcfile, target=os.path.join('openwns', 'wrowser', srcfile.split('.')[0] + "_ui.py"))
 
 env.Alias("install-python", ".")
 env.Default("install-python")

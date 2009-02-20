@@ -1,4 +1,4 @@
-import probeselector.Errors as Errors
+import openwns.wrowser.probeselector.Errors as Errors
 
 class XY:
     def __init__(self, x, y):

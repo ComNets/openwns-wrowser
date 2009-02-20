@@ -2,7 +2,7 @@
 """
 import operator
 
-from Tools import objectFilter, ObjectFilterError
+from openwns.wrowser.Tools import objectFilter, ObjectFilterError
 
 import Representations
 import Errors

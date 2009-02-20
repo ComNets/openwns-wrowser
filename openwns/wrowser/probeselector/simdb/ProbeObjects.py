@@ -1,6 +1,6 @@
 import Database as db
 import Configuration as conf
-import TableParser
+import openwns.wrowser.TableParser
 
 
 def getSingleResult(cls, whereClause):
@@ -296,9 +296,9 @@ class Tables:
             lines.append([float(col) for col in line])
 
 
-        self.tableParser = pywns.TableParser.TableParser(result[1], result[2], result[3],
-                                                         result[4], result[5], result[6],
-                                                         result[7], result[8], lines)
+        self.tableParser = openwns.wrowser.TableParser.TableParser(result[1], result[2], result[3],
+                                                                   result[4], result[5], result[6],
+                                                                   result[7], result[8], lines)
 
         self.name                      = probeName
         self.type                      = result[9]

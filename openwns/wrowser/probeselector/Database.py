@@ -3,7 +3,6 @@ import sys
 import imp
 import time
 
-import wnsrc
 import sqlobject
 import sqlobject.sqlbuilder as sqlbuilder
 import sqlobject.dbconnection

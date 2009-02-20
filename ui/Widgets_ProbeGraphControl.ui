@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>Widgets_ProbeGraphControl</class>
  <widget class="QWidget" name="Widgets_ProbeGraphControl" >
   <property name="geometry" >
@@ -13,11 +10,20 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="QGroupBox" name="probesGroup" >
@@ -25,11 +31,20 @@
       <string>Probes</string>
      </property>
      <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <property name="spacing" >
        <number>6</number>
+      </property>
+      <property name="leftMargin" >
+       <number>9</number>
+      </property>
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
       </property>
       <item>
        <widget class="ValidStateMarkingLineEdit" name="probeFilter" />
@@ -57,14 +72,11 @@
    </property>
   </action>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>ValidStateMarkingLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>Widgets.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
+   <header>openwns.wrowser.Widgets.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

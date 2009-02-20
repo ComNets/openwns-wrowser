@@ -43,8 +43,8 @@ class FigureCanvas(FigureCanvasQTAgg):
 
 class ViewScenario(QtGui.QDockWidget):
 
-    from ui.Widgets_ViewScenario_ui import Ui_Widgets_ViewScenario
-    import scenario.generic
+    from openwns.wrowser.ui.Widgets_ViewScenario_ui import Ui_Widgets_ViewScenario
+    import openwns.wrowser.scenario.generic
     class ViewScenarioWidget(QtGui.QWidget, Ui_Widgets_ViewScenario):
         
         def __init__(self, configFilename, mainWindow, *args):

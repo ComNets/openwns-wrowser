@@ -87,7 +87,7 @@
   <customwidget>
    <class>ValidStateMarkingLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>Widgets.h</header>
+   <header>openwns.wrowser.Widgets.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

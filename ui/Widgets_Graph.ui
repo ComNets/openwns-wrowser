@@ -13,18 +13,25 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
    </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
+   </property>
    <item>
-    <widget class="FigureCanvas" name="canvas" >
+    <widget class="FigureCanvas" native="1" name="canvas" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>7</vsizetype>
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -32,7 +39,7 @@
     </widget>
    </item>
    <item>
-    <widget class="GraphNavigationBar" name="navigationBar" />
+    <widget class="GraphNavigationBar" native="1" name="navigationBar" />
    </item>
   </layout>
  </widget>
@@ -40,12 +47,12 @@
   <customwidget>
    <class>GraphNavigationBar</class>
    <extends>QWidget</extends>
-   <header>Widgets.h</header>
+   <header>openwns.wrowser.Widgets.h</header>
   </customwidget>
   <customwidget>
    <class>FigureCanvas</class>
    <extends>QWidget</extends>
-   <header>Widgets</header>
+   <header>openwns.wrowser.Widgets.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

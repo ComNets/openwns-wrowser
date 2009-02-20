@@ -1,5 +1,5 @@
 import Interface
-import Tools
+import openwns.wrowser.Tools as Tools
 
 class GraphInstantiator:
 
