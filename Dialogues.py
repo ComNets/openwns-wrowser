@@ -151,7 +151,7 @@ class OpenDatabase(QtGui.QDialog, Ui_Dialogues_OpenDatabase, Observing):
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
     def __init__(self, *args):
-        from pywns.simdb import Campaigns
+        from probeselector.simdb import Campaigns
 
         QtGui.QDialog.__init__(self, *args)
         self.setupUi(self)
@@ -190,7 +190,7 @@ class OpenDSV(QtGui.QDialog, Ui_Dialogues_OpenDSV):
             self.fileNameEdit.setText(text)
 
     def getSettings(self):
-        from pywns.Tools import Chameleon as Values
+        from Tools import Chameleon as Values
 
         return Values(fileName = str(self.fileNameEdit.text()),
                       delimiter = str(self.delimiterEdit.text()),
@@ -212,7 +212,7 @@ class Progress(QtGui.QProgressDialog):
         QtGui.QProgressDialog.reset(self)
 
     def setCurrentAndMaximum(self, current, maximum, additionalText = ""):
-        from pywns import Time
+        import Time
 
         self.setMaximum(maximum)
         self.setValue(current)

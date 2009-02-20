@@ -1,5 +1,73 @@
 from PyQt4 import QtCore, QtGui
 
+def classAndInstanceDict(instance):
+    """Join class and instance attribute dicts.
+    """
+    return dict(instance.__class__.__dict__.items() + instance.__dict__.items())
+
+class Chameleon:
+    """Class with variable attributes.
+
+    On instantiation of Chameleon, the object will get as attributes all keyword parameters
+    you specify.
+    """
+    def __init__(self, **attribs):
+        for name, value in attribs.items():
+            setattr(self, name, value)
+
+def dict2string(dic, separator = "; ", displayNoneValue = False):
+    """Convert a dict to a nice string.
+    """
+    s = ""
+    for key, value in dic.items():
+        if len(s) > 0:
+            s += separator
+        if key != None or displayNoneValue:
+            s += str(key)
+        if value != None or displayNoneValue:
+            s += ": " + str(value)
+    return s
+
+class ObjectFilterError(Exception):
+    """Raised, if the stringexpression could not be evaluated.
+    """
+    def __init__(self, stringexpression):
+        self.stringexpression = stringexpression
+
+    def __str__(self):
+        return "Could not evaluate '" + self.stringexpression + "'"
+
+def objectFilter(stringexpression, objectList, viewGetter = classAndInstanceDict):
+    """Return all objects in 'objectList' for which 'stringexpression' applies.
+
+    'stringexpression' must be a string containing a valid python expression that
+    can be evaluated against the entries in the dict returned by 'viewGetter'
+    for all instances in 'objectList'. 'viewGetter' defaults to returning the
+    attributes of each object. If you want to specify that 'stringexpression'
+    should be checked against the dict attribute foo, use 'viewGetter = lambda x: x.foo'.
+    Or if you want to check against the attributes of the attribute foo (which
+    then is a class instance), use 'viewGetter = lambda x: classAndInstanceDict(x.foo)'.
+    """
+    # filter by doing list comprehension with eval
+    try:
+        return [instance for instance in objectList if eval(stringexpression,
+                                                            # we don't want globals...
+                                                            {},
+                                                            viewGetter(instance))]
+    except:
+        raise ObjectFilterError(stringexpression)
+
+def convert(expression):
+    """Convert the string 'expression' to its best python representation.
+
+    convert('1') will return an int, convert('2.3') will return a float and so on.
+    If 'expression' cannot be converted returns 'expression' as string.
+    """
+    try:
+        return eval(expression, {}, {})
+    except:
+        return expression
+
 class Observable(object):
 
     def __init__(self):

@@ -1,10 +1,11 @@
 import math
 from pylab import *
-import wnsrc
-wnsrc.wnsrc.setPathToPyConfig('dbg')
-from rise.scenario.Shadowing import Shape2D
-import openwns.simulator
 
+try:
+    from rise.scenario.Shadowing import Shape2D
+    import openwns.simulator
+except:
+    pass
 
 class GenericPlotter:
 

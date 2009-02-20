@@ -1,6 +1,6 @@
 import copy
 
-from pywns.Tools import convert
+from Tools import convert
 
 from PyQt4 import QtCore, QtGui
 

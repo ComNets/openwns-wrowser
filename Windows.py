@@ -2,7 +2,7 @@ import os
 
 from PyQt4 import QtCore, QtGui
 
-import pywns.probeselector.Errors
+import probeselector.Errors
 
 import Dialogues
 import Widgets
@@ -94,7 +94,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDatabase_triggered(self):
-        from pywns.probeselector import SQLReaders, Representations, Interface
+        from probeselector import SQLReaders, Representations, Interface
 
         databaseDialogue = Dialogues.OpenDatabase(self.workspace)
         if databaseDialogue.exec_() == QtGui.QDialog.Accepted:
@@ -118,8 +118,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionOpenCampaignDatabase_triggered(self):
-        from pywns.simdb import Campaigns
-        from pywns.probeselector import PostgresReader, Representations, Interface
+        from probeselector.simdb import Campaigns
+        from probeselector import PostgresReader, Representations, Interface
 
         campaignDbDialogue = Dialogues.OpenCampaignDb(self.workspace)
         self.workspace.addWindow(campaignDbDialogue)
@@ -145,7 +145,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDSV_triggered(self):
-        from pywns.probeselector import DSVReaders, Representations, Interface
+        from probeselector import DSVReaders, Representations, Interface
 
         dsvDialogue = Dialogues.OpenDSV(self.workspace)
         if dsvDialogue.exec_() == QtGui.QDialog.Accepted:
@@ -203,7 +203,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionRefresh_triggered(self):
-        from pywns.probeselector import Representations, Interface
+        from probeselector import Representations, Interface
 
         if self.reader != None:
             self.campaigns.original = Interface.Facade(Representations.Campaign(*self.reader.read()))
@@ -280,7 +280,7 @@ class SimulationParameters(QtGui.QDockWidget):
                     filterExpression = "True"
                 try:
                     filteredCampaign = self.campaign.filteredByExpression(filterExpression)
-                except pywns.probeselector.Errors.InvalidFilterExpression:
+                except probeselector.Errors.InvalidFilterExpression:
                     return (QtGui.QValidator.Intermediate, pos)
                 else:
                     if self.additionalFilter(filteredCampaign).isEmpty():
@@ -393,7 +393,7 @@ class DirectoryNavigation(QtGui.QDockWidget):
 
         @QtCore.pyqtSignature("bool")
         def on_scanButton_clicked(self, checked):
-            from pywns.probeselector import DirectoryReaders, Representations, Interface
+            from probeselector import DirectoryReaders, Representations, Interface
 
             directory = str(self.rootEdit.text())
             progressDialogue = Dialogues.Progress("Reading data", 0, self)
@@ -478,7 +478,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
     @QtCore.pyqtSignature("")
     def on_export_clicked(self):
-        from pywns.probeselector import Exporters
+        from probeselector import Exporters
 
         formatDialogue = Dialogues.SelectItem("Export Format", "Select format", Exporters.directory.keys(), self, Dialogues.SelectItem.RadioButtons)
         if formatDialogue.exec_() == QtGui.QDialog.Accepted:
@@ -546,11 +546,11 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
 
     @staticmethod
     def getProbeTypes():
-        import pywns.Probe
-        return [pywns.Probe.LogEvalProbe]
+        import Probe
+        return [Probe.LogEvalProbe]
 
     def getGraphs(self):
-        dataacquisition = pywns.probeselector.dataacquisition
+        dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         probeNames = self.probeGraphControl.probeNames()
@@ -580,11 +580,11 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
     @staticmethod
     def getProbeTypes():
-        import pywns.Probe
-        return [pywns.Probe.TimeSeriesProbe]
+        import Probe
+        return [Probe.TimeSeriesProbe]
 
     def getGraphs(self):
-        dataacquisition = pywns.probeselector.dataacquisition
+        dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         probeNames = self.probeGraphControl.probeNames()
@@ -616,11 +616,11 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
     @staticmethod
     def getProbeTypes():
-        import pywns.Probe
-        return [pywns.Probe.PDFProbe]
+        import Probe
+        return [Probe.PDFProbe]
 
     def getGraphs(self):
-        dataacquisition = pywns.probeselector.dataacquisition
+        dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         funType = self.probeGraphControl.probeFunction()
@@ -662,11 +662,11 @@ class LREFigure(ProbeFigure, LineGraphs):
 
     @staticmethod
     def getProbeTypes():
-        import pywns.Probe
-        return [pywns.Probe.LreProbe, pywns.Probe.DlreProbe]
+        import Probe
+        return [Probe.LreProbe, Probe.DlreProbe]
 
     def getGraphs(self):
-        dataacquisition = pywns.probeselector.dataacquisition
+        dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         yAxis = self.probeGraphControl.probeFunction()
@@ -711,11 +711,11 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
 
     @staticmethod
     def getProbeTypes():
-        import pywns.Probe
-        return [pywns.Probe.BatchMeansProbe]
+        import Probe
+        return [Probe.BatchMeansProbe]
 
     def getGraphs(self):
-        dataacquisition = pywns.probeselector.dataacquisition
+        dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         yAxis = self.probeGraphControl.probeFunction()
@@ -745,13 +745,13 @@ class TableFigure(ProbeFigure, TableGraphs):
 
     @staticmethod
     def getProbeTypes():
-        import pywns.Probe
-        return [pywns.Probe.TableProbe]
+        import Probe
+        return [Probe.TableProbe]
 
     def getGraphs(self):
-        import pywns.probeselector.Graphs
+        import probeselector.Graphs
 
-        dataacquisition = pywns.probeselector.dataacquisition
+        dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         probeNames = self.probeGraphControl.probeNames()
@@ -769,7 +769,7 @@ class TableFigure(ProbeFigure, TableGraphs):
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
                                                 progressReset = progressDialogue.reset,
-                                                graphClass = pywns.probeselector.Graphs.TableGraph)
+                                                graphClass = probeselector.Graphs.TableGraph)
 
         return graphs
 
@@ -808,7 +808,7 @@ class ParameterFigure(Figure, LineGraphs):
         self.yProbeEntriesModel.setCampaign(self.campaigns.draw)
 
     def getGraphs(self):
-        dataacquisition = pywns.probeselector.dataacquisition
+        dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         parameterName = self.parameterGraphControl.parameterName()

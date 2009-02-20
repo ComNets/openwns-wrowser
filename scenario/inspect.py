@@ -1,7 +1,9 @@
-import wnsrc
-wnsrc.wnsrc.setPathToPyConfig('dbg')
-import rise.Mobility
-import openwns.simulator
+try:
+    import rise.Mobility
+    import openwns.simulator
+except:
+    pass
+
 import os
 
 class SimulatorConfigNotFound:

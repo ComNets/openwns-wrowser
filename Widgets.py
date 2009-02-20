@@ -268,7 +268,7 @@ class LineGraph(Graph, Observing):
         self.setLegend(self.figureConfig.legend)
 
     def plotGraph(self):
-        from pywns.probeselector.Interface import Facade
+        from probeselector.Interface import Facade
 
         self.canvas.axes.clear()
 
