@@ -1,7 +1,7 @@
 """Read campaign from files/directories.
 """
 import os.path
-import openwns.wrowser.Probe as Probe
+import wrowser.Probe as Probe
 import Representations
 
 # matches filename parts to their respective Probe classes

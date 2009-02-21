@@ -1,15 +1,27 @@
 from PyQt4 import QtCore, QtGui
 
+import wrowser.probeselector.simdb.Configuration as Configuration
+
+import os.path
+
 class SimulationThread(QtCore.QThread):
 
     def __init__(self, parent):
         self.parent = parent
         QtCore.QThread.__init__(self, parent)
 
+        c = Configuration.Configuration()
+        c.read(os.path.join(os.environ["HOME"], ".wns", "dbAccess.conf"))
+
+        self.simulatorExecutable = os.path.join(c.sandboxPath, c.sandboxFlavour, 'bin', 'openwns')
+
+        if not os.path.exists(self.simulatorExecutable):
+            QtGui.QMessageBox.warning(self.parent, "Cannot find simulator executable",
+                                      "Cannot find %s. Have you built the flavour that you set in your preferences?" % (unicode(self.simulatorExecutable),))
+
     def run(self):
 
         # Choose template
-        import os
         import subprocess
 
         thisDir = os.path.dirname(__file__)
@@ -42,7 +54,7 @@ class SimulationThread(QtCore.QThread):
         # Execute the simulation
         currentpath = os.getcwd()
         os.chdir(self.parent.workingDir)
-        self.retcode = subprocess.call(["./wns-core", "-f", "xyz.py"])
+        self.retcode = subprocess.call([self.simulatorExecutable, "-f", "xyz.py"])
         if self.retcode == 0:
             self.success = True
             os.remove(os.path.join(self.parent.workingDir, 'xyz.py'))

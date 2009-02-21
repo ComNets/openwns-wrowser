@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/Dialogues_Preferences.ui'
 #
-# Created: Sat Feb 21 12:04:16 2009
+# Created: Sat Feb 21 18:26:10 2009
 #      by: PyQt4 UI code generator 4.3.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -86,6 +86,36 @@ class Ui_Dialogues_Preferences(object):
 
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName("tab_2")
+
+        self.hboxlayout1 = QtGui.QHBoxLayout(self.tab_2)
+        self.hboxlayout1.setObjectName("hboxlayout1")
+
+        self.vboxlayout3 = QtGui.QVBoxLayout()
+        self.vboxlayout3.setObjectName("vboxlayout3")
+
+        self.gridlayout1 = QtGui.QGridLayout()
+        self.gridlayout1.setObjectName("gridlayout1")
+
+        self.label_5 = QtGui.QLabel(self.tab_2)
+        self.label_5.setObjectName("label_5")
+        self.gridlayout1.addWidget(self.label_5,0,0,1,2)
+
+        self.sandboxpath = QtGui.QLineEdit(self.tab_2)
+        self.sandboxpath.setObjectName("sandboxpath")
+        self.gridlayout1.addWidget(self.sandboxpath,0,2,1,1)
+
+        self.label_6 = QtGui.QLabel(self.tab_2)
+        self.label_6.setObjectName("label_6")
+        self.gridlayout1.addWidget(self.label_6,1,0,1,1)
+
+        self.sandboxflavour = QtGui.QComboBox(self.tab_2)
+        self.sandboxflavour.setObjectName("sandboxflavour")
+        self.gridlayout1.addWidget(self.sandboxflavour,1,2,1,1)
+        self.vboxlayout3.addLayout(self.gridlayout1)
+
+        spacerItem1 = QtGui.QSpacerItem(20,40,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
+        self.vboxlayout3.addItem(spacerItem1)
+        self.hboxlayout1.addLayout(self.vboxlayout3)
         self.tabWidget.addTab(self.tab_2,"")
         self.vboxlayout.addWidget(self.tabWidget)
 
@@ -96,7 +126,7 @@ class Ui_Dialogues_Preferences(object):
         self.vboxlayout.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialogues_Preferences)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("accepted()"),Dialogues_Preferences.accept)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("rejected()"),Dialogues_Preferences.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialogues_Preferences)
@@ -120,5 +150,9 @@ class Ui_Dialogues_Preferences(object):
         "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;\"></p>\n"
         "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;\">Please provide the hostname, databasename, username and your password</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("Dialogues_Preferences", "Database", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_5.setText(QtGui.QApplication.translate("Dialogues_Preferences", "Sandboxpath", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_6.setText(QtGui.QApplication.translate("Dialogues_Preferences", "Flavour", None, QtGui.QApplication.UnicodeUTF8))
+        self.sandboxflavour.addItem(QtGui.QApplication.translate("Dialogues_Preferences", "dbg", None, QtGui.QApplication.UnicodeUTF8))
+        self.sandboxflavour.addItem(QtGui.QApplication.translate("Dialogues_Preferences", "opt", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("Dialogues_Preferences", "Sandbox", None, QtGui.QApplication.UnicodeUTF8))
 

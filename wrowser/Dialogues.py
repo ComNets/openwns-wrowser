@@ -165,6 +165,8 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
             setattr(c, 'dbName', "")
             setattr(c, 'userName', "")
             setattr(c, 'userPassword', "")
+            setattr(c, 'sandboxPath', "")
+            setattr(c, 'sandboxFlavour', "dbg")
             c.writeDbAccessConf(filename, owner)
         except (probeselector.simdb.Configuration.BadConfigurationFile,
                 probeselector.simdb.Configuration.MissingConfigurationSection,
@@ -174,12 +176,16 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
             setattr(c, 'dbName', "")
             setattr(c, 'userName', "")
             setattr(c, 'userPassword', "")
+            setattr(c, 'sandboxPath', "")
+            setattr(c, 'sandboxFlavour', "dbg")
             c.writeDbAccessConf(filename, owner)
 
         self.hostname.setText(c.dbHost)
         self.databasename.setText(c.dbName)
         self.username.setText(c.userName)
         self.password.setText(c.userPassword)
+        self.sandboxpath.setText(c.sandboxPath)
+        self.sandboxflavour.setCurrentIndex(self.sandboxflavour.findText(QtCore.QString(c.sandboxFlavour)))
 
     def writeToConfig(self, filename, owner):
         import probeselector.simdb.Configuration
@@ -190,7 +196,8 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
         setattr(c, 'dbName', str(self.databasename.text()))
         setattr(c, 'userName', str(self.username.text()))
         setattr(c, 'userPassword', str(self.password.text()))
-
+        setattr(c, 'sandboxPath', str(self.sandboxpath.text()))
+        setattr(c, 'sandboxFlavour', str(self.sandboxflavour.currentText()))
         c.writeDbAccessConf(filename, owner)
 
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb

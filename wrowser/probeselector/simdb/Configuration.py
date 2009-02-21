@@ -86,13 +86,23 @@ class Configuration(object):
         else:
             raise MissingConfigurationSection(filename, "User")
 
+        if 'Sandbox' in self.parser.sections():
+            if 'path' in self.parser.options('Sandbox'):
+                setattr(self, 'sandboxPath', str(self.parser.get('Sandbox', 'path')))
+            else:
+                raise MissingConfigurationEntry(filename, "Sandbox.path")
+            if 'flavour' in self.parser.options('Sandbox'):
+                setattr(self, 'sandboxFlavour', str(self.parser.get('Sandbox', 'flavour')))
+            else:
+                raise MissingConfigurationEntry(filename, "Sandbox.flavour")
+        else:
+            raise MissingConfigurationSection(filename, "Sandbox")
 
         if 'Campaign' in self.parser.sections():
             if 'id' in self.parser.options('Campaign'):
                 setattr(self, 'campaignId', int(self.parser.get('Campaign', 'id')))
             else:
                 raise MissingConfigurationEntry(filename, "Campaign.id")
-
 
     def writeDbAccessConf(self, filename, owner):
         dbAccessConfFile = filename
@@ -107,6 +117,12 @@ class Configuration(object):
 
         self.parser.set('User', 'name', getattr(self, 'userName'))
         self.parser.set('User', 'password', getattr(self, 'userPassword'))
+
+        if 'Sandbox' not in self.parser.sections():
+            self.parser.add_section('Sandbox')
+
+        self.parser.set('Sandbox', 'path', getattr(self, 'sandboxPath'))
+        self.parser.set('Sandbox', 'flavour', getattr(self, 'sandboxFlavour'))
 
         config = file(dbAccessConfFile, 'w')
         config.write('# Keep this file private. Do NOT change file access permissions. Security hazard!\n\n')

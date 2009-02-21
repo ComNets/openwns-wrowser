@@ -1,10 +1,6 @@
-try:
-    import rise.Mobility
-    import openwns.simulator
-except:
-    pass
-
 import os
+
+import wrowser.probeselector.simdb.Configuration as Configuration
 
 class SimulatorConfigNotFound:
     pass
@@ -14,10 +10,14 @@ class ConfigInspector:
     def __init__(self, configurationFile):
         currentdir = os.getcwd()
 
+        c = Configuration.Configuration()
+        c.read(os.path.join(os.environ["HOME"], ".wns", "dbAccess.conf"))
+
         self.config = {}
         exec("import sys", self.config)
         filepath = os.path.dirname(str(configurationFile))
         exec("sys.path.append('%s')" % filepath, self.config)
+        exec("sys.path.insert(0,'%s/%s/lib/PyConfig')" % (c.sandboxPath, c.sandboxFlavour), self.config)
 
         file = open(str(configurationFile), "r")
         content = file.read()
@@ -30,6 +30,7 @@ class ConfigInspector:
         self.simulator = self.getSimulator()
 
     def getSimulator(self):
+        import openwns.simulator
         for k,v in self.config.items():
             if isinstance(v, openwns.simulator.OpenWNS):
                 return v
@@ -38,15 +39,17 @@ class ConfigInspector:
 
     def getNodes(self):
         sim = self.simulator
-        return sim.nodes
+        return sim.simulationModel.nodes
 
     def hasMobility(self, node):
+        import rise.Mobility
         for c in node.components:
             if isinstance(c, rise.Mobility.Component):
                 return True
         return False
 
     def getMobility(self, node):
+        import rise.Mobility
         assert self.hasMobility(node), "No mobility found"
 
         for c in node.components:

@@ -52,7 +52,7 @@ pyuic_src_files = ['ui/Windows_Main.ui',
 		   'ui/Widgets_ViewScenario.ui']
 
 for srcfile in pyuic_src_files:
-    env.Pyuic(source=srcfile, target=os.path.join('openwns', 'wrowser', srcfile.split('.')[0] + "_ui.py"))
+    env.Pyuic(source=srcfile, target=os.path.join('wrowser', srcfile.split('.')[0] + "_ui.py"))
 
 env.Alias("install-python", ".")
 env.Default("install-python")

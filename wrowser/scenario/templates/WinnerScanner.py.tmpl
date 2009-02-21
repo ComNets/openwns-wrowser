@@ -1,7 +1,7 @@
 import random
 random.seed(42)
-import wns.WNS
-import wns.Node
+import openwns
+import openwns.node
 import rise.Mobility
 import rise.scenario.ScenarioBuilder
 import rise.scenario.Nodes
@@ -11,7 +11,7 @@ import ofdmaphy.Station
 import ofdmaphy.OFDMAPhy
 from openwns.evaluation import *
 
-class BS(wns.Node.Node):
+class BS(openwns.node.Node):
     mobility = None
     sender = None
 
@@ -26,7 +26,7 @@ class BS(wns.Node.Node):
         self.sender = ofdmaphy.Station.Sender(self, name, [ofdmaphy.Transmitter.TransmitterDropIn()])
         self.sender.txPower = powerPerSubBand
 
-class MS(wns.Node.Node):
+class MS(openwns.node.Node):
     mobility = None
     scanner = None
 
@@ -53,9 +53,9 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         self.xBins = xBins
         self.yBins = yBins
 
-        self.simulator = wns.WNS.WNS()
+        self.simulator = openwns.Simulator(simulationModel = openwns.node.NodeSimulationModel())
         self.simulator.maxSimTime = maxSimTime
-        self.simulator.outputStrategy = wns.WNS.OutputStrategy.DELETE
+        self.simulator.outputStrategy = openwns.simulator.OutputStrategy.DELETE
 
         riseConfig = self.simulator.modules.rise
 
@@ -69,7 +69,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
 
     def createBaseStation(self, rap):
         noMobility = rise.Mobility.No(rap.position)
-        self.simulator.nodes.append( BS("BS", noMobility, self.powerPerSubBand) )
+        self.simulator.simulationModel.nodes.append( BS("BS", noMobility, self.powerPerSubBand) )
         self.numBS += 1
 
     def createRelayEnhancedCell(self, rec):
@@ -78,7 +78,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
     def createUserTerminal(self):
         #aMobility = rise.Mobility.BrownianRect([self.scenarioSize[0], self.scenarioSize[1], self.scenarioSize[2], self.scenarioSize[3]])
         aMobility = self.createPointByPointMobility(self.scenarioSize[0], self.scenarioSize[2], self.scenarioSize[1], self.scenarioSize[3], 100.0, None, 1)
-        self.simulator.nodes.append( MS("MS", aMobility) )
+        self.simulator.simulationModel.nodes.append( MS("MS", aMobility) )
 
     def finalizeScenario(self):
         self.createUserTerminal()
@@ -88,7 +88,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         t = 0.0
         inObstacle = False
         timestep = float(maxSimTime)/((xMax-xMin)*(yMax-yMin)* scale * scale)
-        mobility = rise.Mobility.EventList(wns.Position(0,0,0))
+        mobility = rise.Mobility.EventList(openwns.Position(0,0,0))
         for ii in xrange(int(xMax-xMin)*scale):
             for jj in xrange(int(yMax-yMin)*scale):
                 waypoint = [float(ii)/scale + xMin, float(jj)/scale + yMin, 0]
@@ -100,7 +100,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
                 #            break
                 
                 #    if (mobilityObstructions is None or not inObstacle):
-                mobility.addWaypoint(t, wns.Position(float(ii)/scale + xMin, float(jj)/scale + yMin, 1.5))
+                mobility.addWaypoint(t, openwns.Position(float(ii)/scale + xMin, float(jj)/scale + yMin, 1.5))
 
                 #inObstacle = False
                 t += timestep
@@ -140,7 +140,7 @@ baseStations=[]
 
 #for $bsp in $baseStations
 bsPosition = rise.scenario.Nodes.RAP()
-bsPosition.position = wns.Position($bsp.x, $bsp.y, $bsp.z)
+bsPosition.position = openwns.Position($bsp.x, $bsp.y, $bsp.z)
 baseStations.append(bsPosition)
 #end for
 
@@ -157,3 +157,4 @@ builder.finalizeScenario()
 
 WNS = builder.getSimulator()
 WNS.masterLogger.enabled = False
+openwns.setSimulator(WNS)

@@ -5,7 +5,7 @@ import traceback
 
 from PyQt4 import QtGui
 
-import openwns.wrowser.Windows
+import wrowser.Windows
 
 def wrowserExceptHook(eType, eValue, eTraceback):
     message = "".join(traceback.format_exception(eType, eValue, eTraceback))
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     application.setWindowIcon(QtGui.QIcon("icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
-    widget = openwns.wrowser.Windows.Main()
+    widget = wrowser.Windows.Main()
     widget.show()
     sys.excepthook = wrowserExceptHook
     sys.exit(application.exec_())

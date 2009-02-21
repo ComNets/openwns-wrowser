@@ -43,8 +43,8 @@ class FigureCanvas(FigureCanvasQTAgg):
 
 class ViewScenario(QtGui.QDockWidget):
 
-    from openwns.wrowser.ui.Widgets_ViewScenario_ui import Ui_Widgets_ViewScenario
-    import openwns.wrowser.scenario.generic
+    from wrowser.ui.Widgets_ViewScenario_ui import Ui_Widgets_ViewScenario
+    import wrowser.scenario.generic
     class ViewScenarioWidget(QtGui.QWidget, Ui_Widgets_ViewScenario):
         
         def __init__(self, configFilename, mainWindow, *args):
@@ -72,11 +72,11 @@ class ViewScenario(QtGui.QDockWidget):
             self.update()            
 
         def updateFileList(self):
-            import pywns.Probe
+            import wrowser.Probe
             self.fileList.clear()
 
             if os.path.exists(self.workingDir + '/output/'):
-                self.viewScenarioProbes = pywns.Probe.readAllProbes(self.workingDir + '/output/')
+                self.viewScenarioProbes = wrowser.Probe.readAllProbes(self.workingDir + '/output/')
             else:
                 self.viewScenarioProbes = {}
 
