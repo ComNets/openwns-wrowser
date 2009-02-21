@@ -41,6 +41,18 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionRefresh.setVisible(False)
 
     @QtCore.pyqtSignature("")
+    def on_actionPreferences_triggered(self):
+        import os
+        import os.path
+        filename = os.path.join(os.environ["HOME"], ".wns", "dbAccess.conf")
+        owner = os.environ["USER"]
+
+        preferencesDialogue = Dialogues.Preferences(self.workspace)
+        preferencesDialogue.readFromConfig(filename, owner)
+        if preferencesDialogue.exec_() == QtGui.QDialog.Accepted:
+            preferencesDialogue.writeToConfig(filename, owner)
+
+    @QtCore.pyqtSignature("")
     def on_actionView_Scenario_triggered(self):
 
         self.viewScenarioFilename = str(QtGui.QFileDialog.getOpenFileName(

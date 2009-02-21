@@ -3,6 +3,49 @@ import sys
 import pwd
 import ConfigParser
 
+class MissingConfigurationFile(Exception):
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def __str__(self):
+        return "Cannot open configuration file: " + self.filename
+
+
+class WrongFilePermissions(Exception):
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def __str__(self):
+        msg = "Wrong file access permissions to \'%s\'. Due to security reasons only the owner of the file must have read/write access. Consider changing the database password if unauthorized people might have become aware of it." % self.filename
+        return msg
+
+class MissingConfigurationEntry(Exception):
+
+    def __init__(self, filename, entry):
+        self.entry = entry
+        self.filename = filename
+
+    def __str__(self):
+        return "Entry %s is missing in config" % (self.entry, )
+
+class MissingConfigurationSection(Exception):
+
+    def __init__(self, filename,section):
+        self.section = section
+        self.filename = filename
+
+    def __str__(self):
+        return "Section %s is missing in config" % (self.section, )
+
+class BadConfigurationFile(Exception):
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def __str__(self):
+        return "The configuration file %s cannot be read." % (self.filename, )
 
 class Configuration(object):
 
@@ -10,55 +53,49 @@ class Configuration(object):
         self.parser = ConfigParser.SafeConfigParser()
         self.dbAccessConfFile = os.path.join(os.environ['HOME'], '.wns', 'dbAccess.conf')
 
-
     def read(self, filename = ''):
-        if os.stat(self.dbAccessConfFile)[0] & 1023 != 384:
-            print >>sys.stderr, 'Wrong file access permissions to \'%s\'. ' \
-                  'Due to security reasons only the owner of the file must have read/write access. ' \
-                  'Consider changing the database password if unauthorized people might have become aware of it.'
-            sys.exit(1)
-        self.parser.read([self.dbAccessConfFile, filename])
+
+        try:
+            self.parser.read([self.dbAccessConfFile, filename])
+        except ConfigParser.MissingSectionHeaderError, e:
+            raise BadConfigurationFile(filename)
 
         if 'DB' in self.parser.sections():
             if 'host' in self.parser.options('DB'):
                 setattr(self, 'dbHost', self.parser.get('DB', 'host'))
             else:
-                print >>sys.stderr, 'Host name is missing in config file!'
-                sys.exit(1)
+                raise MissingConfigurationEntry(filename, "DB.host")
+
             if 'name' in self.parser.options('DB'):
                 setattr(self, 'dbName', self.parser.get('DB', 'name'))
             else:
-                print >>sys.stderr, 'Database name is missing in config file!'
-                sys.exit(1)
+                raise MissingConfigurationEntry(filename, "DB.name")
         else:
-            print >>sys.stderr, 'Section \'DB\' is missing in config file!'
-            sys.exit(1)
+            raise MissingConfigurationSection(filename, "DB")
 
         if 'User' in self.parser.sections():
             if 'name' in self.parser.options('User'):
                 setattr(self, 'userName', self.parser.get('User', 'name'))
             else:
-                print >>sys.stderr, 'User name is missing in config file!'
-                sys.exit(1)
+                raise MissingConfigurationEntry(filename, "User.name")
+
             if 'password' in self.parser.options('User'):
                 setattr(self, 'userPassword', self.parser.get('User', 'password'))
             else:
-                print >>sys.stderr, 'Password is missing in config file!'
-                sys.exit(1)
+                raise MissingConfigurationEntry(filename, "User.password")
         else:
-            print >>sys.stderr, 'Section \'User\' is missing in config file!'
-            sys.exit(1)
+            raise MissingConfigurationSection(filename, "User")
+
 
         if 'Campaign' in self.parser.sections():
             if 'id' in self.parser.options('Campaign'):
                 setattr(self, 'campaignId', int(self.parser.get('Campaign', 'id')))
             else:
-                print >>sys.stderr, 'Campaign id is missing in config file!'
-                sys.exit(1)
+                raise MissingConfigurationEntry(filename, "Campaign.id")
 
 
-    def writeDbAccessConf(self, home, user):
-        dbAccessConfFile = os.path.join(home, '.wns', 'dbAccess.conf')
+    def writeDbAccessConf(self, filename, owner):
+        dbAccessConfFile = filename
         if 'DB' not in self.parser.sections():
             self.parser.add_section('DB')
 
@@ -75,7 +112,7 @@ class Configuration(object):
         config.write('# Keep this file private. Do NOT change file access permissions. Security hazard!\n\n')
         self.parser.write(config)
         config.close()
-        os.chown(dbAccessConfFile, pwd.getpwnam(user)[2], pwd.getpwnam(user)[3])
+        os.chown(dbAccessConfFile, pwd.getpwnam(owner)[2], pwd.getpwnam(owner)[3])
         os.chmod(dbAccessConfFile, 0600)
 
 

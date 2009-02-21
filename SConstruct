@@ -36,6 +36,7 @@ registerPyuicBuilder(env, pyuic)
 
 pyuic_src_files = ['ui/Windows_Main.ui',
                    'ui/Dialogues_ColumnSelect.ui',
+		   'ui/Dialogues_Preferences.ui',
                    'ui/Dialogues_ConfigureGraph.ui',
                    'ui/Dialogues_OpenDatabase.ui',
                    'ui/Dialogues_OpenCampaignDb.ui',

@@ -37,7 +37,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>30</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -89,8 +89,15 @@
     <addaction name="actionRefresh" />
     <addaction name="actionQuit" />
    </widget>
+   <widget class="QMenu" name="menuExtra" >
+    <property name="title" >
+     <string>Extra</string>
+    </property>
+    <addaction name="actionPreferences" />
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuFigure" />
+   <addaction name="menuExtra" />
    <addaction name="menuHelp" />
   </widget>
   <widget class="QStatusBar" name="statusbar" />
@@ -196,6 +203,11 @@
   <action name="actionView_Scenario" >
    <property name="text" >
     <string>View &amp;Scenario</string>
+   </property>
+  </action>
+  <action name="actionPreferences" >
+   <property name="text" >
+    <string>Preferences</string>
    </property>
   </action>
  </widget>

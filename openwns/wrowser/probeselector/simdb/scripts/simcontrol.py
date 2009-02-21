@@ -7,7 +7,6 @@ import shutil
 import subprocess
 import optparse
 import re
-import profile
 import datetime
 import time
 

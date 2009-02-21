@@ -148,6 +148,51 @@ class OpenDatabase(QtGui.QDialog, Ui_Dialogues_OpenDatabase, Observing):
     def getURI(self, withPassword = False):
         return self.uri.toString(withPassword)
 
+from ui.Dialogues_Preferences_ui import Ui_Dialogues_Preferences
+class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
+
+    def __init__(self, *args):
+        QtGui.QDialog.__init__(self, *args)
+        self.setupUi(self)
+
+    def readFromConfig(self, filename, owner):
+        import probeselector.simdb.Configuration
+        try:
+            c = probeselector.simdb.Configuration.Configuration()
+            c.read(filename)
+        except probeselector.simdb.Configuration.MissingConfigurationFile, e:
+            setattr(c, 'dbHost', "")
+            setattr(c, 'dbName', "")
+            setattr(c, 'userName', "")
+            setattr(c, 'userPassword', "")
+            c.writeDbAccessConf(filename, owner)
+        except (probeselector.simdb.Configuration.BadConfigurationFile,
+                probeselector.simdb.Configuration.MissingConfigurationSection,
+                probeselector.simdb.Configuration.MissingConfigurationEntry), e:
+            QtGui.QMessageBox.warning(self, "Parse Error", "Cannot read %s. Creating a new one.\n Error is : %s" % (unicode(e.filename), str(e)))
+            setattr(c, 'dbHost', "")
+            setattr(c, 'dbName', "")
+            setattr(c, 'userName', "")
+            setattr(c, 'userPassword', "")
+            c.writeDbAccessConf(filename, owner)
+
+        self.hostname.setText(c.dbHost)
+        self.databasename.setText(c.dbName)
+        self.username.setText(c.userName)
+        self.password.setText(c.userPassword)
+
+    def writeToConfig(self, filename, owner):
+        import probeselector.simdb.Configuration
+        c = probeselector.simdb.Configuration.Configuration()
+        c.read(filename)
+
+        setattr(c, 'dbHost', str(self.hostname.text()))
+        setattr(c, 'dbName', str(self.databasename.text()))
+        setattr(c, 'userName', str(self.username.text()))
+        setattr(c, 'userPassword', str(self.password.text()))
+
+        c.writeDbAccessConf(filename, owner)
+
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
     def __init__(self, *args):
