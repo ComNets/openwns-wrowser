@@ -2,7 +2,7 @@
 from FileReaders import ProbeReader, ScenarioReader
 import Representations
 
-from Tools import convert
+from wrowser.Tools import convert
 
 import os.path
 

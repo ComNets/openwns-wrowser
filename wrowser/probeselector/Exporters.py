@@ -1,5 +1,5 @@
 import inspect
-import Tools
+import wrowser.Tools
 import os
 
 class CSV:
@@ -70,7 +70,7 @@ hold on
             for point in graph.points:
                 out.write(repr(point[1]) + " ")
             out.write("];\n")
-            out.write("leg{size(leg,1)+1,1}='%s';\n" % pywns.Tools.dict2string(graph.identity.parameters).replace('_',' '))
+            out.write("leg{size(leg,1)+1,1}='%s';\n" % wrowser.Tools.dict2string(graph.identity.parameters).replace('_',' '))
             out.write("plot(X,Y, linestyles{%d},'LineWidth',lineWidth)\n" % ((index % 9)+1))
         out.write("legend(leg,'Location','NorthEast')\n")
         graphTitle = graphs[0].identity.probe.replace('_',' ')
