@@ -5,7 +5,21 @@ import traceback
 
 from PyQt4 import QtGui
 
-import wrowser.Windows
+try:
+    import wrowser.Windows
+except ImportError:
+
+    import os.path
+    # Path to this script
+    p = sys.path[0]
+    searchPath = os.path.dirname(sys.path[0])
+
+    print "No global installation of wrowser found."
+    print "Prepending %s to sys.path" % searchPath 
+
+    sys.path.insert(0, searchPath)
+
+    import wrowser.Windows
 
 def wrowserExceptHook(eType, eValue, eTraceback):
     message = "".join(traceback.format_exception(eType, eValue, eTraceback))
