@@ -5,7 +5,6 @@ import datetime
 import sys
 
 from wnsbase.playground.builtins.Install.Install import InstallCommand
-from pywns.playgroundPlugins.PatchSet.PatchSet import SnapshotCommand
 
 import wnsbase.playground.Core
 core = wnsbase.playground.Core.getCore()
@@ -61,11 +60,11 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         print "Preparing simulation campaign. Please wait..."
 
         # copy simcontrol.py and sim.py to $OPENWNSROOT/bin
-        absPathToOpenWNS = os.path.abspath(wnsrc.pathToWNS)
-        absPathToSimulationCampaignPlugin = os.path.abspath(wnsrc.pathToSandbox + '/default/lib/python2.4/site-packages/pywns/playgroundPlugins/SimulationCampaign')
+        absPathToOpenWNS = os.path.abspath(core.getPathToSDK())
 
-        shutil.copy(absPathToSimulationCampaignPlugin + '/simcontrol.py', absPathToOpenWNS + '/bin')
-        shutil.copy(absPathToSimulationCampaignPlugin + '/sim.py', absPathToOpenWNS + '/bin')
+        thisPluginPath = os.path.dirname(__file__)
+        shutil.copy(os.path.join(thisPluginPath, 'simcontrol.py'), os.path.join(absPathToOpenWNS,'bin'))
+        shutil.copy(os.path.join(thisPluginPath, 'sim.py'), os.path.join(absPathToOpenWNS, 'bin'))
 
         directory = "".join(self.args)
         # Import playground stuff
@@ -134,7 +133,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
             self.installWNS(absSandboxDir)
 
             if not updating:
-                shutil.copy(os.path.join("framework", "PyWNS--main--1.0", "pywns", "campaignConfiguration.py.template"),
+                shutil.copy(os.path.join(os.path.dirname(__file__), "campaignConfiguration.py"),
                             os.path.join(directory, "simulations", "campaignConfiguration.py"))
             shutil.copy(os.path.join("bin", "simcontrol.py"),
                         os.path.join(directory, "simulations"))
@@ -146,15 +145,13 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
             logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
             logFileHandle.close()
 
-            self.makeSnapshot(directory)
-
             # make read only
             os.system("chmod -R u-w,g-w,o-w " + absSandboxDir)
             os.system("chmod u-w,g-w,o-w " + logFile)
 
         else:
             # use db server
-            import pywns.simdb.PrepareCampaign as PrepareCampaign
+            import PrepareCampaign
 
             updating = False
 
@@ -184,7 +181,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
                 os.makedirs(directory)
                 logFileHandle = file(logFile, 'w')
                 logFileHandle.write("Do NOT remove this file!\n\n")
-                shutil.copy(wnsrc.wnsrc.rootSign, directory)
+                shutil.copy('.thisIsTheRootOfWNS', directory)
 
             logFileHandle.write("---START---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n\n")
             logFileHandle.write("Setting up simulation campaign directory...\n\n")
@@ -198,14 +195,12 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
             self.installWNS(absSandboxDir)
 
             PrepareCampaign.updateSubCampaigns(directory)
-            shutil.copy(os.path.join("sandbox", "default", "lib", "python2.4", "site-packages", "pywns", "simdb", "scripts", "sim.py"), directory)
+            shutil.copy(os.path.join(os.path.dirname(__file__),"sim.py"), directory)
 
             logFileHandle.write("Simulation campaign directory successfully set up.\n\n")
             logFileHandle.write("Installed module versions:\n" + versionInformation + "\n")
             logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
             logFileHandle.close()
-
-            self.makeSnapshot(directory)
 
             # make read only
             os.system("chmod -R u-w,g-w,o-w " + absSandboxDir)
@@ -234,16 +229,6 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
             installCommand.startup(commonArgs + ["--flavour=profOpt"])
             installCommand.options.static = self.options.static
             installCommand.run()
-
-
-    def makeSnapshot(self, directory):
-        snapshotCommand = SnapshotCommand()
-        # snapshotCommand.run()
-        # archiveName = os.path.abspath(snapshotCommand.getSnapshotName())
-        # destination = os.path.join(directory, snapshotCommand.getSnapshotName())
-        # shutil.rmtree(destination, ignore_errors=True)
-        # print "Moving '%s' to '%s' ..." % ( archiveName, destination )
-        # shutil.move(archiveName, destination)
 
 if not core.hasPlugin("SimulationCampaign"):
     core.registerPlugin("SimulationCampaign")

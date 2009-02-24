@@ -28,8 +28,16 @@
 import os
 import shutil
 
-import Database as db
-import wrowser.Configuration as conf
+try:
+    import wrowser.simdb.Database as db
+    import wrowser.Configuration as conf
+except ImportError:
+    # No global installation, lets try if we are part of Wrowser
+    print "Cannot find wrowser in your PYTHONPATH. Trying if we are part of a local wrowser. Adding ../../../"
+    import sys
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+    import wrowser.simdb.Database as db
+    import wrowser.Configuration as conf
 
 __config = conf.Configuration()
 __config.read()
@@ -73,8 +81,8 @@ def createNewSubCampaign(directory):
             break
 
     os.mkdir(subCampaignDir)
-    shutil.copy(os.path.join('sandbox', 'default', 'lib', 'python2.4', 'site-packages', 'pywns', 'simdb', 'scripts', 'simcontrol.py'), subCampaignDir)
-    shutil.copy(os.path.join('sandbox', 'default', 'lib', 'python2.4', 'site-packages', 'pywns', 'simdb', 'scripts', 'campaignConfiguration.py'), subCampaignDir)
+    shutil.copy(os.path.join(os.path.dirname(__file__), 'simcontrol.py'), subCampaignDir)
+    shutil.copy(os.path.join(os.path.dirname(__file__), 'campaignConfiguration.py'), subCampaignDir)
 
     campaignTitle = raw_input('Please enter a name for the campaign: ')
     campaignDescription = raw_input('Please enter a short description of the campaign: ')

@@ -1,3 +1,4 @@
+#! /usr/bin/python
 ###############################################################################
 # This file is part of openWNS (open Wireless Network Simulator)
 # _____________________________________________________________________________
@@ -25,8 +26,6 @@
 #
 ###############################################################################
 
-#! /usr/bin/python
-
 import os
 import pwd
 import sys
@@ -38,10 +37,10 @@ import datetime
 import time
 
 import wrowser.Configuration as conf
-import simdb.Database as db
-import simdb.Parameters as params
-import simdb.ProbeDB
-import Tools
+import wroswer.simdb.Database as db
+import wrowser.simdb.Parameters as params
+import wrowser.simdb.ProbeDB
+import wrowser.Tools
 
 
 config = conf.Configuration()
@@ -73,16 +72,13 @@ def createScenarios(arg = 'unused'):
         os.symlink(os.path.join('..', '..', 'sandbox', options.flavor, 'bin', 'openwns'), os.path.join(simPath, 'openwns'))
         if options.flavor == 'opt':
             os.symlink(os.path.join('..', '..', 'sandbox', 'dbg', 'bin', 'openwns'), os.path.join(simPath, 'openwns-dbg'))
-        os.symlink(os.path.join('..', '..', 'sandbox', 'default', 'lib', 'python2.4', 'site-packages', 'pywns', 'simdb', 'SimConfig.py'), os.path.join(simPath, 'SimConfig.py'))
+
         os.symlink(os.path.join('..', '.campaign.conf'), os.path.join(simPath, '.campaign.conf'))
 
         for f in os.listdir(os.getcwd()):
             if f.endswith('.py') or f.endswith('.probes') or f.endswith('.ini'):
                 if not f == 'simcontrol.py' and not f == 'campaignConfiguration.py' and not f == 'ProbeDB.py':
                     os.symlink(os.path.join('..', f), os.path.join(simPath, f))
-
-    if not os.path.exists(os.path.join(os.getcwd(), 'ProbeDB.py')):
-        os.symlink(os.path.join('..', 'sandbox', 'default', 'lib', 'python2.4', 'site-packages', 'pywns', 'simdb', 'ProbeDB.py'), os.path.join(os.getcwd(), 'ProbeDB.py'))
 
     print 'Scenarios successfully created.'
 
@@ -110,7 +106,7 @@ def removeScenariosFiltered(stringexpression):
     scenarioIds = [element[0] for element in cursor.fetchall()]
     cursor.connection.commit()
 
-    filteredScenarios = pywns.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
+    filteredScenarios = wrowser.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
 
     for scenarioId in filteredScenarios:
         answer = raw_input("Do you want to remove scenario " + str(scenarioId) + "? (Y/n) ")
@@ -215,7 +211,7 @@ def queueScenarios(stringexpression):
     scenarioIds = [element[0] for element in cursor.fetchall()]
     cursor.connection.commit()
 
-    filteredScenarios = pywns.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
+    filteredScenarios = wrowser.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
 
     for scenarioId in filteredScenarios:
         __submitJob(scenarioId)
@@ -245,7 +241,7 @@ def requeueCrashedScenarios(arg = 'unused'):
     cursor.connection.commit()
     for scenario, in scenarioIds:
         # remove results from previous simulation runs
-        pywns.simdb.ProbeDB.removeAllProbesFromDB(scenarioId = scenario)
+        wrowser.simdb.ProbeDB.removeAllProbesFromDB(scenarioId = scenario)
         __submitJob(scenario)
 
 
@@ -295,7 +291,7 @@ def dequeueScenarios(stringexpression):
     scenarioIds = [element[0] for element in cursor.fetchall()]
     cursor.connection.commit()
 
-    filteredScenarios = pywns.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
+    filteredScenarios = wrowser.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
 
     for scenario in filteredScenarios:
         __deleteJob(scenario)

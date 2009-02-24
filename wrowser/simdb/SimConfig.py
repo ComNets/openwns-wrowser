@@ -27,8 +27,8 @@
 
 import os
 
-import pywns.simdb.Parameters
+import Parameters
 
-params = pywns.simdb.Parameters.Parameters()
+params = Parameters.Parameters()
 params.read(int(os.path.basename(os.getcwd())))
 

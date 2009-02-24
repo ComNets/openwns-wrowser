@@ -1,3 +1,4 @@
+#! /usr/bin/python
 ###############################################################################
 # This file is part of openWNS (open Wireless Network Simulator)
 # _____________________________________________________________________________
@@ -25,9 +26,7 @@
 #
 ###############################################################################
 
-#! /usr/bin/python
-
-from simdb.Parameters import AutoSimulationParameters, Parameters, Bool, Int, Float, String
+from wrowser.simdb.Parameters import AutoSimulationParameters, Parameters, Bool, Int, Float, String
 
 ###########################################
 # Please read & delete what you don't need!
@@ -58,7 +57,7 @@ for i in xrange(5):
 # in your config.py, you need
 #
 
-from SimConfig import params
+from wrowser.simdb.SimConfig import params
 
 #
 # and then configure using the params instance

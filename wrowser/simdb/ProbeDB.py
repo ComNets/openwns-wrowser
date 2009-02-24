@@ -27,8 +27,8 @@
 
 import os
 import wrowser.Configuration as conf
-import simdb.Database as db
-import Probe
+import wrowser.simdb.Database as db
+import wrowser.Probe
 
 __config = conf.Configuration()
 __config.read('.campaign.conf')
@@ -36,7 +36,7 @@ __config.read('.campaign.conf')
 
 def __writeMomentsProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all Moments probes in: " + dirname
-    for momProbe in pywns.Probe.MomentsProbe.readProbes(dirname).itervalues():
+    for momProbe in wrowser.Probe.MomentsProbe.readProbes(dirname).itervalues():
         if ( momProbe.trials == 0 and skipNullTrials ): continue
         print "    Writing to database: " + momProbe.name
         cursor.execute('INSERT INTO moments (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials,'\
@@ -60,7 +60,7 @@ def __removeMomentsProbesFromDB(scenarioId, campaignId, cursor):
 
 def __writePDFProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all PDF probes in: " + dirname
-    for pdfProbe in pywns.Probe.PDFProbe.readProbes(dirname).itervalues():
+    for pdfProbe in wrowser.Probe.PDFProbe.readProbes(dirname).itervalues():
         if ( pdfProbe.trials == 0 and skipNullTrials ): continue
         print "    Writing to database: " + pdfProbe.name
         cursor.execute('INSERT INTO pd_fs (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials,'\
@@ -90,7 +90,7 @@ def __removePDFProbesFromDB(scenarioId, campaignId, cursor):
 
 def __writeLogEvalProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all LogEval probes in: " + dirname
-    for logEvalProbe in pywns.Probe.LogEvalProbe.readProbes(dirname).itervalues():
+    for logEvalProbe in wrowser.Probe.LogEvalProbe.readProbes(dirname).itervalues():
         if ( logEvalProbe.trials == 0 and skipNullTrials ): continue
         print "    Writing to database: " + logEvalProbe.name
         cursor.execute('INSERT INTO log_evals (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials,'\
@@ -118,7 +118,7 @@ def __removeLogEvalProbesFromDB(scenarioId, campaignId, cursor):
 
 def __writeBatchMeansProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all BatchMeans probes in: " + dirname
-    for batchMeansProbe in pywns.Probe.BatchMeansProbe.readProbes(dirname).itervalues():
+    for batchMeansProbe in wrowser.Probe.BatchMeansProbe.readProbes(dirname).itervalues():
         if ( batchMeansProbe.trials == 0 and skipNullTrials ): continue
         print "    Writing to database: " + batchMeansProbe.name
         cursor.execute('INSERT INTO batch_means (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials,'\
@@ -155,7 +155,7 @@ def __removeBatchMeansProbesFromDB(scenarioId, campaignId, cursor):
 
 def __writeLreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all LRE probes in: " + dirname
-    for lreProbe in pywns.Probe.LreProbe.readProbes(dirname).itervalues():
+    for lreProbe in wrowser.Probe.LreProbe.readProbes(dirname).itervalues():
         if ( lreProbe.trials == 0 and skipNullTrials ): continue
         print "    Writing to database: " + lreProbe.name
         cursor.execute('INSERT INTO lres (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials, '\
@@ -206,7 +206,7 @@ def __removeLreProbesFromDB(scenarioId, campaignId, cursor):
 
 def __writeDlreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all DLRE probes in: " + dirname
-    for dlreProbe in pywns.Probe.DlreProbe.readProbes(dirname).itervalues():
+    for dlreProbe in wrowser.Probe.DlreProbe.readProbes(dirname).itervalues():
         if ( dlreProbe.trials == 0 and skipNullTrials ): continue
         print "    Writing to database: " + dlreProbe.name
         cursor.execute('INSERT INTO dlres (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials, '\
@@ -243,7 +243,7 @@ def __removeDlreProbesFromDB(scenarioId, campaignId, cursor):
 
 def __writeTableProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all Table probes in: " + dirname
-    for tableProbe in pywns.Probe.TableProbe.readProbes(dirname).itervalues():
+    for tableProbe in wrowser.Probe.TableProbe.readProbes(dirname).itervalues():
         if ( tableProbe.trials == 0 and skipNullTrials ): continue
         print "    Writing to database: " + tableProbe.name
         cursor.execute('INSERT INTO tables (campaign_id, scenario_id, filename, name, type, first_col_type, first_col_description, second_col_type, '\
