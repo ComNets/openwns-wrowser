@@ -21,6 +21,7 @@ except ImportError:
 
     import wrowser.Windows
 
+
 def wrowserExceptHook(eType, eValue, eTraceback):
     message = "".join(traceback.format_exception(eType, eValue, eTraceback))
     print message

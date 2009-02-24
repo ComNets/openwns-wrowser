@@ -156,11 +156,11 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
         self.setupUi(self)
 
     def readFromConfig(self, filename, owner):
-        import probeselector.simdb.Configuration
+        import Configuration
         try:
-            c = probeselector.simdb.Configuration.Configuration()
+            c = Configuration.Configuration()
             c.read(filename)
-        except probeselector.simdb.Configuration.MissingConfigurationFile, e:
+        except Configuration.MissingConfigurationFile, e:
             setattr(c, 'dbHost', "")
             setattr(c, 'dbName', "")
             setattr(c, 'userName', "")
@@ -168,9 +168,9 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
             setattr(c, 'sandboxPath', "")
             setattr(c, 'sandboxFlavour', "dbg")
             c.writeDbAccessConf(filename, owner)
-        except (probeselector.simdb.Configuration.BadConfigurationFile,
-                probeselector.simdb.Configuration.MissingConfigurationSection,
-                probeselector.simdb.Configuration.MissingConfigurationEntry), e:
+        except (Configuration.BadConfigurationFile,
+                Configuration.MissingConfigurationSection,
+                Configuration.MissingConfigurationEntry), e:
             QtGui.QMessageBox.warning(self, "Parse Error", "Cannot read %s. Creating a new one.\n Error is : %s" % (unicode(e.filename), str(e)))
             setattr(c, 'dbHost', "")
             setattr(c, 'dbName', "")
@@ -188,8 +188,8 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
         self.sandboxflavour.setCurrentIndex(self.sandboxflavour.findText(QtCore.QString(c.sandboxFlavour)))
 
     def writeToConfig(self, filename, owner):
-        import probeselector.simdb.Configuration
-        c = probeselector.simdb.Configuration.Configuration()
+        import Configuration
+        c = Configuration.Configuration()
         c.read(filename)
 
         setattr(c, 'dbHost', str(self.hostname.text()))
@@ -203,7 +203,7 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
     def __init__(self, *args):
-        from probeselector.simdb import Campaigns
+        from wrowser.simdb import Campaigns
 
         QtGui.QDialog.__init__(self, *args)
         self.setupUi(self)

@@ -2,7 +2,7 @@ import os
 import shutil
 
 import Database as db
-import Configuration as conf
+import wrowser.Configuration as conf
 
 __config = conf.Configuration()
 __config.read()

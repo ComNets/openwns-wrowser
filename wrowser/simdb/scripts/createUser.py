@@ -5,7 +5,7 @@ import pwd
 import os
 import sys
 
-import simdb.Configuration as config
+import wrowser.Configuration as config
 import simdb.Database as db
 
 hostname = 'postgres'

@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-from pywns.simdb.Parameters import AutoSimulationParameters, Parameters, Bool, Int, Float, String
+from simdb.Parameters import AutoSimulationParameters, Parameters, Bool, Int, Float, String
 
 ###########################################
 # Please read & delete what you don't need!
@@ -111,6 +111,7 @@ def getTotalThroughput(paramsString, inputName, cursor):
 #
 # Then, some pre-work to get the cursor
 #
+import wrowser.Configuration as config
 conf = config.Configuration()
 conf.read("./.campaign.conf")
 db.Database.connectConf(conf)

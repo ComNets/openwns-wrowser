@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import simdb.Configuration as Configuration
+import wrowser.Configuration as Configuration
 import simdb.Database as db
 import os
 import sys

@@ -130,7 +130,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionOpenCampaignDatabase_triggered(self):
-        from probeselector.simdb import Campaigns
+        from simdb import Campaigns
         from probeselector import PostgresReader, Representations, Interface
 
         campaignDbDialogue = Dialogues.OpenCampaignDb(self.workspace)

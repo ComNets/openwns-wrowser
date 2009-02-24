@@ -51,7 +51,7 @@ os.chdir(options.campaignPath)
 sys.path.append(os.getcwd())
 
 import simdb.Database as db
-import simdb.Configuration as conf
+import wrowser.Configuration as conf
 import ProbeDB
 
 class DatePrepender:

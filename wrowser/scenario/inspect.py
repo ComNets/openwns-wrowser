@@ -1,6 +1,6 @@
 import os
 
-import wrowser.probeselector.simdb.Configuration as Configuration
+import wrowser.Configuration as Configuration
 
 class SimulatorConfigNotFound:
     pass

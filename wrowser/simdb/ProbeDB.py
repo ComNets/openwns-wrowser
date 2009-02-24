@@ -1,5 +1,5 @@
 import os
-import simdb.Configuration as conf
+import wrowser.Configuration as conf
 import simdb.Database as db
 import Probe
 

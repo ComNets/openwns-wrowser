@@ -1,7 +1,7 @@
-from simdb.Parameters import Parameters
-from simdb.ProbeObjects import getSingleResult, getMultipleResults, Moments, PDFs, LogEvals, BatchMeans, Lres, Dlres, Tables
-from simdb.Database import Database
-from simdb.Configuration import Configuration
+from wrowser.simdb.Parameters import Parameters
+from wrowser.simdb.ProbeObjects import getSingleResult, getMultipleResults, Moments, PDFs, LogEvals, BatchMeans, Lres, Dlres, Tables
+from wrowser.simdb.Database import Database
+from wrowser.Configuration import Configuration
 
 import Representations
 

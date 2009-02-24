@@ -1,5 +1,5 @@
 import Database as db
-import Configuration as conf
+import wrowser.Configuration as conf
 
 
 def getCampaignsDict():

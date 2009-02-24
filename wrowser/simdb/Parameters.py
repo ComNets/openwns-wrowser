@@ -1,7 +1,7 @@
 import copy
 
 import Database as db
-import Configuration as config
+import wrowser.Configuration as config
 
 
 class Type(object):

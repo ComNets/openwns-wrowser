@@ -1,6 +1,6 @@
 from PyQt4 import QtCore, QtGui
 
-import wrowser.probeselector.simdb.Configuration as Configuration
+import wrowser.Configuration as Configuration
 
 import os.path
 

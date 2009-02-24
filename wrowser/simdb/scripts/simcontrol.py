@@ -10,7 +10,7 @@ import re
 import datetime
 import time
 
-import simdb.Configuration as conf
+import wrowser.Configuration as conf
 import simdb.Database as db
 import simdb.Parameters as params
 import simdb.ProbeDB
