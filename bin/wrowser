@@ -64,7 +64,7 @@ if __name__ == "__main__":
     application = QtGui.QApplication(sys.argv)
     application.setQuitOnLastWindowClosed(True)
     application.setApplicationName("Wrowser")
-    application.setWindowIcon(QtGui.QIcon("icon.png"))
+    application.setWindowIcon(QtGui.QIcon(":/icons/icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
     widget = wrowser.Windows.Main()

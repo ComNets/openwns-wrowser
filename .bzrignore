@@ -20,3 +20,6 @@ wrowser/ui/Windows_Main_ui.py
 wrowser/ui/Windows_ProbeInfo_ui.py
 wrowser/ui/Windows_SimulationParameters_ui.py
 wrowser/ui/Widgets_ViewScenario_ui.py
+dist
+MANIFEST
+wrowser/ui/wrowser_rc.py
