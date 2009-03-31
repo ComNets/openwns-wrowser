@@ -11,6 +11,26 @@ core = wnsbase.playground.Core.getCore()
 
 class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
 
+    def __getDirectoryProposal(self, directory):
+        files = os.listdir(directory)
+        filteredFiles = [f[11:] for f in files if f.startswith('simulations')]
+        ids = []
+        # print filteredFiles
+        for f in filteredFiles:
+            print f
+            if f == '':
+                f = 1
+            try:
+                print ids
+                ids.append(int(f))
+            except ValueError:
+                pass
+        #    print ids
+        proposedDirectory = 'simulations'
+        if len(ids) > 0:
+            proposedDirectory += str(max(ids)+1)
+        return proposedDirectory
+
     def __init__(self):
         usage = "\n%prog preparecampaign PATH\n\n"
         rationale = "Prepare a simulation campaign."
@@ -100,12 +120,15 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         # use sqlite
         if useDbServer == False:
             updating = False
+            createSimDir = False
+            subCampaignDirName = "simulations"
 
             if os.path.exists(directory):
                 if os.path.exists(logFile):
                     print "Found simulation campaign in directory %s." % directory
-                    answer = core.userFeedback.askForReject("Shall I try to update sandbox and python dir?")
-                    if not answer:
+                    answer = raw_input("Shall I try to (U)pdate the sandbox or do you want to (C)reate a new sub campaign? Type \'e\' to exit (u/c/e) [e]: ")
+                    answer = answer.lower()
+                    if answer == "u":
                         if os.path.exists(absSandboxDir):
                             os.system("chmod -R u+w " + absSandboxDir)
                             os.system("rm -rf " + absSandboxDir)
@@ -113,6 +136,22 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
                             os.system("chmod u+w " + logFile)
                         logFileHandle = file(logFile, 'a')
                         updating = True
+                    elif answer == "c":
+                        proposedDirectory = self.__getDirectoryProposal(directory)
+                        while True:
+                            subCampaignDirName = raw_input('Please enter the name of the directory the simulations shall be stored in [%s]: ' % proposedDirectory)
+                            if subCampaignDirName == '':
+                                subCampaignDirName = proposedDirectory
+
+                            fullDirName = os.path.join(directory, subCampaignDirName)
+                            if os.path.exists(fullDirName):
+                                print 'Path already exists. Please use a different name'
+                            else:
+                                if os.path.exists(logFile):
+                                    os.system("chmod u+w " + logFile)
+                                logFileHandle = file(logFile, 'a')
+                                createSimDir = True
+                                break
                     else:
                         sys.exit(0)
                 else:
@@ -121,32 +160,38 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
                     sys.exit(0)
             else:
                 os.mkdir(directory)
-                os.mkdir(os.path.join(directory, "simulations"))
                 logFileHandle = file(logFile, 'w')
                 logFileHandle.write("Do NOT remove this file!\n\n")
                 shutil.copy('.thisIsTheRootOfWNS', directory)
+                updating = True
+                createSimDir = True
 
 
             logFileHandle.write("---START---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n\n")
-            logFileHandle.write("Setting up simulation campaign directory...\n\n")
 
-            self.installWNS(absSandboxDir)
+            if updating:
+                logFileHandle.write("Setting up sandbox directory...\n\n")
+                self.installWNS(absSandboxDir)
+                logFileHandle.write("Sandbox directory successfully created.\n\n")
 
-            if not updating:
+            if createSimDir:
+                logFileHandle.write("Create sub-campaign directory %s ...\n\n" % (subCampaignDirName))
+                os.mkdir(os.path.join(directory, subCampaignDirName))
                 shutil.copy(os.path.join(os.path.dirname(__file__), "campaignConfiguration.py"),
-                            os.path.join(directory, "simulations", "campaignConfiguration.py"))
-            shutil.copy(os.path.join("bin", "simcontrol.py"),
-                        os.path.join(directory, "simulations"))
+                            os.path.join(directory, subCampaignDirName, "campaignConfiguration.py"))
+                shutil.copy(os.path.join("bin", "simcontrol.py"),
+                            os.path.join(directory, subCampaignDirName))
+                logFileHandle.write("Sub-campaign directory %s successfully created.\n\n" % (subCampaignDirName))
             shutil.copy(os.path.join("bin", "sim.py"),
                         directory)
 
-            logFileHandle.write("Simulation campaign directory successfully set up.\n\n")
             logFileHandle.write("Installed module versions:\n" + versionInformation + "\n")
+            logFileHandle.write("Change sanbox to read only.\n")
+            os.system("chmod -R u-w,g-w,o-w " + absSandboxDir)
             logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
             logFileHandle.close()
 
             # make read only
-            os.system("chmod -R u-w,g-w,o-w " + absSandboxDir)
             os.system("chmod u-w,g-w,o-w " + logFile)
 
         else:
@@ -229,6 +274,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
             installCommand.startup(commonArgs + ["--flavour=profOpt"])
             installCommand.options.static = self.options.static
             installCommand.run()
+
 
 if not core.hasPlugin("SimulationCampaign"):
     core.registerPlugin("SimulationCampaign")
