@@ -124,7 +124,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
                 os.mkdir(os.path.join(directory, "simulations"))
                 logFileHandle = file(logFile, 'w')
                 logFileHandle.write("Do NOT remove this file!\n\n")
-                shutil.copy(wnsrc.wnsrc.rootSign, directory)
+                shutil.copy('.thisIsTheRootOfWNS', directory)
 
 
             logFileHandle.write("---START---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n\n")
