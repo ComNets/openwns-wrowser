@@ -247,7 +247,7 @@
   <customwidget>
    <class>ValidStateMarkingLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>openwns.wrowser.Widgets.h</header>
+   <header>wrowser.Widgets.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

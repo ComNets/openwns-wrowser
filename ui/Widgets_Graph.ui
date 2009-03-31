@@ -47,12 +47,12 @@
   <customwidget>
    <class>GraphNavigationBar</class>
    <extends>QWidget</extends>
-   <header>openwns.wrowser.Widgets.h</header>
+   <header>wrowser.Widgets.h</header>
   </customwidget>
   <customwidget>
    <class>FigureCanvas</class>
    <extends>QWidget</extends>
-   <header>openwns.wrowser.Widgets.h</header>
+   <header>wrowser.Widgets.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
