@@ -43,6 +43,14 @@ if len(args):
 os.chdir(options.campaignPath)
 sys.path.append(os.getcwd())
 
+import ConfigParser
+configParser = ConfigParser.SafeConfigParser()
+configParser.read(os.path.join(os.environ['HOME'], '.wns', 'dbAccess.conf'))
+if 'Wrowser' not in configParser.sections():
+    print "ERROR! Path to wrowser not in dbAccess.conf"
+    exit(0)
+sys.path.append(configParser.get('Wrowser', 'path'))
+
 import wrowser.simdb.Database as db
 import wrowser.Configuration as conf
 import wrowser.simdb.ProbeDB
@@ -236,11 +244,11 @@ class Sim:
         cursor.connection.commit()
 
         try:
-            ProbeDB.removeAllProbesFromDB(self.simId)
-            ProbeDB.writeAllProbesIntoDB(self.outputPath, self.simId, options.skipNullTrials)
+            wrowser.simdb.ProbeDB.removeAllProbesFromDB(self.simId)
+            wrowser.simdb.ProbeDB.writeAllProbesIntoDB(self.outputPath, self.simId, options.skipNullTrials)
         except Exception, e:
             print >>sys.stdout, "Probe import for simId %d failed (Exception caught: %s)" % ( self.simId, e)
-            ProbeDB.removeAllProbesFromDB(self.simId)
+            wrowser.simdb.ProbeDB.removeAllProbesFromDB(self.simId)
 
         if statusCode == 0:
             state = 'Finished'

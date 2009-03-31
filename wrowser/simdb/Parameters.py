@@ -27,7 +27,18 @@
 
 import copy
 
-import Database as db
+import os
+import sys
+
+import ConfigParser
+configParser = ConfigParser.SafeConfigParser()
+configParser.read(os.path.join(os.environ['HOME'], '.wns', 'dbAccess.conf'))
+if 'Wrowser' not in configParser.sections():
+    print "ERROR! Path to wrowser not in dbAccess.conf"
+    exit(0)
+sys.path.append(configParser.get('Wrowser', 'path'))
+
+import wrowser.simdb.Database as db
 import wrowser.Configuration as config
 
 

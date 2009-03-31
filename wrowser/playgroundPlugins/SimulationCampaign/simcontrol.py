@@ -36,8 +36,16 @@ import re
 import datetime
 import time
 
+import ConfigParser
+configParser = ConfigParser.SafeConfigParser()
+configParser.read(os.path.join(os.environ['HOME'], '.wns', 'dbAccess.conf'))
+if 'Wrowser' not in configParser.sections():
+    print "ERROR! Path to wrowser not in dbAccess.conf"
+    exit(0)
+sys.path.append(configParser.get('Wrowser', 'path'))
+
 import wrowser.Configuration as conf
-import wroswer.simdb.Database as db
+import wrowser.simdb.Database as db
 import wrowser.simdb.Parameters as params
 import wrowser.simdb.ProbeDB
 import wrowser.Tools
@@ -73,12 +81,21 @@ def createScenarios(arg = 'unused'):
         if options.flavor == 'opt':
             os.symlink(os.path.join('..', '..', 'sandbox', 'dbg', 'bin', 'openwns'), os.path.join(simPath, 'openwns-dbg'))
 
+            os.symlink(os.path.join(configParser.get('Wrowser', 'path'), 'wrowser', 'simdb', 'SimConfig.py'),
+                       os.path.join(simPath, 'SimConfig.py'))
+
+
         os.symlink(os.path.join('..', '.campaign.conf'), os.path.join(simPath, '.campaign.conf'))
 
         for f in os.listdir(os.getcwd()):
             if f.endswith('.py') or f.endswith('.probes') or f.endswith('.ini'):
                 if not f == 'simcontrol.py' and not f == 'campaignConfiguration.py' and not f == 'ProbeDB.py':
                     os.symlink(os.path.join('..', f), os.path.join(simPath, f))
+
+    if not os.path.exists(os.path.join(os.getcwd(), 'ProbeDB.py')):
+        os.symlink(os.path.join(configParser.get('Wrowser', 'path'), 'wrowser', 'simdb', 'ProbeDB.py'),
+                   os.path.join(os.getcwd(), 'ProbeDB.py'))
+
 
     print 'Scenarios successfully created.'
 

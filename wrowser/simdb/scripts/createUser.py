@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 ###############################################################################
 # This file is part of openWNS (open Wireless Network Simulator)
 # _____________________________________________________________________________
@@ -25,18 +27,26 @@
 #
 ###############################################################################
 
-#! /usr/bin/python
-
 import getpass
 import pwd
 import os
 import sys
 
-import wrowser.Configuration as config
-import simdb.Database as db
+def searchPath(path, rootSign):
+	while rootSign not in os.listdir(path):
+		if path == os.sep:
+			return None
+		path, tail = os.path.split(path)
+	path, tail = os.path.split(path)
+	return os.path.abspath(path)
 
-hostname = 'postgres'
-dbName = 'simdbtest'
+sys.path.append(searchPath(os.path.abspath(os.path.dirname(sys.argv[0])), 'Configuration.py'))
+
+#import wrowser.Configuration as config
+import wrowser.simdb.Database as db
+
+hostname = 'localhost'
+dbName = 'simdb'
 
 postgresPassword = getpass.getpass('Please enter the password of the \'postgres\' super user: ')
 db.Database.connect(dbName, hostname, 'postgres', postgresPassword)
@@ -53,11 +63,12 @@ password = 'foobar'
 curs.execute('INSERT INTO administration.users (user_name, full_name, password, group_account) VALUES (\'%s\', \'%s\', \'%s\', \'%s\')' % (userName, fullName, password, False))
 curs.connection.commit()
 
-conf = config.Configuration()
-conf.dbHost = hostname
-conf.dbName = dbName
-conf.userName = userName
-conf.userPassword = password
-conf.writeDbAccessConf(home = os.path.join('/', 'home', userName), user = userName)
+# configuration file is written by the wrowser!
+#conf = config.Configuration()
+#conf.dbHost = hostname
+#conf.dbName = dbName
+#conf.userName = userName
+#conf.userPassword = password
+#conf.writeDbAccessConf(home = os.path.join('/', 'home', userName), user = userName)
 
 print 'User successfully created.'

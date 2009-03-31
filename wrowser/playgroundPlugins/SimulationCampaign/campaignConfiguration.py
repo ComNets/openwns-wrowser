@@ -26,6 +26,16 @@
 #
 ###############################################################################
 
+import os
+import sys
+import ConfigParser
+parser = ConfigParser.SafeConfigParser()
+parser.read(os.path.join(os.environ['HOME'], '.wns', 'dbAccess.conf'))
+if 'Wrowser' not in parser.sections():
+    print "ERROR! Path to wrowser not in dbAccess.conf"
+    exit(0)
+sys.path.append(parser.get('Wrowser', 'path'))
+
 from wrowser.simdb.Parameters import Parameters, Bool, Int, Float, String
 
 ###################################

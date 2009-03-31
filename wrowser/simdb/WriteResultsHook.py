@@ -26,9 +26,19 @@
 ###############################################################################
 
 import os
+import sys
+
+import ConfigParser
+configParser = ConfigParser.SafeConfigParser()
+configParser.read(os.path.join(os.environ['HOME'], '.wns', 'dbAccess.conf'))
+if 'Wrowser' not in configParser.sections():
+    print "ERROR! Path to wrowser not in dbAccess.conf"
+    exit(0)
+sys.path.append(configParser.get('Wrowser', 'path'))
+
 import wrowser.Configuration as conf
-import simdb.Database as db
-import simdb.ProbeDB
+import wrowser.simdb.Database as db
+import wrowser.simdb.ProbeDB
 
 
 class Type(object):
@@ -128,11 +138,11 @@ class WriteResultsHook:
                                     (value.getType(), self.campaignId, scenarioId, value.getType(), key, str(value.getValue())))
         elif len(self.matchingScenarios) == 1:
             scenarioId = self.matchingScenarios[0][0]
-            pywns.simdb.ProbeDB.removeAllProbesFromDB(scenarioId, config = self.conf)
+            wrowser.pywns.simdb.ProbeDB.removeAllProbesFromDB(scenarioId, config = self.conf)
         elif len(self.matchingScenarios) > 1:
             raise Exception("Cannot write results to database: More than one scenario stored in database matches the given parameter set")
 
-        pywns.simdb.ProbeDB.writeAllProbesIntoDB(simulator.outputDir, scenarioId, skipNullTrials = self.skipNullTrials, config = self.conf)
+        wrowser.pywns.simdb.ProbeDB.writeAllProbesIntoDB(simulator.outputDir, scenarioId, skipNullTrials = self.skipNullTrials, config = self.conf)
 
         db.Database.connectConf(self.conf)
         self.cursor = db.Database.getCursor()
