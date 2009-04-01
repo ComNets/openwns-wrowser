@@ -181,7 +181,11 @@ def renderLineSampleImage(line, width, dpi = 100):
 #    Debug.printCall(None, (line, width))
     from matplotlib.backends.backend_agg import RendererAgg as Renderer
     from matplotlib.lines import Line2D
-    ###from matplotlib.transforms import Value
+    useValue = True
+    try:
+        from matplotlib.transforms import Value
+    except ImportError:
+        useValue = False
 
     from PyQt4 import QtGui
 
@@ -195,8 +199,10 @@ def renderLineSampleImage(line, width, dpi = 100):
         lineAttributes[attribute] = getattr(line, "get_" + attribute)()
 
     height = lineAttributes["linewidth"]
-    ###renderer = Renderer(width, height, Value(dpi))
-    renderer = Renderer(width, height, dpi)
+    if(useValue):
+        renderer = Renderer(width, height, Value(dpi))
+    else:
+        renderer = Renderer(width, height, dpi)
 
     linePos = height / 2 + 1
     sampleLine = Line2D([0, width], [linePos, linePos], **lineAttributes)
