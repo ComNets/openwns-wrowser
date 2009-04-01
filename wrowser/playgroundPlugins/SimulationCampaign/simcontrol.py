@@ -47,6 +47,15 @@ config = conf.Configuration()
 config.read('.campaign.conf')
 db.Database.connectConf(config)
 
+
+def getWrowserDir():
+    pypaths = os.environ.get('PYTHONPATH').split(':')
+
+    for cand in pypaths:
+        if os.path.isdir(os.path.join(cand, 'wrowser')):
+            return cand
+    return None
+
 def createDatabase(arg = 'unused'):
     subprocess.call(['./campaignConfiguration.py'], shell = True)
     print 'Database entries successfully created.'
@@ -58,6 +67,12 @@ def createScenarios(arg = 'unused'):
     scenarioIds = [ entry[0] for entry in cursor.fetchall() ]
     scenarioIds.sort()
     cursor.connection.commit()
+
+    wdir = getWrowserDir()
+    if wdir is None:
+        print "ERROR: Cannot find Wrowser directory! Exiting..."
+        return
+
 
     for scenario in scenarioIds:
         simId = str(scenario)
@@ -73,7 +88,7 @@ def createScenarios(arg = 'unused'):
         if options.flavor == 'opt':
             os.symlink(os.path.join('..', '..', 'sandbox', 'dbg', 'bin', 'openwns'), os.path.join(simPath, 'openwns-dbg'))
 
-            os.symlink(os.path.join(configParser.get('Wrowser', 'path'), 'wrowser', 'simdb', 'SimConfig.py'),
+            os.symlink(os.path.join(wdir, 'wrowser', 'simdb', 'SimConfig.py'),
                        os.path.join(simPath, 'SimConfig.py'))
 
 
@@ -85,7 +100,7 @@ def createScenarios(arg = 'unused'):
                     os.symlink(os.path.join('..', f), os.path.join(simPath, f))
 
     if not os.path.exists(os.path.join(os.getcwd(), 'ProbeDB.py')):
-        os.symlink(os.path.join(configParser.get('Wrowser', 'path'), 'wrowser', 'simdb', 'ProbeDB.py'),
+        os.symlink(os.path.join(wdir, 'wrowser', 'simdb', 'ProbeDB.py'),
                    os.path.join(os.getcwd(), 'ProbeDB.py'))
 
 
