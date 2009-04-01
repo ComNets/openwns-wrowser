@@ -38,6 +38,7 @@ except ImportError:
     sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
     import wrowser.simdb.Database as db
     import wrowser.Configuration as conf
+    print "Success. Please consider to add the wrowser to your PYTHONPATH!"
 
 __config = conf.Configuration()
 __config.read()

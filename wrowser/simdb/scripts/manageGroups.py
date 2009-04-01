@@ -32,8 +32,8 @@ import getpass
 import os
 import sys
 
-hostname = 'postgres'
-dbName = 'simdbtest'
+hostname = 'localhost'
+dbName = 'simdb'
 
 postgresPassword = getpass.getpass('Please enter the password of the \'postgres\' super user: ')
 db.Database.connect(dbName, hostname, 'postgres', postgresPassword)

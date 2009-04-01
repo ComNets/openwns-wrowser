@@ -27,7 +27,6 @@
 
 import psycopg2 as pg
 import sys
-import ConfigParser
 
 class Database:
     __connection = None
@@ -71,17 +70,11 @@ class Database:
 
     @staticmethod
     def connectConf(conf, debug = False):
-        if(c.__class__ == ConfigParser.SafeConfigParser):
-            Database.connect(database = conf.get('DB', 'name'),
-                             host = conf.get('DB', 'host'),
-                             user = conf.get('user', 'name'),
-                             password = conf.get('user', 'password'))
-        else:
-            Database.connect(database = conf.dbName,
-                             host = conf.dbHost,
-                             user = conf.userName,
-                             password = conf.userPassword,
-                             debug = debug)
+        Database.connect(database = conf.dbName,
+                         host = conf.dbHost,
+                         user = conf.userName,
+                         password = conf.userPassword,
+                         debug = debug)
 
 
     @staticmethod

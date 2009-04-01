@@ -151,12 +151,6 @@ class Configuration(object):
         self.parser.set('Sandbox', 'path', getattr(self, 'sandboxPath'))
         self.parser.set('Sandbox', 'flavour', getattr(self, 'sandboxFlavour'))
 
-        if 'Wrowser' not in self.parser.sections():
-            self.parser.add_section('Wrowser')
-
-        path, tail = os.path.split(os.path.abspath(os.path.dirname(sys.argv[0])))
-        self.parser.set('Wrowser', 'path', path)
-
         config = file(dbAccessConfFile, 'w')
         config.write('# Keep this file private. Do NOT change file access permissions. Security hazard!\n\n')
         self.parser.write(config)

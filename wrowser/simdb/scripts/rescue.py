@@ -77,9 +77,9 @@ if len(args):
 os.chdir(options.campaignPath)
 sys.path.append(os.getcwd())
 
-import simdb.Database as db
+import wrowser.simdb.Database as db
 import wrowser.Configuration as conf
-import ProbeDB
+import wrowser.simdb.ProbeDB
 
 class DatePrepender:
     fileObj = None
@@ -147,12 +147,12 @@ class Sim:
         cursor.connection.commit()
 
         try:
-            ProbeDB.removeAllProbesFromDB(self.simId)
-            ProbeDB.writeAllProbesIntoDB(self.outputPath, self.simId, options.skipNullTrials)
+            wrowser.simdb.ProbeDB.removeAllProbesFromDB(self.simId)
+            wrowser.simdb.ProbeDB.writeAllProbesIntoDB(self.outputPath, self.simId, options.skipNullTrials)
             statusCode = 0
         except Exception, e:
             print >>sys.stdout, "Probe import for simId %d failed (Exception caught: %s)" % ( self.simId, e)
-            ProbeDB.removeAllProbesFromDB(self.simId)
+            wrowser.simdb.ProbeDB.removeAllProbesFromDB(self.simId)
 
         if statusCode == 0:
             state = 'Finished'

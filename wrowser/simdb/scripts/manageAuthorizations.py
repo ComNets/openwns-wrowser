@@ -28,7 +28,7 @@
 #! /usr/bin/python
 
 import wrowser.Configuration as Configuration
-import simdb.Database as db
+import wrowser.simdb.Database as db
 import os
 import sys
 
