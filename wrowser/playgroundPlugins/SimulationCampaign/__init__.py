@@ -109,13 +109,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         answer = core.userFeedback.askForReject('Do you want to use the database server for storing simulation campaign related data?')
 
         if not answer:
-            answer2 = raw_input( 'NOTICE: The database server is still in alpha stage. Hence, the consistency of the data stored\n'\
-                                     'in the database cannot be guarranted. A complete loss of data is also possible.\n'\
-                                     'If you are sure you want to continue, please type \'yes\': ')
-            if answer2.lower() == 'yes':
-                useDbServer = True
-            else:
-                sys.exit(1)
+            useDbServer = True
 
         # use sqlite
         if useDbServer == False:
