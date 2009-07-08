@@ -57,7 +57,7 @@ def getWrowserDir():
     return None
 
 def createDatabase(arg = 'unused'):
-    subprocess.call(['./campaignConfiguration.py'], shell = True)
+    subprocess.call(['python ./campaignConfiguration.py'], shell = True)
     print 'Database entries successfully created.'
 
 
