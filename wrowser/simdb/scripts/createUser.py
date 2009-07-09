@@ -54,9 +54,10 @@ if(userName == 'root' or userName == 'postgres'):
 	print "ERROR!"
 	print "You have tried to call the script ./createUser.py as user %s" % (userName)
 	print "* It is strongly recommended that you call the script using the user account"
-	print "  with which you plan to do the simulations, i.e., your usual working account"
-	print "* It is NOT recommended to call the script as root or as user postgres"
-	print "Please login with your usual working account and repeat the procedure"
+	print "  with which you plan to do the simulations, i.e., your usual working account."
+	print "* It is NOT recommended to call the script as root or as user postgres - or "
+	print "  that you do simulations using one of them."
+	print "Please login with your usual working account and repeat the procedure!"
 	sys.exit()
 
 postgresPassword = getpass.getpass('Please enter the password of the \'postgres\' super user: ')
