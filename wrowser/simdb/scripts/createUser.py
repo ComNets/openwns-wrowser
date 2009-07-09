@@ -49,10 +49,19 @@ hostname = 'localhost'
 dbName = 'simdb'
 password = 'foobar'
 
+userName = getpass.getuser()
+if(userName == 'root' or userName == 'postgres'):
+	print "ERROR!"
+	print "You have tried to call the script ./createUser.py as user %s" % (userName)
+	print "* It is strongly recommended that you call the script using the user account"
+	print "  with which you plan to do the simulations, i.e., your usual working account"
+	print "* It is NOT recommended to call the script as root or as user postgres"
+	print "Please login with your usual working account and repeat the procedure"
+	sys.exit()
+
 postgresPassword = getpass.getpass('Please enter the password of the \'postgres\' super user: ')
 db.Database.connect(dbName, hostname, 'postgres', postgresPassword)
 
-userName = getpass.getuser()
 curs = db.Database.getCursor()
 curs.execute('SELECT * FROM administration.users WHERE user_name = \'%s\'' % userName)
 if len(curs.fetchall()) != 0:
