@@ -93,6 +93,9 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
                                             QtGui.QItemSelectionModel.Select)
         self.probeFilterValidator = ProbeFilterValidator(model, self)
         self.probeFilter.setValidator(self.probeFilterValidator)
+    def setAggregateParametersModel(self, model):
+        self.aggregateParameter.setModelColumn(0)
+        self.aggregateParameter.setModel(model)
 
     def setProbeFunctions(self, probeFunctions, initialIndex = 0):
         if len(probeFunctions) == 0:
@@ -130,6 +133,15 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
         Debug.printCall(self, str(text))
         if self.probeFilter.hasAcceptableInput():
             self.probes.model().setFilter(str(text))
+
+    def isAggregateParameter(self):
+        return self.aggregatecheckBox.isChecked()
+
+    def aggregationParameter(self):
+        return str(self.aggregateParameter.currentText())
+
+    def isPlotNotAggregatedGraphs(self):
+        return self.originalgraphcheckBox.isChecked()
 
 from ui.Widgets_ParameterGraphControl_ui import Ui_Widgets_ParameterGraphControl
 class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
@@ -169,6 +181,10 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
     def setSimulationParametersModel(self, model):
         self.simulationParameter.setModelColumn(0)
         self.simulationParameter.setModel(model)
+
+    def setAggregateParametersModel(self, model):
+        self.yProbesControl.aggregateParameter.setModelColumn(0)
+        self.yProbesControl.aggregateParameter.setModel(model)
 
     def setXProbesModel(self, model):
         self.xProbesControl.setModel(model)
@@ -222,6 +238,14 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
     def yProbeEntriesView(self):
         return self.yProbeEntry
+    def isAggregateParameter(self):
+        return self.yProbesControl.aggregatecheckBox.isChecked()
+
+    def aggregationParameter(self):
+        return str(self.yProbesControl.aggregateParameter.currentText())
+
+    def isPlotNotAggregatedGraphs(self):
+        return self.yProbesControl.originalgraphcheckBox.isChecked()
 
 class GraphNavigationBar(QtGui.QWidget):
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg

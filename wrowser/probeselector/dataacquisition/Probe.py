@@ -25,13 +25,23 @@
 #
 ###############################################################################
 
+def defaultGraphWriter(x, y, graph, probe):
+    graph.points.append((x, y))
+
+def aggregateGraphWriter(x, y, graph, probe):
+    if x in graph.pointsDict.keys():
+        graph.pointsDict[x].append((y, probe))
+    else:
+        graph.pointsDict[x] = [(y, probe)]
+
 class Histogram:
-    def __init__(self, histogramAttr, xDataAttr, yDataAttr, yLabel, reversePoints = False):
+    def __init__(self, histogramAttr, xDataAttr, yDataAttr, yLabel, reversePoints = False, graphWriter = defaultGraphWriter):
         self.histogramAttr = histogramAttr
         self.xDataAttr = xDataAttr
         self.yDataAttr = yDataAttr
         self.yLabel = yLabel
         self.reversePoints = reversePoints
+        self.graphWriter = graphWriter
 
     def __call__(self, scenario, probe, graph, errors):
         def graphReverse(graph):
@@ -42,7 +52,8 @@ class Histogram:
         for histogramEntry in getattr(probe.data, self.histogramAttr):
             x = getattr(histogramEntry, self.xDataAttr)
             y = getattr(histogramEntry, self.yDataAttr)
-            graph.points.append((x, y))
+            self.graphWriter(x, y, graph, probe.data)
+        graph.reversePoints = self.reversePoints
         graph.axisLabels = (probe.data.description,
                             self.yLabel)
         if self.reversePoints:
@@ -52,18 +63,18 @@ class Histogram:
 
 class PDF(Histogram):
 
-    def __init__(self):
-        Histogram.__init__(self, "pureHistogram", "x", "pdf", "p(x)")
+    def __init__(self, graphWriter = defaultGraphWriter):
+        Histogram.__init__(self, "pureHistogram", "x", "pdf", "p(x)", graphWriter = graphWriter)
 
 class CDF(Histogram):
 
-    def __init__(self):
-        Histogram.__init__(self, "pureHistogram", "x", "cdf", "P(X <= x)")
+    def __init__(self, graphWriter = defaultGraphWriter):
+        Histogram.__init__(self, "pureHistogram", "x", "cdf", "P(X <= x)", graphWriter = graphWriter)
 
 class CCDF(Histogram):
 
-    def __init__(self):
-        Histogram.__init__(self, "pureHistogram", "x", "ccdf", "P(X > x)")
+    def __init__(self, graphWriter = defaultGraphWriter):
+        Histogram.__init__(self, "pureHistogram", "x", "ccdf", "P(X > x)", graphWriter = graphWriter)
 
 class LRE_F(Histogram):
 

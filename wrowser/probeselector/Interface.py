@@ -295,15 +295,15 @@ class Facade:
             acquireScenarioData(scenario, graphs, errors)
         graphsList = graphs.graphsAsList()
         maxIndex = len(graphsList) - 1
-        if graphClass == Graphs.Graph:
+        if graphClass == Graphs.Graph or graphClass == Graphs.AggregatedGraph:
             if callable(progressReset):
                 progressReset()
             for index, graph in enumerate(graphsList):
                 if callable(progressNotify):
-                    msg = "Sorting graph points..."
+                    msg = "Processing and sorting graph points..."
                     msg += "\n" + str(graph.identity)
                     progressNotify(index, maxIndex, msg)
-                graph.orderPoints(key = operator.itemgetter(0))
+                graph.process()
         if callable(progressReset):
             progressReset()
         if callable(progressNotify):

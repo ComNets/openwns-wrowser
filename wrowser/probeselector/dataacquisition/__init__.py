@@ -31,12 +31,14 @@ import wrowser.probeselector.Graphs as Graphs
 
 import Probe
 import Compose
+import Aggregator
 
 class Scenario:
 
-    def __init__(self, probeDataAcquirers, parameterNames):
+    def __init__(self, probeDataAcquirers, parameterNames, aggregationFunction = None):
         self.probeDataAcquirers = probeDataAcquirers
         self.parameterNames = parameterNames
+        self.aggregationFunction = aggregationFunction
 
     def __call__(self, scenario, graphs, errors):
 
@@ -49,7 +51,8 @@ class Scenario:
                 probeName = probe.name
             graphIdentity = Graphs.GraphIdentityParameters(probeName, graphParameters)
             graphargs = {"identity" : graphIdentity,
-                         "sortkey" : graphParameters}
+                         "sortkey" : graphParameters,
+                         "aggregationFunction" : self.aggregationFunction}
             graph = graphs.getGraphInstance(key = str(graphIdentity), graphargs = graphargs)
             acquireXYData(scenario, probe, graph, errors)
 
