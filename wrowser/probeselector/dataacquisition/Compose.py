@@ -27,10 +27,20 @@
 
 import wrowser.probeselector.Errors as Errors
 
+def defaultGraphWriter(x, y, graph):
+    graph.points.append((x, y))
+
+def aggregateGraphWriter(x, y, graph):
+    if x in graph.pointsDict.keys():
+        graph.pointsDict[x].append(y)
+    else:
+        graph.pointsDict[x] = [y]
+
 class XY:
-    def __init__(self, x, y):
+    def __init__(self, x, y, graphWriter = defaultGraphWriter):
         self.acquireXData = x
         self.acquireYData = y
+        self.graphWriter = graphWriter
 
     def __call__(self, scenario, probe, graph, errors):
         try:
@@ -45,7 +55,7 @@ class XY:
             else:
                 graph.axisLabels = (self.acquireXData.label,
                                     self.acquireYData.label)
-                graph.points.append((x, y))
+                self.graphWriter(x, y, graph)
 
 class ParameterValue:
     def __init__(self, parameterName):
@@ -62,6 +72,14 @@ class ProbeEntry:
     def __call__(self, scenario, probe):
         self.label = self.entryName + " of " + probe.data.description
         return getattr(probe.data, self.entryName)
+
+class Probe:
+    def __init__(self, entryName):
+        self.entryName = entryName
+
+    def __call__(self, scenario, probe):
+        self.label = self.entryName + " of " + probe.data.description
+        return probe.data
 
 class ProbeEntryOfProbe:
     def __init__(self, probeName, entryName):

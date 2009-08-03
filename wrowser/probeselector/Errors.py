@@ -92,3 +92,7 @@ class MultipleErrors(Exception):
         for error in self.errors:
             s += str(error.__class__) + ": " + str(error) + "\n"
         return s
+class Aggregation(Exception):
+
+    def __str__(self):
+        return "Could not aggregate graphs! The number of y values to aggregate is different for different x values!"

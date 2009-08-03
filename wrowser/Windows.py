@@ -573,6 +573,9 @@ class ProbeFigure(Figure):
         self.probesModel = Models.ProbeNames(self.campaigns.draw, self.getProbeTypes())
         self.probeGraphControl.setModel(self.probesModel)
 
+        self.aggregateParametersModel = Models.SimulationParameters(self.campaigns.draw, onlyNumeric = True)
+        self.probeGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
+
     def on_drawCampaign_changed(self, campaign):
         self.probesModel.setCampaign(self.campaigns.draw)
 
@@ -665,19 +668,45 @@ class XDFFigure(ProbeFigure, LineGraphs):
         funType = self.probeGraphControl.probeFunction()
         probeNames = self.probeGraphControl.probeNames()
 
-        probeDataAcquirer = getattr(dataacquisition.Probe, funType)()
-        probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
+        graphs = list()
+        errors = list()
 
-        parameterNames = list(campaign.getChangingParameterNames())
+        if self.probeGraphControl.isAggregateParameter():
+            probeDataAcquirer = getattr(dataacquisition.Probe, funType)(graphWriter = dataacquisition.Probe.aggregateGraphWriter)
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
 
-        scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
-                                                        parameterNames = parameterNames)
+            aggregationParameter = self.probeGraphControl.aggregationParameter()
+            parameterNames = list(campaign.getChangingParameterNames() - set([aggregationParameter]))
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.weightedXDF)
 
-        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
 
-        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                progressReset = progressDialogue.reset)
+            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                            progressNotify = progressDialogue.setCurrentAndMaximum,
+                                                            progressReset = progressDialogue.reset,
+                                                            graphClass = probeselector.Graphs.AggregatedGraph)
+
+            graphs += graphsHelp
+            errors += errorsHelp
+
+        if self.probeGraphControl.isPlotNotAggregatedGraphs() or not self.probeGraphControl.isAggregateParameter():
+            probeDataAcquirer = getattr(dataacquisition.Probe, funType)()
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
+
+            parameterNames = list(campaign.getChangingParameterNames())
+
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
+                                                            parameterNames = parameterNames)
+
+            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+
+            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                            progressNotify = progressDialogue.setCurrentAndMaximum,
+                                                            progressReset = progressDialogue.reset)
+
+
+            graphs += graphsHelp
+            errors += errorsHelp
 
         return graphs
 
@@ -824,6 +853,8 @@ class ParameterFigure(Figure, LineGraphs):
 
         self.simulationParametersModel = Models.SimulationParameters(self.campaigns.draw, onlyNumeric = True)
         self.parameterGraphControl.setSimulationParametersModel(self.simulationParametersModel)
+        self.aggregateParametersModel = Models.SimulationParameters(self.campaigns.draw, onlyNumeric = True)
+        self.parameterGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
 
         self.xProbesModel = Models.ProbeNames(self.campaigns.draw)
         self.parameterGraphControl.setXProbesModel(self.xProbesModel)
@@ -847,39 +878,76 @@ class ParameterFigure(Figure, LineGraphs):
         self.yProbeEntriesModel.setCampaign(self.campaigns.draw)
 
     def getGraphs(self):
+        import probeselector.Graphs
+
         dataacquisition = probeselector.dataacquisition
         campaign = self.campaigns.draw
 
         parameterName = self.parameterGraphControl.parameterName()
 
-        if self.parameterGraphControl.isXUseProbeEntry():
-            xProbeName = self.parameterGraphControl.xProbeNames()[0]
-            xProbeEntry = self.parameterGraphControl.xProbeEntryName()
-            xAcquirer = dataacquisition.Compose.ProbeEntryOfProbe(xProbeName, xProbeEntry)
-        else:
+        graphs = list()
+        errors = list()
+
+        if self.parameterGraphControl.isAggregateParameter():
+            assert(self.parameterGraphControl.isXUseProbeEntry(), False)
+            assert(self.parameterGraphControl.isYUseProbeEntry(), True)
+
             xAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
 
         if self.parameterGraphControl.isYUseProbeEntry():
             yProbeNames = self.parameterGraphControl.yProbeNames()
             yProbeEntry = self.parameterGraphControl.yProbeEntryName()
-            yAcquirer = dataacquisition.Compose.ProbeEntry(yProbeEntry)
+            yAcquirer = dataacquisition.Compose.Probe(yProbeEntry)
 
-            probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)
-            probeDataAcquirers = dict([(probeName, probeDataAcquirer)
-                                       for probeName in yProbeNames])
-        else:
-            yAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
+            probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer, graphWriter = dataacquisition.Compose.aggregateGraphWriter)
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in yProbeNames])
 
-            probeDataAcquirers = {None : dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)}
+            aggregationParameter = self.parameterGraphControl.aggregationParameter()
+            parameterNames = list(campaign.getChangingParameterNames() - set([parameterName, aggregationParameter]))
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.mapping[yProbeEntry])
 
-        parameterNames = list(campaign.getChangingParameterNames() - set([parameterName]))
-        scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
+            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
 
-        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                      progressNotify = progressDialogue.setCurrentAndMaximum,
+                                                      progressReset = progressDialogue.reset,
+                                                      graphClass = probeselector.Graphs.AggregatedGraph)
 
-        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                progressReset = progressDialogue.reset)
+            graphs += graphsHelp
+            errors += errorsHelp
+
+        if self.parameterGraphControl.isPlotNotAggregatedGraphs() or not self.parameterGraphControl.isAggregateParameter():
+            if self.parameterGraphControl.isXUseProbeEntry():
+                xProbeName = self.parameterGraphControl.xProbeNames()[0]
+                xProbeEntry = self.parameterGraphControl.xProbeEntryName()
+                xAcquirer = dataacquisition.Compose.ProbeEntryOfProbe(xProbeName, xProbeEntry)
+            else:
+                xAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
+
+            if self.parameterGraphControl.isYUseProbeEntry():
+                yProbeNames = self.parameterGraphControl.yProbeNames()
+                yProbeEntry = self.parameterGraphControl.yProbeEntryName()
+                yAcquirer = dataacquisition.Compose.ProbeEntry(yProbeEntry)
+
+                probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)
+                probeDataAcquirers = dict([(probeName, probeDataAcquirer)
+                                           for probeName in yProbeNames])
+            else:
+                yAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
+
+                probeDataAcquirers = {None : dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)}
+
+            parameterNames = list(campaign.getChangingParameterNames() - set([parameterName]))
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
+
+            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+
+            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                            progressNotify = progressDialogue.setCurrentAndMaximum,
+                                                            progressReset = progressDialogue.reset)
+
+            graphs += graphsHelp
+            errors += errorsHelp
 
         return graphs
 

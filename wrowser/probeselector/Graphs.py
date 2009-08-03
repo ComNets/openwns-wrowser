@@ -27,6 +27,7 @@
 
 import Interface
 import wrowser.Tools as Tools
+import Errors
 
 class GraphInstantiator:
 
@@ -64,7 +65,27 @@ class Graph(Tools.Chameleon):
         self.points = list()
         self.identity = identity
         self.axisLabels = ("", "")
-        self.orderPoints = self.points.sort
+        self.reversePoints = False
+
+    def process(self):
+        if self.reversePoints:
+            self.points.reverse()
+        self.points.sort(key = lambda x: x[0])
+
+
+class AggregatedGraph(Graph):
+
+    def __init__(self, identity = None, **additionalAttributes):
+        Graph.__init__(self, identity, **additionalAttributes)
+        self.pointsDict = dict()
+
+    def process(self):
+        numberOfPoints = map(lambda x: len(x), self.pointsDict.values())
+        if min(numberOfPoints) != max(numberOfPoints):
+            raise Errors.Aggregation()
+        self.points = self.aggregationFunction(self.pointsDict)
+        Graph.process(self)
+
 
 class TableGraph(Graph):
 
