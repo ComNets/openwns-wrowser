@@ -894,7 +894,6 @@ class ParameterFigure(Figure, LineGraphs):
 
             xAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
 
-        if self.parameterGraphControl.isYUseProbeEntry():
             yProbeNames = self.parameterGraphControl.yProbeNames()
             yProbeEntry = self.parameterGraphControl.yProbeEntryName()
             yAcquirer = dataacquisition.Compose.Probe(yProbeEntry)

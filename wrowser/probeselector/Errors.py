@@ -96,3 +96,11 @@ class Aggregation(Exception):
 
     def __str__(self):
         return "Could not aggregate graphs! The number of y values to aggregate is different for different x values!"
+
+class NotEqual(Exception):
+
+    def __init__(self, attribute):
+        self.attribute = attribute
+
+    def __str__(self):
+        return "The value of '%s' differs for the probes to be aggregated!" % self.attribute

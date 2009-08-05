@@ -28,6 +28,7 @@
 ###############################################################################
 
 import math
+import wrowser.probeselector.Errors as Errors
 
 
 def total(attribute, list):
@@ -53,7 +54,10 @@ def weightedMean(pointsDict):
     for x, yProbeList in pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValues = total('sum_of_all_values', yProbeList)
-        y = totalSumOfAllValues/totalTrials
+        if totalTrials > 0.0:
+            y = totalSumOfAllValues/totalTrials
+        else:
+            y = 0.0
         points.append((x, y))
     return points
 
@@ -137,7 +141,10 @@ def weightedMoment2(pointsDict):
     for x, yProbeList in pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
-        y = totalSumOfAllValuesSquare/totalTrials
+        if totalTrials > 0.0:
+            y = totalSumOfAllValuesSquare/totalTrials
+        else:
+            y = 0.0
         points.append((x, y))
     return points
 
@@ -148,7 +155,10 @@ def weightedMoment3(pointsDict):
     for x, yProbeList in pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValuesCubic = total('sum_of_all_values_cubic', yProbeList)
-        y = totalSumOfAllValuesCubic/totalTrials
+        if totalTrials > 0.0:
+            y = totalSumOfAllValuesCubic/totalTrials
+        else:
+            y = 0.0
         points.append((x, y))
     return points
 
@@ -179,6 +189,48 @@ def weightedXDF(pointsDict):
     return points
 
 
+class WeightedPercentile:
+
+    def __init__(self, percentile):
+        self.percentile = percentile
+
+    def __call__(self, pointsDict):
+        pointsList = list()
+        for x, probeList in pointsDict.iteritems():
+            values = dict()
+            totalTrials = 0
+            for probe in probeList:
+                totalTrials += probe.trials
+                for histogramEntry in probe.histogram:
+                    if histogramEntry.x in values.keys():
+                        values[histogramEntry.x] += histogramEntry.cdf*probe.trials
+                    else:
+                        values[histogramEntry.x] = histogramEntry.cdf*probe.trials
+            valueList = [(xx, yy/totalTrials) for xx, yy in values.iteritems()]
+            valueList.sort(key = lambda xx: xx[0])
+            for value in valueList:
+                if value[1] > self.percentile:
+                    pointsList.append((x, value[0]))
+                    break
+        return pointsList
+
+
+
+class AssureEquality:
+
+    def __init__(self, attribute):
+        self.attribute = attribute
+
+    def __call__(self, pointsDict):
+        points = list()
+        for x, yProbeList in pointsDict.iteritems():
+            minV = getattr(min(yProbeList, key = lambda x: getattr(x, self.attribute)), self.attribute)
+            maxV = getattr(max(yProbeList, key = lambda x: getattr(x, self.attribute)), self.attribute)
+            if minV == maxV:
+                points.append((x, minV))
+            else:
+                raise Errors.NotEqual(self.attribute)
+        return points
 
 
 
@@ -196,14 +248,14 @@ mapping = {'minimum' : minimum,
            'sum_of_all_values' : Sum('sum_of_all_values'),
            'sum_of_all_values_square' : Sum('sum_of_all_values_square'),
            'sum_of_all_values_cubic' : Sum('sum_of_all_values_cubic'),
-           'p01' : None,
-           'p05' : None,
-           'p50' : None,
-           'p95' : None,
-           'p99' : None,
-           'min_x' : None,
-           'max_x' : None,
-           'number_of_bins' : None,
+           'p01' : WeightedPercentile(0.01),
+           'p05' : WeightedPercentile(0.05),
+           'p50' : WeightedPercentile(0.50),
+           'p95' : WeightedPercentile(0.95),
+           'p99' : WeightedPercentile(0.99),
+           'min_x' : AssureEquality('min_x'),
+           'max_x' : AssureEquality('max_x'),
+           'number_of_bins' : AssureEquality('number_of_bins'),
            'underflows' : Sum('underflows'),
            'overflows' : Sum('overflows')}
 
