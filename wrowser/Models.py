@@ -43,20 +43,21 @@ class CampaignDb(QtCore.QAbstractItemModel):
         for username, campaigns in self.campaignIds.items():
             if None in campaigns.keys():
                 del self.campaignIds[username]
+        self.sortedCampaignIdsKeys = sorted(campaignIds.keys())
 
     def getCampaign(self, index):
-        userName = self.campaignIds.keys()[index.internalId()]
-        return self.campaignIds[userName].keys()[index.row()]
+        userName = self.sortedCampaignIdsKeys[index.internalId()]
+        return map(lambda x: x[0], sorted(self.campaignIds[userName].items(), key = lambda x: x[1][0].lower()))[index.row()]
 
     def columnCount(self, parent = QtCore.QModelIndex()):
         return len(self.headerNames)
 
     def rowCount(self, parent = QtCore.QModelIndex()):
         if parent.isValid() and parent.internalId() == -1:
-            userName = self.campaignIds.keys()[parent.row()]
+            userName = self.sortedCampaignIdsKeys[parent.row()]
             return len(self.campaignIds[userName])
         elif not parent.isValid():
-            return len(self.campaignIds.keys())
+            return len(self.sortedCampaignIdsKeys)
         else:
             return 0
 
@@ -81,8 +82,8 @@ class CampaignDb(QtCore.QAbstractItemModel):
         if not index.isValid():
             return QtCore.Qt.ItemIsEnabled
         if index.internalId() > -1:
-            userName = self.campaignIds.keys()[index.internalId()]
-            if self.campaignIds[userName].values()[index.row()][3]:
+            userName = self.sortedCampaignIdsKeys[index.internalId()]
+            if sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][3]:
                 return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
             else:
                 return QtCore.Qt.ItemFlags()
@@ -99,16 +100,16 @@ class CampaignDb(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.DisplayRole:
             if index.internalId() == -1 and index.column() == 0:
-                return QtCore.QVariant(self.campaignIds.keys()[index.row()])
+                return QtCore.QVariant(self.sortedCampaignIdsKeys[index.row()])
             elif index.internalId() > -1 and index.column() == 1:
-                userName = self.campaignIds.keys()[index.internalId()]
-                return QtCore.QVariant(self.campaignIds[userName].values()[index.row()][0])
+                userName = self.sortedCampaignIdsKeys[index.internalId()]
+                return QtCore.QVariant(sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][0])
             elif index.internalId() > -1 and index.column() == 2:
-                userName = self.campaignIds.keys()[index.internalId()]
-                return QtCore.QVariant(self.campaignIds[userName].values()[index.row()][1])
+                userName = self.sortedCampaignIdsKeys[index.internalId()]
+                return QtCore.QVariant(sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][1])
             elif index.internalId() > -1 and index.column() == 3:
-                userName = self.campaignIds.keys()[index.internalId()]
-                return QtCore.QVariant(self.campaignIds[userName].values()[index.row()][2])
+                userName = self.sortedCampaignIdsKeys[index.internalId()]
+                return QtCore.QVariant(sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][2])
 
         return QtCore.QVariant()
 
