@@ -46,7 +46,7 @@ class ScenarioPlotter:
         canvas.axes.plot(x, y, *args, **kwargs)
 
     def plotLine(self, canvas, endPoints, *args, **kwargs):
-        """the endPoints parameter must be a list of instances of type wns.Position"""
+        """the endPoints parameter must be a list of instances of type openwns.geometry.position.Position"""
         canvas.axes.plot([ endPoints[0].x, endPoints[1].x ],
                               [ endPoints[0].y, endPoints[1].y ],
                               *args,
@@ -118,10 +118,10 @@ from ScenarioFrame to plot special scenarios"""
         if len(self.utPositions):
             if isinstance(self.utPositions[0], tuple):
                 for pos, nr in self.utPositions:
-                    assert isinstance(pos, wns.Position)
+                    assert isinstance(pos, openwns.geometry.position.Position)
                     axes.plot([pos.x], [pos.y], 'go')
                     axes.text(pos.x, pos.y, str(nr))
-            elif isinstance(self.utPositions[0], wns.Position):
+            elif isinstance(self.utPositions[0], openwns.geometry.position.Position):
                 utX = [ pos.x for pos in self.utPositions ]
                 utY = [ pos.y for pos in self.utPositions ]
                 axes.plot(utX, utY, 'go')

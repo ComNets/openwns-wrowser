@@ -51,7 +51,7 @@ class GenericPlotter:
         canvas.axes.plot(x, y, *args, **kwargs)
 
     def plotLine(self, canvas, endPoints, *args, **kwargs):
-        """the endPoints parameter must be a list of instances of type wns.Position"""
+        """the endPoints parameter must be a list of instances of type openwns.geometry.position.Position"""
         canvas.axes.plot([ endPoints[0].x, endPoints[1].x ],
                               [ endPoints[0].y, endPoints[1].y ],
                               *args,

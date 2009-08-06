@@ -283,6 +283,7 @@ class Progress(QtGui.QProgressDialog):
         self.labelText = labelText
         self.setLabelText(labelText)
         self.setMinimumDuration(minShow)
+        self.setAutoClose(True)
         self.reset()
 
     def reset(self):
