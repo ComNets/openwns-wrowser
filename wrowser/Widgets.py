@@ -93,6 +93,7 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
                                             QtGui.QItemSelectionModel.Select)
         self.probeFilterValidator = ProbeFilterValidator(model, self)
         self.probeFilter.setValidator(self.probeFilterValidator)
+
     def setAggregateParametersModel(self, model):
         self.aggregateParameter.setModelColumn(0)
         self.aggregateParameter.setModel(model)
@@ -238,6 +239,7 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
     def yProbeEntriesView(self):
         return self.yProbeEntry
+
     def isAggregateParameter(self):
         return self.yProbesControl.aggregatecheckBox.isChecked()
 
