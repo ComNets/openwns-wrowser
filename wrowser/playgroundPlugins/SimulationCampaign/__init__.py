@@ -4,6 +4,8 @@ import datetime
 
 import sys
 
+import PrepareCampaign
+
 from wnsbase.playground.builtins.Install.Install import InstallCommand
 
 import wnsbase.playground.Core
@@ -90,160 +92,61 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         # Import playground stuff
         projects = core.getProjects()
 
-        versionInformation = ""
-
-        def createVersionInformation(project):
-            return project.getRCS().getTreeVersion() + "--" + \
-                project.getRCS().getPatchLevel() + "\n" + \
-                str(project.getRCS().status())
-
-        versionInformation += str().join(createVersionInformation(projects.root))
-        versionInformation += str().join([ii.result for ii in core.foreachProject(createVersionInformation)])
-
         absSandboxDir = os.path.abspath(os.path.join(directory, "sandbox"))
         campaignName = os.path.basename(os.path.abspath(directory))
         logFile = os.path.join(directory, campaignName + ".history")
 
-        useDbServer = False
+        updating = False
 
-        answer = core.userFeedback.askForReject('Do you want to use the database server for storing simulation campaign related data?')
-
-        if not answer:
-            useDbServer = True
-
-        # use sqlite
-        if useDbServer == False:
-            updating = False
-            createSimDir = False
-            subCampaignDirName = "simulations"
-
-            if os.path.exists(directory):
-                if os.path.exists(logFile):
-                    print "Found simulation campaign in directory %s." % directory
-                    answer = raw_input("Shall I try to (U)pdate the sandbox or do you want to (C)reate a new sub campaign? Type \'e\' to exit (u/c/e) [e]: ")
-                    answer = answer.lower()
-                    if answer == "u":
-                        if os.path.exists(absSandboxDir):
-                            os.system("chmod -R u+w " + absSandboxDir)
-                            os.system("rm -rf " + absSandboxDir)
-                        if os.path.exists(logFile):
-                            os.system("chmod u+w " + logFile)
-                        logFileHandle = file(logFile, 'a')
-                        updating = True
-                    elif answer == "c":
-                        proposedDirectory = self.__getDirectoryProposal(directory)
-                        while True:
-                            subCampaignDirName = raw_input('Please enter the name of the directory the simulations shall be stored in [%s]: ' % proposedDirectory)
-                            if subCampaignDirName == '':
-                                subCampaignDirName = proposedDirectory
-
-                            fullDirName = os.path.join(directory, subCampaignDirName)
-                            if os.path.exists(fullDirName):
-                                print 'Path already exists. Please use a different name'
-                            else:
-                                if os.path.exists(logFile):
-                                    os.system("chmod u+w " + logFile)
-                                logFileHandle = file(logFile, 'a')
-                                createSimDir = True
-                                break
-                    else:
-                        sys.exit(0)
+        if os.path.exists(directory):
+            if os.path.exists(logFile):
+                print "Found simulation campaign in directory %s." % directory
+                answer = raw_input("Shall I try to (U)pdate the sandbox or do you want to (C)reate a new sub campaign? Type \'e\' to exit (u/c/e) [e]: ")
+                answer = answer.lower()
+                if answer == "u":
+                    if os.path.exists(absSandboxDir):
+                        os.system("chmod -R u+w " + absSandboxDir)
+                        os.system("rm -rf " + absSandboxDir)
+                    if os.path.exists(logFile):
+                        os.system("chmod u+w " + logFile)
+                    logFileHandle = file(logFile, 'a')
+                    updating = True
+                elif answer == "c":
+                    PrepareCampaign.createNewSubCampaign(directory)
+                    sys.exit(0)
                 else:
-                    print "Directory %s already exists and does not seem to be a simulation campaign directory." % directory
-                    print "Please remove the directory or use a different name and try again."
                     sys.exit(0)
             else:
-                os.mkdir(directory)
-                logFileHandle = file(logFile, 'w')
-                logFileHandle.write("Do NOT remove this file!\n\n")
-                shutil.copy('.thisIsTheRootOfWNS', directory)
-                updating = True
-                createSimDir = True
-
-
-            logFileHandle.write("---START---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n\n")
-
-            if updating:
-                logFileHandle.write("Setting up sandbox directory...\n\n")
-                self.installWNS(absSandboxDir)
-                logFileHandle.write("Sandbox directory successfully created.\n\n")
-
-            if createSimDir:
-                logFileHandle.write("Create sub-campaign directory %s ...\n\n" % (subCampaignDirName))
-                os.mkdir(os.path.join(directory, subCampaignDirName))
-                shutil.copy(os.path.join(os.path.dirname(__file__), "campaignConfiguration.py"),
-                            os.path.join(directory, subCampaignDirName, "campaignConfiguration.py"))
-                shutil.copy(os.path.join("bin", "simcontrol.py"),
-                            os.path.join(directory, subCampaignDirName))
-                logFileHandle.write("Sub-campaign directory %s successfully created.\n\n" % (subCampaignDirName))
-            shutil.copy(os.path.join("bin", "sim.py"),
-                        directory)
-
-            logFileHandle.write("Installed module versions:\n" + versionInformation + "\n")
-            logFileHandle.write("Change sanbox to read only.\n")
-            os.system("chmod -R u-w,g-w,o-w " + absSandboxDir)
-            logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
-            logFileHandle.close()
-
-            # make read only
-            os.system("chmod u-w,g-w,o-w " + logFile)
-
+                print "Directory %s already exists and does not seem to be a simulation campaign directory." % directory
+                print "Please remove the directory or use a different name and try again."
+                sys.exit(0)
         else:
-            # use db server
-            import PrepareCampaign
+            os.makedirs(directory)
+            logFileHandle = file(logFile, 'w')
+            logFileHandle.write("Do NOT remove this file!\n\n")
+            shutil.copy('.thisIsTheRootOfWNS', directory)
 
-            updating = False
+        logFileHandle.write("---START---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n\n")
+        logFileHandle.write("Setting up simulation campaign directory...\n\n")
 
-            if os.path.exists(directory):
-                if os.path.exists(logFile):
-                    print "Found simulation campaign in directory %s." % directory
-                    answer = raw_input("Shall I try to (U)pdate the sandbox or do you want to (C)reate a new sub campaign? Type \'e\' to exit (u/c/e) [e]: ")
-                    answer = answer.lower()
-                    if answer == "u":
-                        if os.path.exists(absSandboxDir):
-                            os.system("chmod -R u+w " + absSandboxDir)
-                            os.system("rm -rf " + absSandboxDir)
-                        if os.path.exists(logFile):
-                            os.system("chmod u+w " + logFile)
-                        logFileHandle = file(logFile, 'a')
-                        updating = True
-                    elif answer == "c":
-                        PrepareCampaign.createNewSubCampaign(directory)
-                        sys.exit(0)
-                    else:
-                        sys.exit(0)
-                else:
-                    print "Directory %s already exists and does not seem to be a simulation campaign directory." % directory
-                    print "Please remove the directory or use a different name and try again."
-                    sys.exit(0)
-            else:
-                os.makedirs(directory)
-                logFileHandle = file(logFile, 'w')
-                logFileHandle.write("Do NOT remove this file!\n\n")
-                shutil.copy('.thisIsTheRootOfWNS', directory)
+        if not updating:
+            PrepareCampaign.createNewSubCampaign(directory)
 
-            logFileHandle.write("---START---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n\n")
-            logFileHandle.write("Setting up simulation campaign directory...\n\n")
+        if not os.path.exists(absSandboxDir):
+            os.makedirs(absSandboxDir)
 
-            if not updating:
-                PrepareCampaign.createNewSubCampaign(directory)
+        self.installWNS(absSandboxDir)
 
-            if not os.path.exists(absSandboxDir):
-                os.makedirs(absSandboxDir)
+        PrepareCampaign.updateSubCampaigns(directory)
+        shutil.copy(os.path.join(os.path.dirname(__file__),"sim.py"), directory)
 
-            self.installWNS(absSandboxDir)
+        logFileHandle.write("Simulation campaign directory successfully set up.\n\n")
+        logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
+        logFileHandle.close()
 
-            PrepareCampaign.updateSubCampaigns(directory)
-            shutil.copy(os.path.join(os.path.dirname(__file__),"sim.py"), directory)
-
-            logFileHandle.write("Simulation campaign directory successfully set up.\n\n")
-            logFileHandle.write("Installed module versions:\n" + versionInformation + "\n")
-            logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
-            logFileHandle.close()
-
-            # make read only
-            os.system("chmod -R u-w,g-w,o-w " + absSandboxDir)
-            os.system("chmod u-w,g-w,o-w " + logFile)
+        # make read only
+        os.system("chmod -R u-w,g-w,o-w " + absSandboxDir)
+        os.system("chmod u-w,g-w,o-w " + logFile)
 
 
     def installWNS(self, absSandboxDir):
