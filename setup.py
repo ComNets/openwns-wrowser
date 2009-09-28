@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+import subprocess
+
+print "Creating wrowser.ui files"
+p = subprocess.call(["scons", "-s"])
 
 setup(name='openWNS-Wrowser',
       version='0.9beta2',
