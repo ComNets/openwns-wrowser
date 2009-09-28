@@ -200,7 +200,10 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             elif index.internalId() > -1 and index.column() == 1:
                 parameterName = self.parameterNames[index.internalId()]
                 values = self.parameterValues[parameterName]
-                return QtCore.QVariant(values[index.row()])
+                prettyValue = values[index.row()]
+                if prettyValue is None:
+                    prettyValue = "None"
+                return QtCore.QVariant(prettyValue)
         elif role == QtCore.Qt.CheckStateRole and index.internalId() > -1 and index.column() == 1:
             parameterName = self.parameterNames[index.internalId()]
             value = self.parameterValues[parameterName][index.row()]
