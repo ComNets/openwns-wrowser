@@ -183,7 +183,7 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             return QtCore.Qt.ItemIsEnabled
         if index.internalId() > -1:
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable
-        return QtCore.Qt.ItemIsEnabled
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def headerData(self, section, orientation, role):
         if role != QtCore.Qt.DisplayRole or orientation != QtCore.Qt.Horizontal:
@@ -200,10 +200,7 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             elif index.internalId() > -1 and index.column() == 1:
                 parameterName = self.parameterNames[index.internalId()]
                 values = self.parameterValues[parameterName]
-                prettyValue = values[index.row()]
-                if prettyValue is None:
-                    prettyValue = "None"
-                return QtCore.QVariant(prettyValue)
+                return QtCore.QVariant(values[index.row()])
         elif role == QtCore.Qt.CheckStateRole and index.internalId() > -1 and index.column() == 1:
             parameterName = self.parameterNames[index.internalId()]
             value = self.parameterValues[parameterName][index.row()]

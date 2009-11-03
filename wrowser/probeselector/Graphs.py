@@ -78,12 +78,13 @@ class AggregatedGraph(Graph):
     def __init__(self, identity = None, **additionalAttributes):
         Graph.__init__(self, identity, **additionalAttributes)
         self.pointsDict = dict()
+        self.confidenceIntervalDict = dict()
 
     def process(self):
         numberOfPoints = map(lambda x: len(x), self.pointsDict.values())
         if min(numberOfPoints) != max(numberOfPoints):
             raise Errors.Aggregation()
-        self.points = self.aggregationFunction(self.pointsDict)
+        self.points = self.aggregationFunction(self)
         Graph.process(self)
 
 

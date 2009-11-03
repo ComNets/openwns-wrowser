@@ -304,34 +304,56 @@ class Facade:
                     msg += "\n" + str(graph.identity)
                     progressNotify(index, maxIndex, msg)
                 graph.process()
-        if callable(progressReset):
-            progressReset()
-        if callable(progressNotify):
-            progressNotify(0, 1, "Sorting graphs...")
         graphsList.sort(key = operator.attrgetter("sortkey"))
-        if callable(progressNotify):
-            progressNotify(1, 1, "done")
         return graphsList, errors
 
-    def getGraphs(self, xParameter, probeName, probeEntry, progressNotify = None, progressReset = None):
-        probeDataAcquirer = dataacquisition.Compose.XY(x = dataacquisition.Compose.ParameterValue(xParameter),
-                                                       y = dataacquisition.Compose.ProbeEntryOfProbe(probeName, probeEntry))
-        parameterNames = list(self.getChangingParameterNames() - set([xParameter]))
-        scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
-                                                        parameterNames = parameterNames)
-        graphs, errors = self.acquireGraphs(progressNotify = progressNotify,
-                                            progressReset = progressReset,
-                                            acquireScenarioData = scenarioDataAcquirer)
+    def getGraphs(self, xParameter, probeName, probeEntry, aggregationParameter = None, plotConfidenceIntervals = False, confidenceLevel = 0.95, progressNotify = None, progressReset = None):
+        if aggregationParameter is None and plotConfidenceLevels == False:
+            probeDataAcquirer = dataacquisition.Compose.XY(x = dataacquisition.Compose.ParameterValue(xParameter),
+                                                           y = dataacquisition.Compose.ProbeEntryOfProbe(probeName, probeEntry))
+            parameterNames = list(self.getChangingParameterNames() - set([xParameter]))
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+                                                            parameterNames = parameterNames)
+            graphs, errors = self.acquireGraphs(progressNotify = progressNotify,
+                                                progressReset = progressReset,
+                                                acquireScenarioData = scenarioDataAcquirer)
+        else:
+            probeDataAcquirer = dataacquisition.Compose.XY(x = dataacquisition.Compose.ParameterValue(xParameter),
+                                                           y = dataacquisition.Compose.Probe(probeEntry),
+                                                           graphWriter = dataacquisition.Compose.aggregateGraphWriter)
+            if aggregationParameter is None:
+                parameterNames = list(self.getChangingParameterNames() - set([xParameter]))
+            else:
+                parameterNames = list(self.getChangingParameterNames() - set([xParameter, aggregationParameter]))
+            if plotConfidenceIntervals:
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+                                                                parameterNames = parameterNames,
+                                                                aggregationFunction = dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
+            else:
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+                                                                parameterNames = parameterNames,
+                                                                aggregationFunction = dataacquisition.Aggregator.mapping[probeEntry])
+            graphs, errors = self.acquireGraphs(progressNotify = progressNotify,
+                                                progressReset = progressReset,
+                                                acquireScenarioData = scenarioDataAcquirer,
+                                                graphClass = pywns.probeselector.Graphs.AggregatedGraph)
         if len(errors) > 0:
             raise Errors.MultipleErrors(errors, graphs = graphs)
         else:
             return graphs
 
-    def getHistograms(self, probeName, function, progressNotify = None, progressReset = None):
-        probeDataAcquirer = getattr(dataacquisition.Probe, function)()
-        parameterNames = list(self.getChangingParameterNames())
-        scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
-                                                        parameterNames = parameterNames)
+    def getHistograms(self, probeName, function, aggregationParameter = None, progressNotify = None, progressReset = None):
+        if aggregationParameter is None:
+            probeDataAcquirer = getattr(dataacquisition.Probe, function)()
+            parameterNames = list(self.getChangingParameterNames())
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+                                                            parameterNames = parameterNames)
+        else:
+            probeDataAcquirer = getattr(dataacquisition.Probe, function)(graphWriter = dataacquisition.Probe.aggregateGraphWriter)
+            parameterNames = list(self.getChangingParameterNames() - set([aggregationParameter]))
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+                                                            parameterNames = parameterNames,
+                                                            aggregationFunction = dataacquisition.Aggregator.weightedXDF)
         graphs, errors = self.acquireGraphs(progressNotify = progressNotify,
                                             progressReset = progressReset,
                                             acquireScenarioData = scenarioDataAcquirer)

@@ -28,30 +28,60 @@
 ###############################################################################
 
 import math
-import wrowser.probeselector.Errors as Errors
+import scipy.special
+import scipy.stats
 
 
 def total(attribute, list):
     return float(reduce(lambda x, y: x + getattr(y, attribute), [0] + list))
 
+def totalSquare(attribute, list):
+    return float(reduce(lambda x, y: x + getattr(y, attribute)**2, [0] + list))
 
 class Sum:
 
     def __init__(self, entryName):
         self.entryName = entryName
 
-    def __call__(self, pointsDict):
+    def __call__(self, graph):
         points = list()
-        for x, yProbeList in pointsDict.iteritems():
+        for x, yProbeList in graph.pointsDict.iteritems():
             y = total(self.entryName, yProbeList)
             points.append((x, y))
         return points
 
 
+class Mean:
 
-def weightedMean(pointsDict):
+    def __init__(self, entryName, confidenceLevel, calculateConfidenceLevel):
+        self.entryName = entryName
+        self.confidenceLevel = confidenceLevel
+        self.calculateConfidenceLevel = calculateConfidenceLevel
+
+    def __call__(self, graph):
+        points = list()
+        for x, yProbeList in graph.pointsDict.iteritems():
+            totalTrials = float(len(yProbeList))
+            totalSumOfAllValues = total(self.entryName, yProbeList)
+            totalSumOfAllValuesSquare = totalSquare(self.entryName, yProbeList)
+            if totalTrials > 0.0:
+                y = totalSumOfAllValues/totalTrials
+            else:
+                y = 0.0
+            points.append((x, y))
+            if self.calculateConfidenceLevel:
+                if totalTrials > 1.0 and (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials) > 0.0:
+                    var = 1.0 / (totalTrials - 1.0) * (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials)
+                    confInt = math.sqrt(var/totalTrials) * scipy.stats.t.ppf((self.confidenceLevel+1)/2., totalTrials - 1)
+                else:
+                    confInt = 0.0
+                graph.confidenceIntervalDict[x] = confInt
+        return points
+
+
+def weightedMean(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValues = total('sum_of_all_values', yProbeList)
         if totalTrials > 0.0:
@@ -62,10 +92,34 @@ def weightedMean(pointsDict):
     return points
 
 
+class WeightedMeanWithConfidenceInterval:
 
-def weightedVariance(pointsDict):
+    def __init__(self, confidenceLevel):
+        self.confidenceLevel = confidenceLevel
+
+    def __call__(self, graph):
+        points = list()
+        for x, yProbeList in graph.pointsDict.iteritems():
+            totalTrials = total('trials', yProbeList)
+            totalSumOfAllValues = total('sum_of_all_values', yProbeList)
+            totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
+            if totalTrials > 0.0:
+                y = totalSumOfAllValues/totalTrials
+            else:
+                y = 0.0
+            points.append((x, y))
+            if totalTrials > 1.0 and (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials) > 0.0:
+                stdDev = math.sqrt(1.0 / (totalTrials - 1.0) * (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials))
+                confInt = math.sqrt(2.0/totalTrials) * stdDev * scipy.special.erfinv(self.confidenceLevel)
+            else:
+                confInt = 0.0
+            graph.confidenceIntervalDict[x] = confInt
+        return points
+
+
+def weightedVariance(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValues = total('sum_of_all_values', yProbeList)
         totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
@@ -77,9 +131,9 @@ def weightedVariance(pointsDict):
     return points
 
 
-def weightedRelativeVariance(pointsDict):
+def weightedRelativeVariance(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValues = total('sum_of_all_values', yProbeList)
         totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
@@ -91,13 +145,13 @@ def weightedRelativeVariance(pointsDict):
     return points
 
 
-def weightedStandardDeviation(pointsDict):
+def weightedStandardDeviation(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValues = total('sum_of_all_values', yProbeList)
         totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
-        if totalTrials > 1.0:
+        if totalTrials > 1.0 and (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials) > 0.0:
             y = math.sqrt(1.0 / (totalTrials - 1.0) * (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials))
         else:
             y = 0.0
@@ -105,13 +159,13 @@ def weightedStandardDeviation(pointsDict):
     return points
 
 
-def weightedRelativeStandardDeviation(pointsDict):
+def weightedRelativeStandardDeviation(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValues = total('sum_of_all_values', yProbeList)
         totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
-        if totalTrials > 1.0 and totalSumOfAllValues > 0.0:
+        if totalTrials > 1.0 and totalSumOfAllValues > 0.0 and (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials) > 0.0:
             y = totalTrials / totalSumOfAllValues * math.sqrt(1.0 / (totalTrials - 1.0) * (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials))
         else:
             y = 0.0
@@ -119,14 +173,14 @@ def weightedRelativeStandardDeviation(pointsDict):
     return points
 
 
-def weightedSkewness(pointsDict):
+def weightedSkewness(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValues = total('sum_of_all_values', yProbeList)
         totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
         totalSumOfAllValuesCubic = total('sum_of_all_values_cubic', yProbeList)
-        if totalTrials > 1.0 and totalSumOfAllValues > 0.0:
+        if totalTrials > 1.0 and totalSumOfAllValues > 0.0 and (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials) > 0.0:
             y = (3.0 * (totalSumOfAllValues/totalTrials)**3.0 - 3.0 * totalSumOfAllValuesSquare/totalTrials * totalSumOfAllValues/totalTrials + totalSumOfAllValuesCubic) /\
             (1.0 / (totalTrials - 1.0) * (totalSumOfAllValuesSquare - totalSumOfAllValues**2.0/totalTrials))**1.5
         else:
@@ -136,9 +190,9 @@ def weightedSkewness(pointsDict):
 
 
 
-def weightedMoment2(pointsDict):
+def weightedMoment2(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValuesSquare = total('sum_of_all_values_square', yProbeList)
         if totalTrials > 0.0:
@@ -150,9 +204,9 @@ def weightedMoment2(pointsDict):
 
 
 
-def weightedMoment3(pointsDict):
+def weightedMoment3(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         totalTrials = total('trials', yProbeList)
         totalSumOfAllValuesCubic = total('sum_of_all_values_cubic', yProbeList)
         if totalTrials > 0.0:
@@ -164,25 +218,25 @@ def weightedMoment3(pointsDict):
 
 
 
-def minimum(pointsDict):
+def minimum(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         points.append((x, min(yProbeList, key = lambda z: z.minimum)))
     return points
 
 
 
-def maximum(pointsDict):
+def maximum(graph):
     points = list()
-    for x, yProbeList in pointsDict.iteritems():
+    for x, yProbeList in graph.pointsDict.iteritems():
         points.append((x, max(yProbeList, key = lambda z: z.maximum)))
     return points
 
 
 
-def weightedXDF(pointsDict):
+def weightedXDF(graph):
     points = list()
-    for x, yList in pointsDict.iteritems():
+    for x, yList in graph.pointsDict.iteritems():
         totalY = reduce(lambda x, y: x + y[0]*y[1].trials, [0] + yList)
         totalTrials = reduce(lambda x, y: x + y[1].trials, [0] + yList)
         points.append((x, totalY/totalTrials))
@@ -194,9 +248,9 @@ class WeightedPercentile:
     def __init__(self, percentile):
         self.percentile = percentile
 
-    def __call__(self, pointsDict):
+    def __call__(self, graph):
         pointsList = list()
-        for x, probeList in pointsDict.iteritems():
+        for x, probeList in graph.pointsDict.iteritems():
             values = dict()
             totalTrials = 0
             for probe in probeList:
@@ -221,9 +275,9 @@ class AssureEquality:
     def __init__(self, attribute):
         self.attribute = attribute
 
-    def __call__(self, pointsDict):
+    def __call__(self, graph):
         points = list()
-        for x, yProbeList in pointsDict.iteritems():
+        for x, yProbeList in graph.pointsDict.iteritems():
             minV = getattr(min(yProbeList, key = lambda x: getattr(x, self.attribute)), self.attribute)
             maxV = getattr(max(yProbeList, key = lambda x: getattr(x, self.attribute)), self.attribute)
             if minV == maxV:
@@ -275,14 +329,19 @@ if __name__ == '__main__':
                 self.sum_of_all_values = mean * trials
                 self.trials = trials
 
+        class Graph:
+
+            def __init__(self, pointsDict):
+                self.pointsDict = pointsDict
+
 
         def testOneValue(self):
             a = TestWeightedMean.Value(7.0, 1)
             b = TestWeightedMean.Value(8.0, 1)
 
-            pointsDict = { 0: [a],
-                           1: [b]}
-            points = weightedMean(pointsDict)
+            graph = TestWeightedMean.Graph(pointsDict = { 0: [a],
+                                                          1: [b]})
+            points = weightedMean(graph)
             self.assertEqual(points[0][0], 0)
             self.assertAlmostEqual(points[0][1], 7.0)
             self.assertEqual(points[1][0], 1)
@@ -292,8 +351,8 @@ if __name__ == '__main__':
             a = TestWeightedMean.Value(7.0, 1)
             b = TestWeightedMean.Value(8.0, 1)
 
-            pointsDict = { 0: [a, b]}
-            points = weightedMean(pointsDict)
+            graph = TestWeightedMean.Graph(pointsDict = { 0: [a, b]})
+            points = weightedMean(graph)
             self.assertEqual(points[0][0], 0)
             self.assertAlmostEqual(points[0][1], 7.5)
 
@@ -301,8 +360,8 @@ if __name__ == '__main__':
             a = TestWeightedMean.Value(7.0, 1)
             b = TestWeightedMean.Value(8.0, 3)
 
-            pointsDict = { 0: [a, b]}
-            points = weightedMean(pointsDict)
+            graph = TestWeightedMean.Graph(pointsDict = { 0: [a, b]})
+            points = weightedMean(graph)
             self.assertEqual(points[0][0], 0)
             self.assertAlmostEqual(points[0][1], 7.75)
 

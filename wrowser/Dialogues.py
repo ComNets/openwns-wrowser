@@ -34,6 +34,7 @@ from Tools import URI, Observing
 
 import Models
 import Debug
+import time
 
 from ui.Dialogues_OpenDatabase_ui import Ui_Dialogues_OpenDatabase
 class OpenDatabase(QtGui.QDialog, Ui_Dialogues_OpenDatabase, Observing):
@@ -308,6 +309,7 @@ class Progress(QtGui.QProgressDialog):
         if QtGui.QApplication.hasPendingEvents():
             QtGui.QApplication.instance().syncX()
             QtGui.QApplication.instance().processEvents()
+        time.sleep(0.006)
 
 from ui.Dialogues_ColumnSelect_ui import Ui_Dialogues_ColumnSelect
 class ColumnSelect(QtGui.QDialog, Ui_Dialogues_ColumnSelect):

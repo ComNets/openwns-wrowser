@@ -81,9 +81,36 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
 
         self.probes.addAction(self.actionDisplayProbeInfo)
 
+        self.aggregatecheckBox.setChecked(False)
+        self.connect(self.aggregatecheckBox, QtCore.SIGNAL("clicked()"), self.on_aggregatecheckBox_setchecked)
+        self.connect(self.confidencecheckBox, QtCore.SIGNAL("clicked()"), self.on_confidencecheckBox_setchecked)
+        self.aggregateparameterframe.setEnabled(False)
+        self.confidenceparameterframe.setEnabled(False)
+        self.originalgraphcheckBox.setChecked(False)
+        self.confidencecheckBox.setChecked(False)
+
         self.connect(self.probeFilter, QtCore.SIGNAL("textEdited(const QString&)"), self.on_probeFilter_textEdited)
         self.setProbeFunctions([])
         self.probeInfoWindows = list()
+    def on_aggregatecheckBox_setchecked(self):
+        if self.aggregatecheckBox.isChecked():
+            self.aggregateparameterframe.setEnabled(True)
+            self.confidenceparameterframe.setEnabled(True)
+            self.confidenceLevel.setEnabled(False)
+            self.confidencelevellabel.setEnabled(False)
+        else:
+            self.aggregateparameterframe.setEnabled(False)
+            self.originalgraphcheckBox.setChecked(False)
+            self.confidenceparameterframe.setEnabled(False)
+            self.confidencecheckBox.setChecked(False)
+
+    def on_confidencecheckBox_setchecked(self):
+        if self.confidencecheckBox.isChecked():
+            self.confidenceLevel.setEnabled(True)
+            self.confidencelevellabel.setEnabled(True)
+        else:
+            self.confidenceLevel.setEnabled(False)
+            self.confidencelevellabel.setEnabled(False)
 
     def setModel(self, model):
         from Tools import ProbeFilterValidator
@@ -151,21 +178,48 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
         QtGui.QWidget.__init__(self, *qwidgetArgs)
         self.setupUi(self)
 
+        self.connect(self.simulationParameter , QtCore.SIGNAL("activated(parameterName)"), self.on_simulationParameter_activated)
+
         self.xUseParameterValue.setChecked(True)
         self.on_xUseProbeEntry_toggled(False)
         self.yUseProbeEntry.setChecked(True)
         self.on_yUseProbeEntry_toggled(True)
         self.xyTab.setCurrentIndex(1)
+        self.xProbesControl.aggregateframe.setVisible(False)
+
+    @QtCore.pyqtSignature("QString")
+    def on_simulationParameter_activated(self, parameterName):
+        self.aggregateParametersModel =  Models.SimulationParameters(self.yProbesControl.probeFilterValidator.probesModel.campaign, onlyNumeric = True)
+        self.aggregateParametersModel.parameterNames.remove(parameterName)
+        self.setAggregateParametersModel(self.aggregateParametersModel)
 
     @QtCore.pyqtSignature("bool")
     def on_xUseProbeEntry_toggled(self, checked):
         self.xProbesControl.setEnabled(checked)
         self.xProbeEntry.setEnabled(checked)
+        if self.xUseProbeEntry.isChecked() or self.yUseParameterValue.isChecked():
+            self.yProbesControl.aggregatecheckBox.setChecked(False)
+            self.yProbesControl.aggregateframe.setEnabled(False)
+            self.yProbesControl.confidencecheckBox.setChecked(False)
+            self.yProbesControl.originalgraphcheckBox.setChecked(False)
+        else:
+            self.yProbesControl.aggregateframe.setEnabled(True)
+            self.yProbesControl.aggregateparameterframe.setEnabled(False)
+            self.yProbesControl.confidenceparameterframe.setEnabled(False)
 
     @QtCore.pyqtSignature("bool")
     def on_yUseProbeEntry_toggled(self, checked):
         self.yProbesControl.setEnabled(checked)
         self.yProbeEntry.setEnabled(checked)
+        if self.xUseProbeEntry.isChecked() or self.yUseParameterValue.isChecked():
+            self.yProbesControl.aggregatecheckBox.setChecked(False)
+            self.yProbesControl.aggregateframe.setEnabled(False)
+            self.yProbesControl.confidencecheckBox.setChecked(False)
+            self.yProbesControl.originalgraphcheckBox.setChecked(False)
+        else:
+            self.yProbesControl.aggregateframe.setEnabled(True)
+            self.yProbesControl.aggregateparameterframe.setEnabled(False)
+            self.yProbesControl.confidenceparameterframe.setEnabled(False)
 
     @QtCore.pyqtSignature("const QItemSelection&, const QItemSelection&")
     def on_xProbes_selectionChanged(self, selected, deselected):
@@ -248,6 +302,11 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
     def isPlotNotAggregatedGraphs(self):
         return self.yProbesControl.originalgraphcheckBox.isChecked()
+    def isShowConfidenceLevels(self):
+        return self.yProbesControl.confidencecheckBox.isChecked()
+
+    def getConfidenceLevel(self):
+        return self.yProbesControl.confidenceLevel.value()
 
 class GraphNavigationBar(QtGui.QWidget):
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg
@@ -344,6 +403,7 @@ class LineGraph(Graph, Observing):
             xLabels.add(graph.axisLabels[0])
             yLabels.add(graph.axisLabels[1])
             self.progressDialogue.setCurrentAndMaximum(index, maxIndex, "Preparing: " + label)
+           
             try:
                 style = csIter.next()
             except StopIteration:
@@ -351,6 +411,13 @@ class LineGraph(Graph, Observing):
                 style = csIter.next()
             self.lines.append(self.canvas.axes.plot(x, y, style, label = label, marker = self.figureConfig.marker))
             self.labels.append(label)
+            try:
+                if len(graph.confidenceIntervalDict) > 0:
+                    for i in range(len(x)):
+                        e = graph.confidenceIntervalDict[x[i]]
+                        self.canvas.axes.errorbar(x[i], y[i], yerr=e , fmt=style)
+            except: None
+
         self.canvas.axes.set_xlabel("\n".join(xLabels))
         self.canvas.axes.set_ylabel("\n".join(yLabels))
         ymin, ymax = self.canvas.axes.get_ylim()

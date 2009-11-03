@@ -853,7 +853,10 @@ class ParameterFigure(Figure, LineGraphs):
 
         self.simulationParametersModel = Models.SimulationParameters(self.campaigns.draw, onlyNumeric = True)
         self.parameterGraphControl.setSimulationParametersModel(self.simulationParametersModel)
+        parameterName = self.parameterGraphControl.parameterName()
+
         self.aggregateParametersModel = Models.SimulationParameters(self.campaigns.draw, onlyNumeric = True)
+        self.aggregateParametersModel.parameterNames.remove(parameterName)
         self.parameterGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
 
         self.xProbesModel = Models.ProbeNames(self.campaigns.draw)
@@ -903,7 +906,11 @@ class ParameterFigure(Figure, LineGraphs):
 
             aggregationParameter = self.parameterGraphControl.aggregationParameter()
             parameterNames = list(campaign.getChangingParameterNames() - set([parameterName, aggregationParameter]))
-            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.mapping[yProbeEntry])
+            if self.parameterGraphControl.isShowConfidenceLevels() and yProbeEntry == 'mean':
+                confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
+            else:
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.mapping[yProbeEntry])
 
             progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
 
@@ -926,9 +933,13 @@ class ParameterFigure(Figure, LineGraphs):
             if self.parameterGraphControl.isYUseProbeEntry():
                 yProbeNames = self.parameterGraphControl.yProbeNames()
                 yProbeEntry = self.parameterGraphControl.yProbeEntryName()
-                yAcquirer = dataacquisition.Compose.ProbeEntry(yProbeEntry)
+                if self.parameterGraphControl.isShowConfidenceLevels() and yProbeEntry == 'mean':
+                    yAcquirer = dataacquisition.Compose.Probe(yProbeEntry)
+                    probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer, graphWriter = dataacquisition.Compose.aggregateGraphWriter)
+                else:
+                    yAcquirer = dataacquisition.Compose.ProbeEntry(yProbeEntry)
+                    probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)
 
-                probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)
                 probeDataAcquirers = dict([(probeName, probeDataAcquirer)
                                            for probeName in yProbeNames])
             else:
@@ -937,13 +948,24 @@ class ParameterFigure(Figure, LineGraphs):
                 probeDataAcquirers = {None : dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)}
 
             parameterNames = list(campaign.getChangingParameterNames() - set([parameterName]))
-            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
+            if self.parameterGraphControl.isShowConfidenceLevels() and yProbeEntry == 'mean':
+                confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
 
-            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+                progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
 
-            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                            progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                            progressReset = progressDialogue.reset)
+                graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                                progressNotify = progressDialogue.setCurrentAndMaximum,
+                                                                progressReset = progressDialogue.reset,
+                                                                graphClass = probeselector.Graphs.AggregatedGraph)
+            else:
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
+
+                progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+
+                graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                                progressNotify = progressDialogue.setCurrentAndMaximum,
+                                                                progressReset = progressDialogue.reset)
 
             graphs += graphsHelp
             errors += errorsHelp
