@@ -37,8 +37,8 @@ class ConfigInspector:
     def __init__(self, configurationFile):
         currentdir = os.getcwd()
 
-        c = Configuration.Configuration()
-        c.read(os.path.join(os.environ["HOME"], ".wns", "dbAccess.conf"))
+        c = Configuration.SandboxConfiguration()
+        c.read()
 
         self.config = {}
         exec("import sys", self.config)

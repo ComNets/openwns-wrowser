@@ -193,8 +193,6 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
             setattr(c, 'dbName', "")
             setattr(c, 'userName', "")
             setattr(c, 'userPassword', "")
-            setattr(c, 'sandboxPath', "")
-            setattr(c, 'sandboxFlavour', "dbg")
             c.writeDbAccessConf(filename, owner)
         except (Configuration.BadConfigurationFile,
                 Configuration.MissingConfigurationSection,
@@ -204,16 +202,29 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
             setattr(c, 'dbName', "")
             setattr(c, 'userName', "")
             setattr(c, 'userPassword', "")
-            setattr(c, 'sandboxPath', "")
-            setattr(c, 'sandboxFlavour', "dbg")
             c.writeDbAccessConf(filename, owner)
 
         self.hostname.setText(c.dbHost)
         self.databasename.setText(c.dbName)
         self.username.setText(c.userName)
         self.password.setText(c.userPassword)
-        self.sandboxpath.setText(c.sandboxPath)
-        self.sandboxflavour.setCurrentIndex(self.sandboxflavour.findText(QtCore.QString(c.sandboxFlavour)))
+        
+        try:
+            cSandbox = Configuration.SandboxConfiguration()
+            cSandbox.read()
+        except Configuration.MissingConfigurationFile, e:
+            setattr(cSandbox, 'sandboxPath', "")
+            setattr(cSandbox, 'sandboxFlavour', "dbg")
+            c.writeDbAccessConf(filename, owner)
+        except (Configuration.BadConfigurationFile,
+                Configuration.MissingConfigurationSection,
+                Configuration.MissingConfigurationEntry), e:
+            setattr(cSandbox, 'sandboxPath', "")
+            setattr(cSandbox, 'sandboxFlavour', "dbg")
+            cSandbox.writeSandboxConf(owner)            
+        
+        self.sandboxpath.setText(cSandbox.sandboxPath)
+        self.sandboxflavour.setCurrentIndex(self.sandboxflavour.findText(QtCore.QString(cSandbox.sandboxFlavour)))
 
     def writeToConfig(self, filename, owner):
         import Configuration
@@ -224,9 +235,13 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
         setattr(c, 'dbName', str(self.databasename.text()))
         setattr(c, 'userName', str(self.username.text()))
         setattr(c, 'userPassword', str(self.password.text()))
-        setattr(c, 'sandboxPath', str(self.sandboxpath.text()))
-        setattr(c, 'sandboxFlavour', str(self.sandboxflavour.currentText()))
         c.writeDbAccessConf(filename, owner)
+        
+        cSandbox = Configuration.SandboxConfiguration()
+        cSandbox.read()        
+        setattr(cSandbox, 'sandboxPath', str(self.sandboxpath.text()))
+        setattr(cSandbox, 'sandboxFlavour', str(self.sandboxflavour.currentText()))
+        cSandbox.writeSandboxConf(owner)            
 
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):

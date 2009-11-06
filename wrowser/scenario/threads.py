@@ -37,8 +37,8 @@ class SimulationThread(QtCore.QThread):
         self.parent = parent
         QtCore.QThread.__init__(self, parent)
 
-        c = Configuration.Configuration()
-        c.read(os.path.join(os.environ["HOME"], ".wns", "dbAccess.conf"))
+        c = Configuration.SandboxConfiguration()
+        c.read()
 
         self.simulatorExecutable = os.path.join(c.sandboxPath, c.sandboxFlavour, 'bin', 'openwns')
 

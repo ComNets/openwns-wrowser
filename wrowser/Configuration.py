@@ -74,6 +74,46 @@ class BadConfigurationFile(Exception):
     def __str__(self):
         return "The configuration file %s cannot be read." % (self.filename, )
 
+class SandboxConfiguration(object):
+  
+    def __init__(self):
+        self.parser = ConfigParser.SafeConfigParser()
+        self.confFile = os.path.join(os.environ['HOME'], '.wns', 'sandbox.conf')
+        
+    def read(self):
+
+        try:
+            self.parser.read([self.confFile])
+        except ConfigParser.MissingSectionHeaderError, e:
+            raise BadConfigurationFile(self.confFile)        
+        
+        if 'Sandbox' in self.parser.sections():
+            if 'path' in self.parser.options('Sandbox'):
+                setattr(self, 'sandboxPath', str(self.parser.get('Sandbox', 'path')))
+            else:
+                raise MissingConfigurationEntry(self.confFile, "Sandbox.path")
+            if 'flavour' in self.parser.options('Sandbox'):
+                setattr(self, 'sandboxFlavour', str(self.parser.get('Sandbox', 'flavour')))
+            else:
+                raise MissingConfigurationEntry(self.confFile, "Sandbox.flavour")
+        else:
+            raise MissingConfigurationSection(self.confFile, "Sandbox")
+
+    def writeSandboxConf(self, owner):        
+        if 'Sandbox' not in self.parser.sections():
+            self.parser.add_section('Sandbox')
+
+        self.parser.set('Sandbox', 'path', getattr(self, 'sandboxPath'))
+        self.parser.set('Sandbox', 'flavour', getattr(self, 'sandboxFlavour'))
+
+        config = file(self.confFile, 'w')
+        self.parser.write(config)
+        config.close()
+        os.chown(self.confFile, pwd.getpwnam(owner)[2], pwd.getpwnam(owner)[3])
+        os.chmod(self.confFile, 0644)
+
+
+
 class Configuration(object):
 
     def __init__(self):
@@ -113,18 +153,6 @@ class Configuration(object):
         else:
             raise MissingConfigurationSection(filename, "User")
 
-        if 'Sandbox' in self.parser.sections():
-            if 'path' in self.parser.options('Sandbox'):
-                setattr(self, 'sandboxPath', str(self.parser.get('Sandbox', 'path')))
-            else:
-                raise MissingConfigurationEntry(filename, "Sandbox.path")
-            if 'flavour' in self.parser.options('Sandbox'):
-                setattr(self, 'sandboxFlavour', str(self.parser.get('Sandbox', 'flavour')))
-            else:
-                raise MissingConfigurationEntry(filename, "Sandbox.flavour")
-        else:
-            raise MissingConfigurationSection(filename, "Sandbox")
-
         if 'Campaign' in self.parser.sections():
             if 'id' in self.parser.options('Campaign'):
                 setattr(self, 'campaignId', int(self.parser.get('Campaign', 'id')))
@@ -144,12 +172,6 @@ class Configuration(object):
 
         self.parser.set('User', 'name', getattr(self, 'userName'))
         self.parser.set('User', 'password', getattr(self, 'userPassword'))
-
-        if 'Sandbox' not in self.parser.sections():
-            self.parser.add_section('Sandbox')
-
-        self.parser.set('Sandbox', 'path', getattr(self, 'sandboxPath'))
-        self.parser.set('Sandbox', 'flavour', getattr(self, 'sandboxFlavour'))
 
         config = file(dbAccessConfFile, 'w')
         config.write('# Keep this file private. Do NOT change file access permissions. Security hazard!\n\n')
