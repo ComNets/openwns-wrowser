@@ -143,7 +143,7 @@ class Probe(object):
         for ff in os.listdir(dirname):
             filename = os.path.join(dirname, ff)
             if os.path.isfile(filename):
-                if probeType in filename:
+                if filename.endswith(probeType):
                     try:
                         probe = probeClass(filename)
                         result[probe.filenameWithoutDir] = probe
@@ -554,11 +554,11 @@ class DlreProbe(Probe):
 
 
 class TableProbe:
-    fileNameSigs = ['_mean',
-                    '_max',
-                    '_min',
-                    '_trials',
-                    '_var',
+    fileNameSigs = ['_mean.dat',
+                    '_max.dat',
+                    '_min.dat',
+                    '_trials.dat',
+                    '_var.dat',
                     ] # there are more than these, but these are the most commonly used ones.
     valueNames = ["minimum", "maximum"]
 
