@@ -456,7 +456,7 @@ class LineGraph(Graph, Observing):
 
 
 from ui.Widgets_TableGraph_ui import Ui_Widgets_TableGraph
-class TableGraph(QtGui.QWidget, Ui_Widgets_TableGraph):
+class TableGraph(QtGui.QWidget, Ui_Widgets_TableGraph, Observing):
     def __init__(self, window, *qwidgetArgs):
         QtGui.QWidget.__init__(self, *qwidgetArgs)
         self.setupUi(self)
@@ -465,15 +465,23 @@ class TableGraph(QtGui.QWidget, Ui_Widgets_TableGraph):
 
         self.graphWidgets = dict()
 
+        self.figureConfig = Data.Figure()
+        #self.observe(self.on_figureConfig_grid_changed, self.figureConfig, "grid")
+        self.observe(self.on_figureConfig_redraw, self.figureConfig)
+        #self.observe(self.on_figureConfig_redraw, self.figureConfig, "colorbar")
+
         self.connect(self.graphSwitcher, QtCore.SIGNAL("currentIndexChanged(const QString&)"), self.on_graphSwitcher_currentIndexChanged)
 
     def setGraphs(self, graphs):
-        import matplotlib.pylab
+        self.graphs = graphs
+        self.doDraw()
 
+    def doDraw(self):
+        import matplotlib.pylab
         self.graphSwitcher.clear()
         for index in xrange(self.graphStack.count() - 1, -1, -1):
             self.graphStack.removeWidget(self.graphStack.widget(index))
-        for graph in graphs:
+        for graph in self.graphs:
             if len(graph.points) > 1:
                 widget = Graph()
                 self.graphWidgets[str(graph.identity)] = (widget, graph)
@@ -482,14 +490,28 @@ class TableGraph(QtGui.QWidget, Ui_Widgets_TableGraph):
                 X, Y = matplotlib.pylab.meshgrid(
                     [p[0] for p in graph.points],
                     [p[1] for p in graph.points])
-                widget.canvas.axes.pcolor(X,
+                collection = widget.canvas.axes.pcolor(X,
                                           Y,
                                           matplotlib.pylab.array(graph.colours),
-                                          shading = "flat")
+                                          shading = "flat",
+                                          cmap = matplotlib.cm.get_cmap(str(self.figureConfig.colormap)))
+                if self.figureConfig.colorbar:
+                    widget.canvas.fig.colorbar(collection)
                 widget.canvas.axes.axis('scaled')
-                widget.canvas.axes.set_xlabel(graph.axisLabels[0])
-                widget.canvas.axes.set_ylabel(graph.axisLabels[1])
-                widget.canvas.axes.set_title(graph.title)
+                if self.figureConfig.xAxisTitle == "":
+                    widget.canvas.axes.set_xlabel(graph.axisLabels[0])
+                else:
+                    widget.canvas.axes.set_xlabel(self.figureConfig.xAxisTitle)
+
+                if self.figureConfig.yAxisTitle == "":
+                    widget.canvas.axes.set_ylabel(graph.axisLabels[1])
+                else:
+                    widget.canvas.axes.set_ylabel(self.figureConfig.yAxisTitle)
+
+                if self.figureConfig.title == "":
+                    widget.canvas.axes.set_title(graph.title)
+                else:
+                    widget.canvas.axes.set_title(self.figureConfig.title)
 
     @QtCore.pyqtSignature("const QString&")
     def on_graphSwitcher_currentIndexChanged(self, text):
@@ -497,6 +519,19 @@ class TableGraph(QtGui.QWidget, Ui_Widgets_TableGraph):
             self.graphStack.setCurrentWidget(self.graphWidgets[str(text)][0])
             self.window.setWindowTitle(self.graphWidgets[str(text)][1].title)
             self.window.activateAction.setText(self.graphWidgets[str(text)][1].title)
+
+    def setGrid(self, xmajor, xminor, ymajor, yminor):
+        self.canvas.axes.get_xaxis().grid(xmajor, which="major")
+        self.canvas.axes.get_xaxis().grid(xminor, which="minor")
+        self.canvas.axes.get_yaxis().grid(ymajor, which="major")
+        self.canvas.axes.get_yaxis().grid(yminor, which="minor")
+
+    def on_figureConfig_grid_changed(self, value):
+        self.setGrid(*value)
+        self.doDraw()
+
+    def on_figureConfig_redraw(self, value):
+        self.doDraw()
 
 class Legend(QtGui.QListView):
     pass

@@ -382,6 +382,15 @@ class ConfigureGraph(QtGui.QDialog, Ui_Dialogues_ConfigureGraph):
         if self.figure.legend:
             self.showLegend.setCheckState(QtCore.Qt.Checked)
         self.titleEdit.setText(self.figure.title)
+        self.xAxisEdit.setText(self.figure.xAxisTitle)
+        self.yAxisEdit.setText(self.figure.yAxisTitle)
+        if self.figure.colorbar:
+            self.colorbarCheckBox.setCheckState(QtCore.Qt.Checked)
+        else:
+            self.colorbarCheckBox.setCheckState(QtCore.Qt.Unchecked)
+
+        self.colormapComboBox.setCurrentIndex(self.colormapComboBox.findText(self.figure.colormap))
+
 
     @QtCore.pyqtSignature("")
     def on_buttonBox_accepted(self):
@@ -414,8 +423,18 @@ class ConfigureGraph(QtGui.QDialog, Ui_Dialogues_ConfigureGraph):
         if legend != self.figure.legend:
             self.figure.legend = legend
 
+        self.figure.colormap = self.colormapComboBox.currentText()
+        self.figure.colorbar = self.colorbarCheckBox.checkState() == QtCore.Qt.Checked
+
         title = str(self.titleEdit.text())
-        self.figure.title = title
+        if self.figure.title != title:
+            self.figure.title = title
+
+        if self.figure.xAxisTitle != str(self.xAxisEdit.text()):
+            self.figure.xAxisTitle = str(self.xAxisEdit.text())
+
+        if self.figure.yAxisTitle != str(self.yAxisEdit.text()):
+            self.figure.yAxisTitle = str(self.yAxisEdit.text())
 
 class SelectItem(QtGui.QDialog):
 

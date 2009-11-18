@@ -560,7 +560,7 @@ class TableGraphs:
     def __init__(self):
         self.graph = Widgets.TableGraph(window = self)
         self.graphDisplayLayout.addWidget(self.graph)
-        self.configure.setVisible(False)
+        self.configure.setVisible(True)
         self.export.setVisible(False)
 
 class ProbeFigure(Figure):
