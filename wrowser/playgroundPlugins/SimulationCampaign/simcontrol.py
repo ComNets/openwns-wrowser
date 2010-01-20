@@ -49,9 +49,7 @@ db.Database.connectConf(config)
 
 
 def getWrowserDir():
-    pypaths = os.environ.get('PYTHONPATH').split(':')
-
-    for cand in pypaths:
+    for cand in sys.path:
         if os.path.isdir(os.path.join(cand, 'wrowser')):
             return cand
     return None
@@ -308,6 +306,22 @@ def dequeueAllScenarios(arg = 'unused'):
     for scenario in scenarioIds:
         __deleteJob(scenario)
 
+def dequeueScenariosState(stringexpression):
+    if stringexpression == 'NotQueued':
+        print >> sys.stderr, 'Cannot dequeue jobs which are already dequeued'
+        sys.exit(1)
+
+    cursor = db.Database.getCursor()
+    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND state = \'%s\' ' % (config.campaignId, stringexpression))
+    scenarioIds = [element[0] for element in cursor.fetchall()]
+    cursor.connection.commit()
+
+    if len(scenarioIds) < 1:
+        print  >>sys.stderr, 'No scenarios found with state ', stringexpression
+        sys.exit(1)
+
+    for scenario in scenarioIds:
+        __deleteJob(scenario)
 
 def dequeueScenarios(stringexpression):
     cursor = db.Database.getCursor()
@@ -592,6 +606,11 @@ parser.add_option('', '--dequeue-scenarios',
                   action = 'callback', callback = queue.append,
                   callback_args = (dequeueScenarios,),
                   help = 'dequeue scenarios matching EXPRESSION')
+parser.add_option('', '--dequeue-scenarios-with-state',
+                  type = 'str', metavar = 'EXPRESSION',
+                  action = 'callback', callback = queue.append,
+                  callback_args = (dequeueScenariosState,),
+                  help = 'dequeue scenarios where the state (Finished, Running, Crashed) matches EXPRESSION')
 
 parser.add_option('', '--consistency-check',
                   action = 'callback', callback = queue.append,
