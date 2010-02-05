@@ -253,6 +253,14 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         self.campaignsModel = Models.CampaignDb(Campaigns.getCampaignsDict())
         self.campaigns.setModel(self.campaignsModel)
+        
+        #self.campaigns.expandAll() #self.campaigns is a QTreeView (see /ui/Dialogues_OpenCampaignDb_ui.py
+        user = os.getenv("USER")
+        userIndex = self.campaignsModel.getUserRow(user)
+        if userIndex != -1 :
+            self.campaigns.expand(userIndex)
+            self.campaigns.scrollTo(userIndex)
+
         for column in xrange(self.campaignsModel.columnCount()):
             self.campaigns.resizeColumnToContents(column)
 

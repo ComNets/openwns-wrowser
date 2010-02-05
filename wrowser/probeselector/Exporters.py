@@ -28,13 +28,15 @@
 import inspect
 import wrowser.Tools
 import os
+import subprocess
 
 class CSV:
 
     formatName = "CSV"
 
     @staticmethod
-    def export(filename, graphs, progressNotify = None, progressReset = None):
+    def export(filename, export , progressNotify = None, progressReset = None):
+        graphs = export.graphs
         out = open(filename, "w")
         maxIndex = len(graphs)
         if callable(progressReset):
@@ -48,12 +50,96 @@ class CSV:
                 out.write(repr(point[0]) + ", " + repr(point[1]) + "\n")
         out.close()
 
+class PythExport:
+
+    formatName = "Python"
+    
+    @staticmethod
+    def export(filename, export, progressNotify = None, progressReset = None):
+        def writeParam(out, name, value, comment='' ):
+            if len(comment)>0:
+                  comment = " #"+comment
+            if type(value) == str : 
+                out.write(name + " = \'" + value + "\'")
+            else:
+                out.write(name + " = " + str(value))
+            out.write(comment+"\n")
+
+        def getDimensions(graphs):
+            minX=graphs[0].points[0][0]
+            maxX=graphs[0].points[-1][0]
+            yvalues = []
+            for graph in graphs :
+                yvalues.append([y for x,y in graph.points])
+            minY=min(min(yvalues))
+            maxY=max(max(yvalues))
+            return  [minX, maxX, minY, maxY]
+
+ 
+        graphs = export.graphs
+        typ = export.graphType #"param"
+        location = filename.rpartition('/')
+        file=location[-1]
+        path=location[0]
+        fullFName=path +"/"+ typ + "_" + file
+        out = open(fullFName, "w")
+        print "X label:",export.graphs[0].axisLabels[0]
+        print "Y label:",export.graphs[0].axisLabels[1]
+        writeParam(out,"probeName",export.probeName)
+        writeParam(out,"probeLegendSuffix",wrowser.Tools.uniqElements(export.probeName))
+
+        writeParam(out,"confidence",export.confidence)
+        writeParam(out,"aggregate",export.aggregate)
+        writeParam(out,"aggrParam",export.aggrParam)
+        writeParam(out,"fileName",file)
+        writeParam(out,"type", export.graphType)
+        writeParam(out,"campaignId", str(export.campaignId))
+        writeParam(out,"xLabel",export.graphs[0].axisLabels[0])
+        print "typ:",typ
+        if typ == 'Param':
+            writeParam(out,"confidenceLevel",export.confidenceLevel)                
+            writeParam(out,"yLabel",export.graphs[0].axisLabels[1])
+            writeParam(out,"parameterName",export.paramName)
+            writeParam(out,"probeEntry",export.probeEntry)
+            plotScript="./exportTemplates/readDBandPlot"
+        else:
+            writeParam(out,"yLabel","P(X)")
+            plotScript="./exportTemplates/readDBandPlotXDF"
+
+        writeParam(out,"filterExpression",export.filterExpr)
+        
+        dimensions=getDimensions(graphs)
+        writeParam(out,"minX",dimensions[0])
+        writeParam(out,"maxX",dimensions[1])
+        writeParam(out,"minY",0,"min Y value is:"+str(dimensions[2]))
+        writeParam(out,"maxY",dimensions[3])
+        writeParam(out,"moveX",0)
+        writeParam(out,"moveY",0)
+
+        #graph config:
+        writeParam(out,"grid",export.grid)
+        writeParam(out,"scale",export.scale)
+        writeParam(out,"marker",export.marker)
+        writeParam(out,"legend",export.legend)
+        writeParam(out,"legendPosition","best","alternatives: upper right, upper left, lower left, lower right, right, center left, center right, lower center, upper center, center or (x,y) with x,y in [0-1]")
+        writeParam(out,"figureTitle",export.title)                
+        writeParam(out,"scaleFactorX",1,"1/1e6 #bit to MBit")                
+        writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
+        writeParam(out,"color",True)                
+        out.close()
+        outFName=file+"Plot.py"
+        cmd="outf="+file+"Plot.py ; echo '#!/usr/bin/python' > $outf ; cat "+fullFName+" >> $outf ; cat "+plotScript+" >> $outf ; chmod u+x $outf"
+        #print "CMD: ",cmd
+        subprocess.call(cmd, shell=True)
+
+
 class Matlab:
 
     formatName = "Matlab"
 
     @staticmethod
-    def export(filename, graphs, progressNotify = None, progressReset = None):
+    def export(filename, export, progressNotify = None, progressReset = None):
+        graphs = export.graphs
         if not filename.endswith('.m'):
             filename += '.m'
 

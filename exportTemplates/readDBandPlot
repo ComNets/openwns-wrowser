@@ -1,0 +1,128 @@
+#!/usr/bin/python
+import optparse
+import sys
+#import wnsrc
+import os
+
+sys.path.append('/net/beast3/KKS/kks/openWNS/sandbox/default/lib/python2.4/site-packages')
+
+import wrowser.Configuration as simDbConf
+import wrowser.simdb.Database as simDb
+from wrowser.simdb.Campaigns import setCampaign as simDbSetCampaign
+
+from wrowser.probeselector import PostgresReader
+from wrowser.probeselector import Interface
+from wrowser.probeselector import Representations
+from wrowser.probeselector import Errors
+
+from matplotlib import rc
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_pdf import FigureCanvasPdf as FigureCanvas
+from matplotlib.font_manager import FontProperties
+from pylab import *
+
+from scipy.special import erf
+
+def lineStyle():
+    
+    for style in ['k-', 'k--', 'b-', 'b--', 'r-', 'r--', 'g-', 'g--', 'c-', 'c--', 'm-', 'm--' ]:
+        yield style
+
+def lineStyleSW():
+
+    for style in ['k-', 'k--', 'k:', 'k-+', 'k--+', 'k:+', 'k-o', 'k--o', 'k:o' ]:
+        yield style
+
+def hatches():
+
+    for hatch in ['/','\\','|','-','+','x','.','//','\\' ]:
+        yield hatch
+
+def prettyPrint(labels):
+    '''
+    Give a pretty string of parameter names.
+    '''
+    def pPString(string):
+        parameterNames = {'periodCount':'TTL', 
+                          'dlUlRatio': 'dlUlRatio',
+                          'voipModel':'', 
+#                          'subframeRatio':'SFratio', 
+                          }
+        if string in parameterNames:
+            return parameterNames[string]
+        else:
+            return string
+
+    out = ''
+    for k,v in labels.iteritems():
+       out += pPString(k) + ': ' + str(v) + ' '
+    return out
+
+
+## Get the campaign
+dbConfig = simDbConf.Configuration()
+dbConfig.read()
+simDb.Database.connectConf(dbConfig)
+simDbSetCampaign([int(campaignId)])
+campaignReader = PostgresReader.CampaignReader(int(campaignId), Interface.DoNotSelectProbeSelectUI())
+print 'Accessing charts from database server with campaignId: ' + str(campaignId) + '\n\n'
+
+
+print "Reading Campaign"
+campaign = Representations.Campaign(*campaignReader.read())
+print "read"
+print "Creating Facade"
+ch = Interface.Facade(campaign)
+print "done"
+
+print ch.getParameterNames()
+print ch.getProbeNames()
+
+outputdir = 'FIGURES'
+if not os.path.exists(outputdir) :
+    os.makedirs(outputdir)
+
+font = FontProperties()
+font.set_size('x-large')
+
+filteredFacade = ch.filteredByExpression(filterExpression)
+print "Found " + str(len(filteredFacade.getScenarios())) + " scenarios"
+
+figure(figsize=(9, 8))
+grid()
+xlabel(xLabel,fontproperties = font)
+ylabel(yLabel,fontproperties = font)
+
+labels=[]
+
+if color:
+    ls = lineStyle()
+else:
+    ls = lineStyleSW()
+
+probeNr = 0
+for probe in probeName :
+    print "plotting graphs of probe: ",probe  
+    try:
+     graphList = filteredFacade.getGraphs(parameterName, probe, probeEntry, aggrParam, confidence) 
+    except Errors.MultipleErrors, e:
+     graphList = e.graphs
+
+    i=0
+    for graph in graphList:
+        labels.append(str(graph.sortkey))
+        try:
+            style=ls.next()
+        except StopIteration:
+            print "You need to define more linestyles or reduce the number of plotted graphs"    
+            os._exit(1)
+        plot([x*scaleFactorX+moveX  for x,y in graph.points], [y*scaleFactorY+moveY  for x,y in graph.points], style , label=prettyPrint(graph.sortkey)+probeLegendSuffix[probeNr])
+    probeNr+=1
+
+axis([minX,maxX,minY,maxY])     
+#title(figureTitle)
+legend(prop = font, loc=legendPosition) # (0.9, 0.01))
+print 'Plotting: ',fileName
+savefig(os.path.join(outputdir, fileName+'.pdf'))
+savefig(os.path.join(outputdir, fileName+'.png'))    
+

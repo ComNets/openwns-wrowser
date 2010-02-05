@@ -237,7 +237,7 @@ class Sim:
 
         try:
             wrowser.simdb.ProbeDB.removeAllProbesFromDB(self.simId)
-            wrowser.simdb.ProbeDB.writeAllProbesIntoDB(self.outputPath, self.simId, options.skipNullTrials)
+            wrowser.simdb.ProbeDB.writeAllProbesIntoDB(self.outputPath, self.simPath, self.simId, options.skipNullTrials)
         except Exception, e:
             print >>sys.stdout, "Probe import for simId %d failed (Exception caught: %s)" % ( self.simId, e)
             wrowser.simdb.ProbeDB.removeAllProbesFromDB(self.simId)

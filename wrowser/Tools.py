@@ -32,6 +32,24 @@ def classAndInstanceDict(instance):
     """
     return dict(instance.__class__.__dict__.items() + instance.__dict__.items())
 
+def uniqElements(probeNames):
+    def numCommonElements(probeNames):
+        for i in range(len(probeNames[0].split(';')[0].split('.'))) :
+            prefix = probeNames[0].split('.')[0:i]
+            for probe in probeNames :
+                if prefix != probe.split('.')[0:i] :
+                    return i-1
+            i+=1 
+        return i-1
+
+    uniqParts = []
+    uniqStart = numCommonElements(probeNames)
+    for probe in probeNames :
+       probeNameParts=len(probe.split('.'))  
+       uniqParts.append(".".join(probe.split('.')[uniqStart:]))
+    return uniqParts
+
+
 class Chameleon:
     """Class with variable attributes.
 

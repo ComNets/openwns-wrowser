@@ -258,6 +258,19 @@ class Facade:
             result.append((scenario.parameters, probeValues))
         return result
 
+    def getAllProbeDataExtended(self, probeName):
+        assert(type(probeName) == type(str()))
+        result = list()
+        for scenario in self.campaign.scenarios:
+            probeValues = dict()
+            for probe in scenario.probes.values():
+                if probe.name == probeName:
+                    if hasattr(probe.data, "probeInfoNames"):
+                        for probeInfoName in probe.data.probeInfoNames:
+                            probeValues[probeInfoName] = getattr(probe.data, probeInfoName)
+            result.append((scenario.parameters, probeValues))
+        return result
+
     def getProbeFilterExpression(self, probeName):
         """Construct a filter expression to let a probe appear in all filtered scenarios.
         """
@@ -336,7 +349,7 @@ class Facade:
             graphs, errors = self.acquireGraphs(progressNotify = progressNotify,
                                                 progressReset = progressReset,
                                                 acquireScenarioData = scenarioDataAcquirer,
-                                                graphClass = pywns.probeselector.Graphs.AggregatedGraph)
+                                                graphClass = Graphs.AggregatedGraph)
         if len(errors) > 0:
             raise Errors.MultipleErrors(errors, graphs = graphs)
         else:

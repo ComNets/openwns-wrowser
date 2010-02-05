@@ -36,7 +36,7 @@ __config = conf.Configuration()
 __config.read('.campaign.conf')
 
 
-def __writeMomentsProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
+def __writeMomentsProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all Moments probes in: " + dirname
     for momProbe in wrowser.Probe.MomentsProbe.readProbes(dirname).itervalues():
         if ( momProbe.trials == 0 and skipNullTrials ): continue
@@ -45,7 +45,7 @@ def __writeMomentsProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, 
                        ' mean, variance, relative_variance, standard_deviation, relative_standard_deviation, skewness, moment2, moment3,'\
                        ' sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic)'\
                        ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
-                       (campaignId, scenarioId, momProbe.filename, momProbe.name, momProbe.altName, momProbe.description,
+                       (campaignId, scenarioId, simPath, momProbe.name, momProbe.altName, momProbe.description,
                         momProbe.minimum, momProbe.maximum, momProbe.trials, momProbe.mean, momProbe.variance, momProbe.relativeVariance,
                         momProbe.standardDeviation, momProbe.relativeStandardDeviation, momProbe.skewness, momProbe.moment2, momProbe.moment3,
                         momProbe.sumOfAllValues, momProbe.sumOfAllValuesSquare, momProbe.sumOfAllValuesCubic))
@@ -60,7 +60,7 @@ def __removeMomentsProbesFromDB(scenarioId, campaignId, cursor):
 
 
 
-def __writePDFProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
+def __writePDFProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all PDF probes in: " + dirname
     for pdfProbe in wrowser.Probe.PDFProbe.readProbes(dirname).itervalues():
         if ( pdfProbe.trials == 0 and skipNullTrials ): continue
@@ -70,7 +70,7 @@ def __writePDFProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, curs
                        ' sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, p01, p05, p50, p95, p99, min_x, max_x, number_of_bins, underflows, overflows)'\
                        ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', '\
                        ' \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', %d, %d, %d)' % \
-                       (campaignId, scenarioId, pdfProbe.filename, pdfProbe.name, pdfProbe.altName, pdfProbe.description,
+                       (campaignId, scenarioId, simPath, pdfProbe.name, pdfProbe.altName, pdfProbe.description,
                         pdfProbe.minimum, pdfProbe.maximum, pdfProbe.trials, pdfProbe.mean, pdfProbe.variance, pdfProbe.relativeVariance,
                         pdfProbe.standardDeviation, pdfProbe.relativeStandardDeviation, pdfProbe.skewness, pdfProbe.moment2, pdfProbe.moment3,
                         pdfProbe.sumOfAllValues, pdfProbe.sumOfAllValuesSquare, pdfProbe.sumOfAllValuesCubic, pdfProbe.P01, pdfProbe.P05, pdfProbe.P50, pdfProbe.P95, pdfProbe.P99,
@@ -90,7 +90,7 @@ def __removePDFProbesFromDB(scenarioId, campaignId, cursor):
     cursor.execute(statement)
     cursor.connection.commit()
 
-def __writeLogEvalProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
+def __writeLogEvalProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all LogEval probes in: " + dirname
     for logEvalProbe in wrowser.Probe.LogEvalProbe.readProbes(dirname).itervalues():
         if ( logEvalProbe.trials == 0 and skipNullTrials ): continue
@@ -99,7 +99,7 @@ def __writeLogEvalProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, 
                        ' mean, variance, relative_variance, standard_deviation, relative_standard_deviation, skewness, moment2, moment3,'\
                        ' sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic)'\
                        ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
-                       (campaignId, scenarioId, logEvalProbe.filename, logEvalProbe.name, logEvalProbe.altName, logEvalProbe.description,
+                       (campaignId, scenarioId, simPath, logEvalProbe.name, logEvalProbe.altName, logEvalProbe.description,
                         logEvalProbe.minimum, logEvalProbe.maximum, logEvalProbe.trials, logEvalProbe.mean, logEvalProbe.variance, logEvalProbe.relativeVariance,
                         logEvalProbe.standardDeviation, logEvalProbe.relativeStandardDeviation, logEvalProbe.skewness, logEvalProbe.moment2, logEvalProbe.moment3,
                         logEvalProbe.sumOfAllValues, logEvalProbe.sumOfAllValuesSquare, logEvalProbe.sumOfAllValuesCubic))
@@ -118,7 +118,7 @@ def __removeLogEvalProbesFromDB(scenarioId, campaignId, cursor):
     cursor.execute(statement)
     cursor.connection.commit()
 
-def __writeBatchMeansProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
+def __writeBatchMeansProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all BatchMeans probes in: " + dirname
     for batchMeansProbe in wrowser.Probe.BatchMeansProbe.readProbes(dirname).itervalues():
         if ( batchMeansProbe.trials == 0 and skipNullTrials ): continue
@@ -131,7 +131,7 @@ def __writeBatchMeansProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignI
                        ' confidence_of_variance_absolute, confidence_of_variance_percent, relative_error_variance, sigma, first_order_correlation_coefficient)'\
                        ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\','\
                        ' \'%.10f\', \'%.10f\', \'%.10f\', %d, \'%.10f\', %d, \'%.10f\', %d, %d, %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
-                       (campaignId, scenarioId, batchMeansProbe.filename, batchMeansProbe.name, batchMeansProbe.altName, batchMeansProbe.description,
+                       (campaignId, scenarioId, simPath, batchMeansProbe.name, batchMeansProbe.altName, batchMeansProbe.description,
                         batchMeansProbe.minimum, batchMeansProbe.maximum, batchMeansProbe.trials, batchMeansProbe.mean, batchMeansProbe.variance, batchMeansProbe.relativeVariance,
                         batchMeansProbe.standardDeviation, batchMeansProbe.relativeStandardDeviation, batchMeansProbe.skewness, batchMeansProbe.moment2, batchMeansProbe.moment3,
                         batchMeansProbe.sumOfAllValues, batchMeansProbe.sumOfAllValuesSquare, batchMeansProbe.sumOfAllValuesCubic, batchMeansProbe.lowerBorder, batchMeansProbe.upperBorder,
@@ -155,7 +155,7 @@ def __removeBatchMeansProbesFromDB(scenarioId, campaignId, cursor):
     cursor.execute(statement)
     cursor.connection.commit()
 
-def __writeLreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
+def __writeLreProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all LRE probes in: " + dirname
     for lreProbe in wrowser.Probe.LreProbe.readProbes(dirname).itervalues():
         if ( lreProbe.trials == 0 and skipNullTrials ): continue
@@ -173,7 +173,7 @@ def __writeLreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, curs
                        'VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%s\', '\
                        '\'%.10f\', \'%.10f\', \'%.10f\', \'%s\', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', '\
                        '\'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
-                       (campaignId, scenarioId, lreProbe.filename, lreProbe.name, lreProbe.altName, lreProbe.description,
+                       (campaignId, scenarioId, simPath, lreProbe.name, lreProbe.altName, lreProbe.description,
                         lreProbe.minimum, lreProbe.maximum, lreProbe.trials, lreProbe.mean, lreProbe.variance, lreProbe.relativeVariance,
                         lreProbe.standardDeviation, lreProbe.relativeStandardDeviation, lreProbe.skewness, lreProbe.moment2, lreProbe.moment3,
                         lreProbe.sumOfAllValues, lreProbe.sumOfAllValuesSquare, lreProbe.sumOfAllValuesCubic,
@@ -206,7 +206,7 @@ def __removeLreProbesFromDB(scenarioId, campaignId, cursor):
     cursor.execute(statement)
     cursor.connection.commit()
 
-def __writeDlreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
+def __writeDlreProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all DLRE probes in: " + dirname
     for dlreProbe in wrowser.Probe.DlreProbe.readProbes(dirname).itervalues():
         if ( dlreProbe.trials == 0 and skipNullTrials ): continue
@@ -219,7 +219,7 @@ def __writeDlreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cur
                        'VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', '\
                        '\'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', '\
                        '\'%s\', \'%.10f\', %d, %d, %d)' % \
-                       (campaignId, scenarioId, dlreProbe.filename, dlreProbe.name, dlreProbe.altName, dlreProbe.description,
+                       (campaignId, scenarioId, simPath, dlreProbe.name, dlreProbe.altName, dlreProbe.description,
                         dlreProbe.minimum, dlreProbe.maximum, dlreProbe.trials, dlreProbe.mean, dlreProbe.variance, dlreProbe.relativeVariance,
                         dlreProbe.standardDeviation, dlreProbe.relativeStandardDeviation, dlreProbe.skewness, dlreProbe.moment2, dlreProbe.moment3,
                         dlreProbe.sumOfAllValues, dlreProbe.sumOfAllValuesSquare, dlreProbe.sumOfAllValuesCubic,
@@ -243,7 +243,7 @@ def __removeDlreProbesFromDB(scenarioId, campaignId, cursor):
     cursor.execute(statement)
     cursor.connection.commit()
 
-def __writeTableProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor):
+def __writeTableProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor):
     print "  Reading all Table probes in: " + dirname
     for tableProbe in wrowser.Probe.TableProbe.readProbes(dirname).itervalues():
         if ( tableProbe.trials == 0 and skipNullTrials ): continue
@@ -251,7 +251,7 @@ def __writeTableProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cu
         cursor.execute('INSERT INTO tables (campaign_id, scenario_id, filename, name, type, first_col_type, first_col_description, second_col_type, '\
                        'second_col_description, description, minimum, maximum) '\
                        'VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\')' % \
-                       (campaignId, scenarioId, tableProbe.filename, tableProbe.name, tableProbe.type, tableProbe.tableParser.firstRowContains,
+                       (campaignId, scenarioId, simPath, tableProbe.name, tableProbe.type, tableProbe.tableParser.firstRowContains,
                         tableProbe.tableParser.firstRowIdName, tableProbe.tableParser.secondRowContains, tableProbe.tableParser.secondRowIdName, tableProbe.description,
                         tableProbe.minimum, tableProbe.maximum))
         cursor.execute('SELECT currval(\'tables_id_seq\')')
@@ -269,17 +269,17 @@ def __removeTableProbesFromDB(scenarioId, campaignId, cursor):
     cursor.execute(statement)
     cursor.connection.commit()
 
-def writeAllProbesIntoDB(dirname, scenarioId, skipNullTrials = False, config = __config):
+def writeAllProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials = False, config = __config):
     campaignId = config.campaignId
     db.Database.connectConf(config)
     cursor = db.Database.getCursor()
-    __writeMomentsProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor)
-    __writePDFProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor)
-    __writeLogEvalProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor)
-    __writeBatchMeansProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor)
-    __writeLreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor)
-    __writeDlreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor)
-    __writeTableProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cursor)
+    __writeMomentsProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor)
+    __writePDFProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor)
+    __writeLogEvalProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor)
+    __writeBatchMeansProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor)
+    __writeLreProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor)
+    __writeDlreProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor)
+    __writeTableProbesIntoDB(dirname, simPath, scenarioId, skipNullTrials, campaignId, cursor)
 
 def removeAllProbesFromDB(scenarioId, config = __config):
     campaignId = config.campaignId

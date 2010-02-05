@@ -148,6 +148,7 @@ class CampaignReader:
                 scenarioParameters2[parameter] = scenarioParameters[parameter].getValue()
             scenarioData = Representations.Scenario(HighLatencyScenarioReader(self.campaignId, scenarioId, campaignProbes), scenarioParameters2, self.prefetchProbeNames)
             scenarios.append(scenarioData)
-            if callable(self.progressNotify):
+            if callable(self.progressNotify) and ( (index % 10) == 0 or index==(maxIndex-1)) :
                 self.progressNotify(index + 1, maxIndex, "reading id " + str(scenarioId))
+#self.progressNotify(maxIndex, maxIndex, "reading id " + str(scenarioId))
         return scenarios, parameters

@@ -26,8 +26,8 @@
 ###############################################################################
 
 import copy
+import wrowser.Tools
 
-from Tools import convert
 
 from PyQt4 import QtCore, QtGui
 
@@ -113,6 +113,13 @@ class CampaignDb(QtCore.QAbstractItemModel):
 
         return QtCore.QVariant()
 
+    def getUserRow(self, user):
+        for i in range(self.rowCount()):
+            desc = str(self.data(self.index(i,0)).toString()) 
+            if desc.find(user) != -1 :
+                return self.index(i,0)
+        return -1
+ 
 class SimulationParameters(QtCore.QAbstractItemModel):
 
     headerNames = ["Parameter", "Values"]
@@ -148,6 +155,12 @@ class SimulationParameters(QtCore.QAbstractItemModel):
 
     def getValueSelection(self):
         return self.__getValueSelection(self.parameterValueCheckStates)
+
+    def getParameterValues(self):
+        return self.parameterValues
+
+    def getCheckStates(self):
+        return self.parameterValueCheckStates
 
     def columnCount(self, parent = QtCore.QModelIndex()):
         return len(self.headerNames)
@@ -349,12 +362,13 @@ class ProbeData(QtCore.QAbstractTableModel):
         QtCore.QAbstractListModel.__init__(self, parent)
         self.campaign = campaign
         self.probeName = probeName
-        self.probeData = campaign.getAllProbeData(probeName)
+        self.probeData = campaign.getAllProbeDataExtended(probeName)
         self.parameterNames = list(campaign.getParameterNames())
-        self.valueNames = set()
+        #self.valueNames = set()
+        self.probeInfoNames = set()
         for data in self.probeData:
-            self.valueNames |= set(data[1].keys())
-        self.headerNames = self.parameterNames + list(self.valueNames)
+            self.probeInfoNames |= set(data[1].keys())
+        self.headerNames = self.parameterNames + list(self.probeInfoNames)
 
     def rowCount(self, parent = QtCore.QModelIndex()):
         if parent.isValid():
@@ -380,14 +394,20 @@ class ProbeData(QtCore.QAbstractTableModel):
             key = self.headerNames[index.column()]
             if key in self.parameterNames:
                 return QtCore.QVariant(self.probeData[index.row()][0][key])
-            elif key in self.valueNames:
+            elif key in self.probeInfoNames:
                 if self.probeData[index.row()][1].has_key(key):
                     return QtCore.QVariant(self.probeData[index.row()][1][key])
         if role == QtCore.Qt.ForegroundRole:
             key = self.headerNames[index.column()]
-            if key in self.valueNames:
+            if key in self.probeInfoNames:
                 return QtCore.QVariant(QtGui.QColor("blue"))
         return QtCore.QVariant()
+
+    def printTable(self):
+        for row in range(self.rowCount()):
+            for col in range(self.columnCount()):
+                desc = str(self.data(self.index(row,col)).toString()) 
+                print "desc:",desc
 
 class Legend(QtCore.QAbstractListModel):
 
@@ -398,7 +418,9 @@ class Legend(QtCore.QAbstractListModel):
 
     def updateLinesNLabels(self, lines, labels):
         from Tools import renderLineSampleImage
-
+        if len(labels)>0 :
+            labels = wrowser.Tools.uniqElements(labels)
+        
         if len(lines) != len(labels):
             raise Exception("Models.Legend: " + str(len(lines)) + " graphs, but " + str(len(labels)) + " labels!?")
 

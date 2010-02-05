@@ -112,6 +112,9 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
             self.confidenceLevel.setEnabled(False)
             self.confidencelevellabel.setEnabled(False)
 
+    def isShowConfidenceLevels(self):
+        return self.confidencecheckBox.isChecked()
+
     def setModel(self, model):
         from Tools import ProbeFilterValidator
 
@@ -170,6 +173,13 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
 
     def isPlotNotAggregatedGraphs(self):
         return self.originalgraphcheckBox.isChecked()
+
+    def getSelectedProbeName(self):
+        return self.probes.model().getProbeName(self.probes.currentIndex()) #"testPDF_Probe"
+
+    def getAllSelectedProbeNames(self):
+        return self.probeNames()
+
 
 from ui.Widgets_ParameterGraphControl_ui import Ui_Widgets_ParameterGraphControl
 class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
@@ -307,6 +317,12 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
     def getConfidenceLevel(self):
         return self.yProbesControl.confidenceLevel.value()
+
+    def getSelectedProbeName(self):
+        return self.yProbeNames()[0]  
+
+    def getAllSelectedProbeNames(self):
+        return self.yProbeNames()
 
 class GraphNavigationBar(QtGui.QWidget):
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg
