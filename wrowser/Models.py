@@ -403,10 +403,17 @@ class ProbeData(QtCore.QAbstractTableModel):
                 return QtCore.QVariant(QtGui.QColor("blue"))
         return QtCore.QVariant()
 
+    def getPath(self, index):
+        print "get path to scenario"
+        print "current row: ",index.row()
+        print "path = ",self.probeData[3][22]
+        #return self.probeNamesUnionFiltered[index.row()]
+
     def printTable(self):
         for row in range(self.rowCount()):
             for col in range(self.columnCount()):
                 desc = str(self.data(self.index(row,col)).toString()) 
+                print "col:",col
                 print "desc:",desc
 
 class Legend(QtCore.QAbstractListModel):

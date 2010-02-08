@@ -1076,6 +1076,21 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
         self.model = Models.ProbeData(campaign, probeName)
         self.view.setModel(self.model)
+        self.view.addAction(self.actionDisplayErrAndOut)
         for column in xrange(self.model.columnCount()):
             self.view.resizeColumnToContents(column)
+
+    @QtCore.pyqtSignature("")
+    def on_actionDisplayErrAndOut_triggered(self):
+        print "context menue clicked"
+        errAndOut = "halloooooooooooooooooooooo Welt"
+        QtGui.QMessageBox.about(self, "Scenario details", errAndOut)
+        self.view.model().getPath(self.view.currentIndex())
+#        self.view.model().printTable()
+#        from Windows import ProbeInfo
+#        campaign = self.probes.model().campaign
+#        probeName = self.probes.model().getProbeName(self.probes.currentIndex())
+#        probeInfo = ProbeInfo(campaign, probeName)
+#        self.probeInfoWindows.append(probeInfo)
+#        probeInfo.show()
 

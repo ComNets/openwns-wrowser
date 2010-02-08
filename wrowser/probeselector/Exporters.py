@@ -60,9 +60,9 @@ class PythExport:
             if len(comment)>0:
                   comment = " #"+comment
             if type(value) == str : 
-                out.write(name + " = \'" + value + "\'")
+                out.write("  "+name + " = \'" + value + "\'")
             else:
-                out.write(name + " = " + str(value))
+                out.write("  "+name + " = " + str(value))
             out.write(comment+"\n")
 
         def getDimensions(graphs):
@@ -83,6 +83,7 @@ class PythExport:
         path=location[0]
         fullFName=path +"/"+ typ + "_" + file
         out = open(fullFName, "w")
+        out.write("class PlotParameters : \n");
         print "X label:",export.graphs[0].axisLabels[0]
         print "Y label:",export.graphs[0].axisLabels[1]
         writeParam(out,"probeName",export.probeName)
@@ -127,11 +128,16 @@ class PythExport:
         writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
         writeParam(out,"color",True)                
         out.close()
-        outFName=file+"Plot.py"
-        cmd="outf="+file+"Plot.py ; echo '#!/usr/bin/python' > $outf ; cat "+fullFName+" >> $outf ; cat "+plotScript+" >> $outf ; chmod u+x $outf"
-        #print "CMD: ",cmd
+        outFName=path+"/"+file+"Plot.py"
+        cmd="outf="+outFName+" ; echo '#!/usr/bin/python' > $outf ; cat "+fullFName+" >> $outf ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
         subprocess.call(cmd, shell=True)
-
+        if not os.path.exists(path+"/plotAll.py") :
+            print "create plotAll.py script"
+            import shutil
+            shutil.copy('./exportTemplates/plotAll.py',path+"/plotAll.py")
+#cmd = "cp ./exportTemplates/plotAll.py "+path
+#            subprocess.call(cmd, shell= True)
+        
 
 class Matlab:
 
