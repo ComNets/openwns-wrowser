@@ -406,7 +406,9 @@ class ProbeData(QtCore.QAbstractTableModel):
     def getPath(self, index):
         print "get path to scenario"
         print "current row: ",index.row()
-        print "path = ",self.probeData[3][22]
+        print "path = ",self.probeData[1][1]['filename'].rpartition('/')[0]
+        return "/net/storage/KSW/rrr/campaign/sdmaTest3/simulations/48377"
+# print "path = ",self.probeData[1][22]
         #return self.probeNamesUnionFiltered[index.row()]
 
     def printTable(self):

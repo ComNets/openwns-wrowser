@@ -169,7 +169,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         if campaignDbDialogue.exec_() == QtGui.QDialog.Accepted:
             campaignId = campaignDbDialogue.getCampaign()
             self.campaignId = campaignId
-            #print "Campaign: ", self.campaignId
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
             self.reader = PostgresReader.CampaignReader(campaignId,
@@ -494,9 +493,7 @@ class Export:
         self.aggregate = graphControl.isAggregateParameter()
         if self.aggregate :
             self.aggrParam = graphControl.aggregationParameter()
-            print "aggregagte clicked and aggrParam=",self.aggrParam
         self.simParams=simParams
-        pprint.pprint(simParams)
 
         self.filterExpr=self.getExpression() 
         self.marker = figureConfig.marker
@@ -1062,7 +1059,7 @@ class ParameterFigure(Figure, LineGraphs):
         exp.campaignId = self.campaignId
 
         return exp
- 
+
 from ui.Windows_ProbeInfo_ui import Ui_Windows_ProbeInfo
 class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
@@ -1083,9 +1080,24 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
     @QtCore.pyqtSignature("")
     def on_actionDisplayErrAndOut_triggered(self):
         print "context menue clicked"
-        errAndOut = "halloooooooooooooooooooooo Welt"
-        QtGui.QMessageBox.about(self, "Scenario details", errAndOut)
-        self.view.model().getPath(self.view.currentIndex())
+        path=self.view.model().getPath(self.view.currentIndex())
+        stderr_data=file(path+"/stderr").readlines()
+        stdout_data=file(path+"/stdout").readlines()
+
+        listWidget = QtGui.QListWidget(self)
+        listWidget.addItem(QtGui.QListWidgetItem("stderr:"))
+        for line in stderr_data :
+            listWidget.addItem(QtGui.QListWidgetItem(line))
+        listWidget.addItem(QtGui.QListWidgetItem("stdout:"))
+        for line in stdout_data :
+            listWidget.addItem(QtGui.QListWidgetItem(line))
+        print "number of added items = ",listWidget.count()
+        dialog = QtGui.QDialog(self)
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(listWidget)
+        dialog.setLayout(layout)
+        dialog.showMaximized()
+#        QtGui.QMessageBox.information(self, "Scenario details", errAndOut)
 #        self.view.model().printTable()
 #        from Windows import ProbeInfo
 #        campaign = self.probes.model().campaign
@@ -1093,4 +1105,16 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 #        probeInfo = ProbeInfo(campaign, probeName)
 #        self.probeInfoWindows.append(probeInfo)
 #        probeInfo.show()
+#        errAndOut = "stderr: \n"
+#        for line in stderr_data :
+#            errAndOut += line
+#        errAndOut = "stdout: \n"
+#        for line in stdout_data :
+#            errAndOut += line
+#        label = QtGui.QLabel(QtCore.QString(errAndOut)) 
+#        scrollArea = QtGui.QScrollArea()
+#        scrollArea.setWidget(label)
+#        scrollArea.showMaximized()
+#layout.addWidget(label)
+#        layout.setWidget(scrollArea)
 

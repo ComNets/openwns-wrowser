@@ -1,7 +1,7 @@
   parameterNames = {'TimeToLive':'TTL', 
                     'subframeRatio':'SFratio', 
                    }
-  color_sytles = ['k-', 'k--', 'b-', 'b--', 'r-', 'r--', 'g-', 'g--', 'c-', 'c--', 'm-', 'm--']
+  color_sytles = ['b-', 'b--', 'r-', 'r--', 'g-', 'g--', 'c-', 'c--', 'm-', 'm--']
   bw_styles = ['k-', 'k--', 'k:', 'k-+', 'k--+', 'k:+', 'k-o', 'k--o', 'k:o' ]
 
 import wrowser.FigurePlotter

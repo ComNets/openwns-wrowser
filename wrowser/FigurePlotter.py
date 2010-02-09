@@ -96,7 +96,7 @@ def plotGraphs(PlotParameters):
         print "plotting graphs of probe: ",probe  
         try:
          if PlotParameters.type == 'Param': 
-            graphList = filteredFacade.getGraphs(PlotParameters.parameterName, probe, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence) 
+            graphList = filteredFacade.getGraphs(PlotParameters.parameterName, probe, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel) 
          else:
             graphList = filteredFacade.getHistograms( probe, PlotParameters.type) #, PlotParameters.aggrParam, PlotParameters.confidence)   
         except Errors.MultipleErrors, e:
@@ -125,8 +125,10 @@ def plotGraphs(PlotParameters):
         probeNr+=1
 
     axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])     
-    #title(PlotParameters.figureTitle)
-    legend(prop = font, loc=PlotParameters.legendPosition) # (0.9, 0.01))
+    if PlotParameters.showTitle :
+        title(PlotParameters.figureTitle)
+    if PlotParameters.legend:
+        legend(prop = font, loc=PlotParameters.legendPosition) # (0.9, 0.01))
     print 'Plotting: ',PlotParameters.fileName
     savefig(os.path.join(outputdir, PlotParameters.fileName+'.pdf'))
     savefig(os.path.join(outputdir, PlotParameters.fileName+'.png'))    

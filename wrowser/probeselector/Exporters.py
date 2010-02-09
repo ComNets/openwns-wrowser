@@ -84,8 +84,6 @@ class PythExport:
         fullFName=path +"/"+ typ + "_" + file
         out = open(fullFName, "w")
         out.write("class PlotParameters : \n");
-        print "X label:",export.graphs[0].axisLabels[0]
-        print "Y label:",export.graphs[0].axisLabels[1]
         writeParam(out,"probeName",export.probeName)
         writeParam(out,"probeLegendSuffix",wrowser.Tools.uniqElements(export.probeName))
 
@@ -96,7 +94,6 @@ class PythExport:
         writeParam(out,"type", export.graphType)
         writeParam(out,"campaignId", str(export.campaignId))
         writeParam(out,"xLabel",export.graphs[0].axisLabels[0])
-        print "typ:",typ
         if typ == 'Param':
             writeParam(out,"confidenceLevel",export.confidenceLevel)                
             writeParam(out,"yLabel",export.graphs[0].axisLabels[1])
@@ -121,22 +118,26 @@ class PythExport:
         writeParam(out,"grid",export.grid)
         writeParam(out,"scale",export.scale)
         writeParam(out,"marker",export.marker)
-        writeParam(out,"legend",export.legend)
+        writeParam(out,"legend", True) #export.legend)
         writeParam(out,"legendPosition","best","alternatives: upper right, upper left, lower left, lower right, right, center left, center right, lower center, upper center, center or (x,y) with x,y in [0-1]")
+        writeParam(out,"showTitle",False)                
         writeParam(out,"figureTitle",export.title)                
         writeParam(out,"scaleFactorX",1,"1/1e6 #bit to MBit")                
         writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
         writeParam(out,"color",True)                
         out.close()
         outFName=path+"/"+file+"Plot.py"
-        cmd="outf="+outFName+" ; echo '#!/usr/bin/python' > $outf ; cat "+fullFName+" >> $outf ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
+        set_path = """#!/usr/bin/python
+import sys
+import os
+sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
+        cmd="outf="+outFName+" ; echo '"+set_path+"' > $outf ; cat "+fullFName+" >> $outf ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
+        print "cmd=",cmd
         subprocess.call(cmd, shell=True)
         if not os.path.exists(path+"/plotAll.py") :
             print "create plotAll.py script"
             import shutil
             shutil.copy('./exportTemplates/plotAll.py',path+"/plotAll.py")
-#cmd = "cp ./exportTemplates/plotAll.py "+path
-#            subprocess.call(cmd, shell= True)
         
 
 class Matlab:
