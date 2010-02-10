@@ -1,7 +1,7 @@
 import optparse
 import sys
 import os
-
+import math
 import wrowser.Configuration as simDbConf
 import wrowser.simdb.Database as simDb
 from wrowser.simdb.Campaigns import setCampaign as simDbSetCampaign
@@ -116,7 +116,7 @@ def plotGraphs(PlotParameters):
             os._exit(1)
         X=[x  for x,y in graph.points]
         Y=[y*PlotParameters.scaleFactorY+PlotParameters.moveY  for x,y in graph.points]
-        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=prettyPrint(graph.sortkey)+PlotParameters.probeLegendSuffix[probeNr])
+        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=prettyPrint(graph.sortkey)+PlotParameters.probeLegendSuffix[probeNr], marker=PlotParameters.marker)
         try:
           if PlotParameters.type == 'Param': 
             if PlotParameters.confidence :
@@ -126,7 +126,16 @@ def plotGraphs(PlotParameters):
                     errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
         except: None
     if PlotParameters.doClip:
-        axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])     
+        axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])    
+    scalex = PlotParameters.scale[0] 
+    scaley = PlotParameters.scale[2] 
+    if scalex != 'linear' :
+        xbase = PlotParameters.scale[1] 
+        xscale('log',basex=xbase)
+    if scaley != 'linear' :
+        ybase= PlotParameters.scale[3]
+        yscale('log',basey=ybase)
+
     if PlotParameters.showTitle :
         title(PlotParameters.figureTitle)
     if PlotParameters.legend:
