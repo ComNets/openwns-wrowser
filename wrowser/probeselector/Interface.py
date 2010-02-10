@@ -320,7 +320,86 @@ class Facade:
         graphsList.sort(key = operator.attrgetter("sortkey"))
         return graphsList, errors
 
-    def getGraphs(self, xParameter, probeName, probeEntry, aggregationParameter = None, plotConfidenceIntervals = False, confidenceLevel = 0.95, progressNotify = None, progressReset = None):
+    def getGraphs(self, xParameter, yProbeNames, yProbeEntry, aggregationParameter = None, plotConfidenceIntervals = False, confidenceLevel = 0.95, progressNotify = None, progressReset = None, plotNotAggregatedGraphs = False, useXProbe = False, xProbeName = None, xProbeEntry = None, useYProbe = True):
+
+        graphs = list()
+        errors = list()
+        parameterName = xParameter
+#        yProbeNames = [ yProbeNames ]
+        if not aggregationParameter is None :
+            print "aggregierter graph"
+            xAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
+
+            yAcquirer = dataacquisition.Compose.Probe(yProbeEntry)
+
+            probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer, graphWriter = dataacquisition.Compose.aggregateGraphWriter)
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in yProbeNames])
+
+            parameterNames = list(self.getChangingParameterNames() - set([parameterName, aggregationParameter]))
+
+            showConfidenceLevel = plotConfidenceIntervals
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
+            print " aquire graphs 1 aggregated graph"
+
+            graphsHelp, errorsHelp = self.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                      progressNotify = progressNotify,
+                                                      progressReset = progressReset,
+                                                      graphClass = Graphs.AggregatedGraph)
+            graphs += graphsHelp
+            errors += errorsHelp
+
+        if plotNotAggregatedGraphs or aggregationParameter is None:
+            if plotNotAggregatedGraphs: print "plot originals"
+            if useXProbe:
+                print " probe fuer x achse"
+                xAcquirer = dataacquisition.Compose.ProbeEntryOfProbe(xProbeName, xProbeEntry)
+            else:
+                print " parameter fuer x achse"
+                xAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
+
+            if useYProbe:
+                print " probe fuer y achse"
+                if plotConfidenceIntervals and yProbeEntry == 'mean':
+                    print "  plotte konfidenzintervalle"  
+                    yAcquirer = dataacquisition.Compose.Probe(yProbeEntry)
+                    probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer, graphWriter = dataacquisition.Compose.aggregateGraphWriter)
+                else:
+                    print "  plotte keine konfidenzintervalle"  
+                    yAcquirer = dataacquisition.Compose.ProbeEntry(yProbeEntry)
+                    probeDataAcquirer = dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)
+
+                probeDataAcquirers = dict([(probeName, probeDataAcquirer)
+                                           for probeName in yProbeNames])
+            else:
+                print " parameter fuer y achse"
+                yAcquirer = dataacquisition.Compose.ParameterValue(parameterName)
+
+                probeDataAcquirers = {None : dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)}
+
+            parameterNames = list(self.getChangingParameterNames() - set([parameterName]))
+            if plotConfidenceIntervals and yProbeEntry == 'mean':
+                print " plotte konfidenzintervalle"  
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
+                print " aquire graphs 2 aggregated "
+                graphsHelp, errorsHelp = self.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                                progressNotify = progressNotify,
+                                                                progressReset = progressReset,
+                                                                graphClass = Graphs.AggregatedGraph)
+            else:
+                print " plotte keine konfidenzintervalle"  
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
+                print " aquire graphs 3 not aggregated"
+
+                graphsHelp, errorsHelp = self.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                                progressNotify = progressNotify,
+                                                                progressReset = progressReset)
+
+            graphs += graphsHelp
+            errors += errorsHelp
+
+        return graphs
+
+    def getGraphsOld(self, xParameter, probeName, probeEntry, aggregationParameter = None, plotConfidenceIntervals = False, confidenceLevel = 0.95, progressNotify = None, progressReset = None, plotNotAggregatedGraphs = False, useXProbe = False, xProbeName = None, xProbeEntry = None, useYProbe = True):
         if aggregationParameter is None and plotConfidenceLevels == False:
             probeDataAcquirer = dataacquisition.Compose.XY(x = dataacquisition.Compose.ParameterValue(xParameter),
                                                            y = dataacquisition.Compose.ProbeEntryOfProbe(probeName, probeEntry))
@@ -337,11 +416,19 @@ class Facade:
             if aggregationParameter is None:
                 parameterNames = list(self.getChangingParameterNames() - set([xParameter]))
             else:
+                print "changingParameterNames:",self.getChangingParameterNames()
                 parameterNames = list(self.getChangingParameterNames() - set([xParameter, aggregationParameter]))
             if plotConfidenceIntervals:
-                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+                print "parameters:",parameterNames
+                print "yProbeEntry:",probeEntry
+                print "confidenceLevel:",confidenceLevel
+                probeDataAcquirers = {probeName : probeDataAcquirer}
+                print "probeDataAquirers:",probeDataAcquirers
+
+                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers,
                                                                 parameterNames = parameterNames,
-                                                                aggregationFunction = dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
+                                                                aggregationFunction = dataacquisition.Aggregator.Mean(probeEntry, confidenceLevel, True))
+#WeightedMeanWithConfidenceInterval(confidenceLevel))
             else:
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
                                                                 parameterNames = parameterNames,

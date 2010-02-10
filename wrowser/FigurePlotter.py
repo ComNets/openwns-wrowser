@@ -92,37 +92,35 @@ def plotGraphs(PlotParameters):
         ls = lineStyleSW()
 
     probeNr = 0
-    for probe in PlotParameters.probeName :
-        print "plotting graphs of probe: ",probe  
+    try:
+     if PlotParameters.type == 'Param': 
+        graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots) 
+     else:
+        graphList = filteredFacade.getHistograms( probe, PlotParameters.type, PlotParameters.aggrParam) #, PlotParameters.aggrParam, PlotParameters.confidence)   
+    except Errors.MultipleErrors, e:
+     graphList = e.graphs
+
+    i=0
+    if len(graphList)==0:
+        print "no graphs to plot"
+    for graph in graphList:
+        labels.append(str(graph.sortkey))
         try:
-         if PlotParameters.type == 'Param': 
-            graphList = filteredFacade.getGraphs(PlotParameters.parameterName, probe, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel) 
-         else:
-            graphList = filteredFacade.getHistograms( probe, PlotParameters.type) #, PlotParameters.aggrParam, PlotParameters.confidence)   
-        except Errors.MultipleErrors, e:
-         graphList = e.graphs
-
-        i=0
-        for graph in graphList:
-            labels.append(str(graph.sortkey))
-            try:
-                style=ls.next()
-            except StopIteration:
-                print "You need to define more linestyles or reduce the number of plotted graphs"    
-                os._exit(1)
-            X=[x  for x,y in graph.points]
-            Y=[y*PlotParameters.scaleFactorY+PlotParameters.moveY  for x,y in graph.points]
-            plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=prettyPrint(graph.sortkey)+PlotParameters.probeLegendSuffix[probeNr])
-            try:
-              if PlotParameters.type == 'Param': 
-                if PlotParameters.confidence :
-                    print "plotting confidence intervals"
-                    for i in range(len(X)):
-                        e = graph.confidenceIntervalDict[X[i]]
-                        errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
-            except: None
-
-        probeNr+=1
+            style=ls.next()
+        except StopIteration:
+            print "You need to define more linestyles or reduce the number of plotted graphs"    
+            os._exit(1)
+        X=[x  for x,y in graph.points]
+        Y=[y*PlotParameters.scaleFactorY+PlotParameters.moveY  for x,y in graph.points]
+        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=prettyPrint(graph.sortkey)+PlotParameters.probeLegendSuffix[probeNr])
+        try:
+          if PlotParameters.type == 'Param': 
+            if PlotParameters.confidence :
+                print "plotting confidence intervals"
+                for i in range(len(X)):
+                    e = graph.confidenceIntervalDict[X[i]]
+                    errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
+        except: None
 
     axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])     
     if PlotParameters.showTitle :
@@ -132,5 +130,3 @@ def plotGraphs(PlotParameters):
     print 'Plotting: ',PlotParameters.fileName
     savefig(os.path.join(outputdir, PlotParameters.fileName+'.pdf'))
     savefig(os.path.join(outputdir, PlotParameters.fileName+'.png'))    
-
-

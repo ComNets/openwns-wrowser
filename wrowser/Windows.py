@@ -460,6 +460,7 @@ class Export:
     paramName = None
     probeEntry = None
     aggregate = False
+    originalPlots = False
     aggrParam = ''
     filterExpr = None
     simParams = None
@@ -493,6 +494,7 @@ class Export:
         self.aggregate = graphControl.isAggregateParameter()
         if self.aggregate :
             self.aggrParam = graphControl.aggregationParameter()
+            self.originalPlots = graphControl.isPlotNotAggregatedGraphs()
         self.simParams=simParams
 
         self.filterExpr=self.getExpression() 
@@ -573,7 +575,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
     def on_export_clicked(self):
         from probeselector import Exporters
         export = self.getExport()
-        print "export:",export
 
         formatDialogue = Dialogues.SelectItem("Export Format", "Select format", Exporters.directory.keys(), self, Dialogues.SelectItem.RadioButtons)
         if formatDialogue.exec_() == QtGui.QDialog.Accepted:
@@ -591,7 +592,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.graph.setGraphs(self.getGraphs())
 
     def getExport(self):
-        print "export Figure"
+        print "export"
  
 class LineGraphs(Observing):
 
@@ -771,7 +772,6 @@ class XDFFigure(ProbeFigure, LineGraphs):
         return graphs
 
     def getExport(self):
-        print "export XDF"
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
         exp = Export(self.probeGraphControl,simParams,self.graph.figureConfig)
         exp.graphs = self.getGraphs()
@@ -976,11 +976,7 @@ class ParameterFigure(Figure, LineGraphs):
 
             aggregationParameter = self.parameterGraphControl.aggregationParameter()
             parameterNames = list(campaign.getChangingParameterNames() - set([parameterName, aggregationParameter]))
-#if self.parameterGraphControl.isShowConfidenceLevels() and yProbeEntry == 'mean':
-#                confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
-#                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
-#            else:
-#                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.mapping[yProbeEntry])
+
             confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
             showConfidenceLevel = self.parameterGraphControl.isShowConfidenceLevels()
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
@@ -1046,13 +1042,11 @@ class ParameterFigure(Figure, LineGraphs):
         return graphs
 
     def getExport(self):
-        print "export Param Figure"
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
         exp = Export(self.parameterGraphControl,simParams,self.graph.figureConfig)
         exp.paramName=self.parameterGraphControl.parameterName()
         exp.probeEntry=self.parameterGraphControl.yProbeEntryName()
         exp.graphs = self.getGraphs()
-        pprint.pprint(inspect.getmembers(exp.graphs[0].identity))
 
         exp.graphType="Param" 
         exp.confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
@@ -1079,7 +1073,6 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
     @QtCore.pyqtSignature("")
     def on_actionDisplayErrAndOut_triggered(self):
-        print "context menue clicked"
         path=self.view.model().getPath(self.view.currentIndex())
         stderr_data=file(path+"/stderr").readlines()
         stdout_data=file(path+"/stdout").readlines()
@@ -1091,7 +1084,6 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
         listWidget.addItem(QtGui.QListWidgetItem("stdout:"))
         for line in stdout_data :
             listWidget.addItem(QtGui.QListWidgetItem(line))
-        print "number of added items = ",listWidget.count()
         dialog = QtGui.QDialog(self)
         layout = QtGui.QVBoxLayout()
         layout.addWidget(listWidget)

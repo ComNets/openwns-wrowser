@@ -89,6 +89,7 @@ class PythExport:
 
         writeParam(out,"confidence",export.confidence)
         writeParam(out,"aggregate",export.aggregate)
+        writeParam(out,"originalPlots",export.originalPlots)
         writeParam(out,"aggrParam",export.aggrParam)
         writeParam(out,"fileName",file)
         writeParam(out,"type", export.graphType)
@@ -132,7 +133,7 @@ import sys
 import os
 sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         cmd="outf="+outFName+" ; echo '"+set_path+"' > $outf ; cat "+fullFName+" >> $outf ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
-        print "cmd=",cmd
+#        print "cmd=",cmd
         subprocess.call(cmd, shell=True)
         if not os.path.exists(path+"/plotAll.py") :
             print "create plotAll.py script"
