@@ -94,7 +94,11 @@ def plotGraphs(PlotParameters):
     probeNr = 0
     try:
      if PlotParameters.type == 'Param': 
-        graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots) 
+        if PlotParameters.useXProbe:
+            print "probe wird fuer x benutzt"
+            graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots, useXProbe = PlotParameters.useXProbe, xProbeName = PlotParameters.xProbeName, xProbeEntry = PlotParameters.xProbeEntry)
+        else:
+            graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots)
      else:
         graphList = filteredFacade.getHistograms( probe, PlotParameters.type, PlotParameters.aggrParam) #, PlotParameters.aggrParam, PlotParameters.confidence)   
     except Errors.MultipleErrors, e:

@@ -459,6 +459,10 @@ class Export:
     probeName = None
     paramName = None
     probeEntry = None
+    useXProbe = False
+    useYProbe = True
+    xProbeName = None
+    xProbeEntry = None
     aggregate = False
     originalPlots = False
     aggrParam = ''
@@ -489,7 +493,7 @@ class Export:
         return fExpr[0:len(fExpr)-5] #cut last conjunction operator
 
     def __init__(self,graphControl,simParams,figureConfig):
-        self.probeName = graphControl.getAllSelectedProbeNames() # graphControl.yProbeNames()[0] 
+        self.probeName = graphControl.getAllSelectedProbeNames() # graphControl.yProbeNames()[0]
         self.confidence = graphControl.isShowConfidenceLevels()
         self.aggregate = graphControl.isAggregateParameter()
         if self.aggregate :
@@ -1047,7 +1051,11 @@ class ParameterFigure(Figure, LineGraphs):
         exp.paramName=self.parameterGraphControl.parameterName()
         exp.probeEntry=self.parameterGraphControl.yProbeEntryName()
         exp.graphs = self.getGraphs()
-
+        exp.useXProbe = self.parameterGraphControl.isXUseProbeEntry()
+        exp.useYProbe = self.parameterGraphControl.isYUseProbeEntry() 
+        if exp.useXProbe :
+            exp.xProbeName = self.parameterGraphControl.xProbeNames()[0]
+            exp.xProbeEntry =  self.parameterGraphControl.xProbeEntryName()
         exp.graphType="Param" 
         exp.confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
         exp.campaignId = self.campaignId

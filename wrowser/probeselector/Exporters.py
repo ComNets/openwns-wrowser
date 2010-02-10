@@ -100,6 +100,11 @@ class PythExport:
             writeParam(out,"yLabel",export.graphs[0].axisLabels[1])
             writeParam(out,"parameterName",export.paramName)
             writeParam(out,"probeEntry",export.probeEntry)
+            writeParam(out,"useXProbe",export.useXProbe)
+            writeParam(out,"useYProbe",export.useYProbe)
+            if export.useXProbe:
+                writeParam(out, "xProbeName",export.xProbeName)
+                writeParam(out, "xProbeEntry",export.xProbeEntry)
             plotScript="./exportTemplates/readDBandPlot"
         else:
             writeParam(out,"yLabel","P(X)")
@@ -127,7 +132,9 @@ class PythExport:
         writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
         writeParam(out,"color",True)                
         out.close()
-        outFName=path+"/"+file+"Plot.py"
+        if not file.endswith('.py'):
+            file += '.py'
+        outFName=path+"/"+file
         set_path = """#!/usr/bin/python
 import sys
 import os
