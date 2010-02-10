@@ -441,6 +441,7 @@ class LineGraph(Graph, Observing):
             self.canvas.axes.set_ylim(0, ymax)
         self.setGrid(*self.figureConfig.grid)
         self.legendModel.updateLinesNLabels(self.lines, self.labels)
+        self.setScale(*(self.figureConfig.scale))
         if self.figureConfig.legend:
             self.setLegend(True)
 

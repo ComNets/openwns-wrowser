@@ -524,7 +524,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.campaigns = campaigns
         self.menu = menu
 
-        self.setWindowTitle(windowTitle)
+        self.setWindowTitle(windowTitle+"campaignTitle")
         self.setupMenu()
 
         self.graphControlLayout = QtGui.QVBoxLayout(self.graphControl)
