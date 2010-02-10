@@ -123,6 +123,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         writeParam(out,"filterExpression",export.filterExpr)
         
         dimensions=getDimensions(graphs)
+        writeParam(out,"doClip",False)
         writeParam(out,"minX",dimensions[0])
         writeParam(out,"maxX",dimensions[1])
         writeParam(out,"minY",0,"min Y value is:"+str(dimensions[2]))

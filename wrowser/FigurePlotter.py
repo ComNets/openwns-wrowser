@@ -125,8 +125,8 @@ def plotGraphs(PlotParameters):
                     e = graph.confidenceIntervalDict[X[i]]
                     errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
         except: None
-
-    axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])     
+    if PlotParameters.doClip:
+        axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])     
     if PlotParameters.showTitle :
         title(PlotParameters.figureTitle)
     if PlotParameters.legend:
