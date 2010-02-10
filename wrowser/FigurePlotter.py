@@ -100,7 +100,7 @@ def plotGraphs(PlotParameters):
         else:
             graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots)
      else:
-        graphList = filteredFacade.getHistograms( probe, PlotParameters.type, PlotParameters.aggrParam) #, PlotParameters.aggrParam, PlotParameters.confidence)   
+        graphList = filteredFacade.getHistograms( PlotParameters.probeName, PlotParameters.type, PlotParameters.aggrParam, plotNotAggregatedGraphs=PlotParameters.originalPlots) #, PlotParameters.aggrParam, PlotParameters.confidence)   
     except Errors.MultipleErrors, e:
      graphList = e.graphs
 

@@ -456,6 +456,7 @@ class DirectoryNavigation(QtGui.QDockWidget):
 
 class Export:
     graphs=[]
+    graph = None
     probeName = None
     paramName = None
     probeEntry = None
@@ -492,7 +493,7 @@ class Export:
             fExpr+="] and "
         return fExpr[0:len(fExpr)-5] #cut last conjunction operator
 
-    def __init__(self,graphControl,simParams,figureConfig):
+    def __init__(self,graphControl,simParams,graph):
         self.probeName = graphControl.getAllSelectedProbeNames() # graphControl.yProbeNames()[0]
         self.confidence = graphControl.isShowConfidenceLevels()
         self.aggregate = graphControl.isAggregateParameter()
@@ -500,13 +501,17 @@ class Export:
             self.aggrParam = graphControl.aggregationParameter()
             self.originalPlots = graphControl.isPlotNotAggregatedGraphs()
         self.simParams=simParams
-
+        self.graph=graph
+        print "canvas:"
+        pprint.pprint(self.graph.canvas.axes.get_ylim())
+        pprint.pprint(self.graph.canvas.axes.get_xlim())
+ 
         self.filterExpr=self.getExpression() 
-        self.marker = figureConfig.marker
-        self.scale= figureConfig.scale
-        self.grid = figureConfig.grid
-        self.legend = figureConfig.legend
-        self.title = figureConfig.title
+        self.marker = graph.figureConfig.marker
+        self.scale= graph.figureConfig.scale
+        self.grid = graph.figureConfig.grid
+        self.legend = graph.figureConfig.legend
+        self.title = graph.figureConfig.title
  
 
 from ui.Windows_Figure_ui import Ui_Windows_Figure
@@ -777,7 +782,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
     def getExport(self):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
-        exp = Export(self.probeGraphControl,simParams,self.graph.figureConfig)
+        exp = Export(self.probeGraphControl,simParams,self.graph)
         exp.graphs = self.getGraphs()
         exp.graphType=self.probeGraphControl.probeFunction() #"XDF" #self.graph.figureConfig.title[0:5]
         exp.campaignId = self.campaignId
@@ -1047,7 +1052,7 @@ class ParameterFigure(Figure, LineGraphs):
 
     def getExport(self):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
-        exp = Export(self.parameterGraphControl,simParams,self.graph.figureConfig)
+        exp = Export(self.parameterGraphControl,simParams,self.graph)
         exp.paramName=self.parameterGraphControl.parameterName()
         exp.probeEntry=self.parameterGraphControl.yProbeEntryName()
         exp.graphs = self.getGraphs()

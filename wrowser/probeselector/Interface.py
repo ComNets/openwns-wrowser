@@ -442,16 +442,61 @@ class Facade:
         else:
             return graphs
 
-    def getHistograms(self, probeName, function, aggregationParameter = None, progressNotify = None, progressReset = None):
+    def getHistograms(self, probeNames, function, aggregationParameter = None, progressNotify = None, progressReset = None, plotNotAggregatedGraphs = False):
+        #dataacquisition = probeselector.dataacquisition
+        #campaign = self.campaigns.draw
+
+        funType = function
+
+        graphs = list()
+        errors = list()
+
+        if  not aggregationParameter is None :
+            probeDataAcquirer = getattr(dataacquisition.Probe, funType)(graphWriter = dataacquisition.Probe.aggregateGraphWriter)
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
+
+            parameterNames = list(self.getChangingParameterNames() - set([aggregationParameter]))
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.weightedXDF)
+
+            graphsHelp, errorsHelp = self.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                            progressNotify = progressNotify,
+                                                            progressReset = progressReset,
+                                                            graphClass = Graphs.AggregatedGraph)
+
+            graphs += graphsHelp
+            errors += errorsHelp
+
+        if plotNotAggregatedGraphs or aggregationParameter is None :
+            probeDataAcquirer = getattr(dataacquisition.Probe, funType)()
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
+
+            parameterNames = list(self.getChangingParameterNames())
+
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
+                                                            parameterNames = parameterNames)
+
+            graphsHelp, errorsHelp = self.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                            progressNotify = progressNotify,
+                                                            progressReset = progressReset)
+
+
+            graphs += graphsHelp
+            errors += errorsHelp
+
+        return graphs
+
+    def getHistogramsOld(self, probeNames, function, aggregationParameter = None, progressNotify = None, progressReset = None):
         if aggregationParameter is None:
             probeDataAcquirer = getattr(dataacquisition.Probe, function)()
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
             parameterNames = list(self.getChangingParameterNames())
-            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                             parameterNames = parameterNames)
         else:
             probeDataAcquirer = getattr(dataacquisition.Probe, function)(graphWriter = dataacquisition.Probe.aggregateGraphWriter)
+            probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
             parameterNames = list(self.getChangingParameterNames() - set([aggregationParameter]))
-            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = {probeName : probeDataAcquirer},
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                             parameterNames = parameterNames,
                                                             aggregationFunction = dataacquisition.Aggregator.weightedXDF)
         graphs, errors = self.acquireGraphs(progressNotify = progressNotify,

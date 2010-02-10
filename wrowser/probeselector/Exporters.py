@@ -65,17 +65,6 @@ class PythExport:
                 out.write("  "+name + " = " + str(value))
             out.write(comment+"\n")
 
-        def getDimensions(graphs):
-            minX=graphs[0].points[0][0]
-            maxX=graphs[0].points[-1][0]
-            yvalues = []
-            for graph in graphs :
-                yvalues.append([y for x,y in graph.points])
-            minY=min(min(yvalues))
-            maxY=max(max(yvalues))
-            return  [minX, maxX, minY, maxY]
-
- 
         graphs = export.graphs
         typ = export.graphType #"param"
         location = filename.rpartition('/')
@@ -122,12 +111,11 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
 
         writeParam(out,"filterExpression",export.filterExpr)
         
-        dimensions=getDimensions(graphs)
-        writeParam(out,"doClip",False)
-        writeParam(out,"minX",dimensions[0])
-        writeParam(out,"maxX",dimensions[1])
-        writeParam(out,"minY",0,"min Y value is:"+str(dimensions[2]))
-        writeParam(out,"maxY",dimensions[3])
+        writeParam(out,"doClip",True)
+        writeParam(out,"minX",export.graph.canvas.axes.get_xlim()[0])
+        writeParam(out,"maxX",export.graph.canvas.axes.get_xlim()[1])
+        writeParam(out,"minY",export.graph.canvas.axes.get_ylim()[0])
+        writeParam(out,"maxY",export.graph.canvas.axes.get_ylim()[1])
         writeParam(out,"moveX",0)
         writeParam(out,"moveY",0)
 
@@ -144,7 +132,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         writeParam(out,"color",True)                
         out.close()
         cmd="outf="+filename+" ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
-        print "cmd=",cmd
+        #print "cmd=",cmd
         subprocess.call(cmd, shell=True)
         if not os.path.exists(path+"/plotAll.py") :
             print "create plotAll.py script"
