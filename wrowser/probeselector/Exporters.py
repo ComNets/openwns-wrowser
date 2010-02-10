@@ -81,8 +81,18 @@ class PythExport:
         location = filename.rpartition('/')
         file=location[-1]
         path=location[0]
-        fullFName=path +"/"+ typ + "_" + file
-        out = open(fullFName, "w")
+        if not filename.endswith('.py'):
+            filename += '.py'
+        else:
+            file=file.rpartition('.')[0]
+
+        set_path = """#!/usr/bin/python
+import sys
+import os
+sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
+ 
+        out = open(filename, "w")
+        out.write(set_path)
         out.write("class PlotParameters : \n");
         writeParam(out,"probeName",export.probeName)
         writeParam(out,"probeLegendSuffix",wrowser.Tools.uniqElements(export.probeName))
@@ -132,15 +142,8 @@ class PythExport:
         writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
         writeParam(out,"color",True)                
         out.close()
-        if not file.endswith('.py'):
-            file += '.py'
-        outFName=path+"/"+file
-        set_path = """#!/usr/bin/python
-import sys
-import os
-sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
-        cmd="outf="+outFName+" ; echo '"+set_path+"' > $outf ; cat "+fullFName+" >> $outf ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
-#        print "cmd=",cmd
+        cmd="outf="+filename+" ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
+        print "cmd=",cmd
         subprocess.call(cmd, shell=True)
         if not os.path.exists(path+"/plotAll.py") :
             print "create plotAll.py script"
