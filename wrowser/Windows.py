@@ -652,6 +652,7 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
         ProbeFigure.__init__(self, campaigns, menu, "LogEval Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "LogEval Probe Figure"
+        self.probeGraphControl.aggregateframe.hide()
 
     @staticmethod
     def getProbeTypes():
@@ -686,6 +687,7 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
         ProbeFigure.__init__(self, campaigns, menu, "TimeSeries Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "TimeSeries Probe Figure"
+        self.probeGraphControl.aggregateframe.hide()
 
     @staticmethod
     def getProbeTypes():
@@ -793,6 +795,7 @@ class LREFigure(ProbeFigure, LineGraphs):
         ProbeFigure.__init__(self, campaigns, menu, "(D)LRE Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "(D)LRE Probe Figure"
+        self.probeGraphControl.aggregateframe.hide()
 
         self.probeFunctions = ["ordinate",
                                "relative error",
@@ -838,6 +841,8 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
     def __init__(self, campaigns, menu, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "BatchMeans Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
+        self.probeGraphControl.aggregateframe.hide()
+        
         self.graph.figureConfig.title = "BatchMeans Probe Figure"
 
         self.probeFunctions = ["CDF",
