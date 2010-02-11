@@ -81,6 +81,15 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
             plotAll.close()
             os.chmod(newlocation,stat.S_IRWXU) #set rwx rights for user
 
+        def writeLegendLabelMapping(out):
+            out.write("  legendLabelMapping = {\n")
+
+            for grp in graphs :
+                label = Facade.getGraphDescription(grp)
+                out.write("    \" "+label+"\":\""+label+"\" ,\n")
+            out.write("  }\n")
+     
+
         graphs = export.graphs
            
         typ = export.graphType #"param"
@@ -145,18 +154,12 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         writeParam(out,"figureTitle",export.title)                
         writeParam(out,"scaleFactorX",1,"1/1e6 #bit to MBit")                
         writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
-        writeParam(out,"color",True)                
-        out.write("  legendLabelMapping = {\n")
-
-        for grp in graphs :
-            label = Facade.getGraphDescription(grp)
-            out.write("    \" "+label+"\":\""+label+"\" ,\n")
-        out.write("  }\n")
- 
+        writeParam(out,"color",True)            
+        writeLegendLabelMapping(out)   
+        template = open('./exportTemplates/readDBandPlot') 
+        out.writelines(template.readlines())
         out.close()
-        cmd="outf="+filename+" ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
-        #print "cmd=",cmd
-        subprocess.call(cmd, shell=True)
+        os.chmod(filename,stat.S_IRWXU) #set rwx rights for user
 
 class Matlab:
 

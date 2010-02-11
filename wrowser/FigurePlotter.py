@@ -46,7 +46,6 @@ def loadCampaignAndPlotGraphs(PlotParameters):
 
     print "Reading Campaign"
     campaign = Representations.Campaign(*campaignReader.read())
-    print "read"
     print "Creating Facade"
     ch = Interface.Facade(campaign)
     print "done"
@@ -112,7 +111,9 @@ def loadCampaignAndPlotGraphs(PlotParameters):
                     errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
         except: None
         i+=1
-
+    for additional in PlotParameters.additional_plots :
+        plot(additional['x'], additional['y'] , additional['style'] , label=additional['label'])
+         
     if PlotParameters.doClip:
         axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])    
     scalex = PlotParameters.scale[0] 
