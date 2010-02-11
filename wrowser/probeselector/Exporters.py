@@ -29,6 +29,7 @@ import inspect
 import wrowser.Tools
 import os
 import subprocess
+import stat
 
 class CSV:
 
@@ -56,6 +57,10 @@ class PythExport:
     
     @staticmethod
     def export(filename, export, progressNotify = None, progressReset = None):
+        set_path = """#!/usr/bin/python
+import sys
+import os
+sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         def writeParam(out, name, value, comment='' ):
             if len(comment)>0:
                   comment = " #"+comment
@@ -65,21 +70,29 @@ class PythExport:
                 out.write("  "+name + " = " + str(value))
             out.write(comment+"\n")
 
+        def createPlotAll(path):
+            newlocation=path+"/plotAll.py"
+            plotAll = open(newlocation,"w")
+            plotAll.write(set_path)
+            template = open('./exportTemplates/plotAll.py',"r")
+            lines = template.readlines()
+            plotAll.writelines(lines)
+            template.close()
+            plotAll.close()
+            os.chmod(newlocation,stat.S_IRWXU) #set rwx rights for user
+
         graphs = export.graphs
         typ = export.graphType #"param"
         location = filename.rpartition('/')
         file=location[-1]
         path=location[0]
+        createPlotAll(path)
         if not filename.endswith('.py'):
             filename += '.py'
         else:
             file=file.rpartition('.')[0]
 
-        set_path = """#!/usr/bin/python
-import sys
-import os
-sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
- 
+
         out = open(filename, "w")
         out.write(set_path)
         out.write("class PlotParameters : \n");

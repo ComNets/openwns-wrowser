@@ -19,7 +19,7 @@ from pylab import *
 
 from scipy.special import erf
 
-def plotGraphs(PlotParameters):
+def loadCampaignAndPlotGraphs(PlotParameters):
     def lineStyle():
         
         for style in PlotParameters.color_sytles :

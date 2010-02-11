@@ -5,5 +5,5 @@
   bw_styles = ['k-', 'k--', 'k:', 'k-+', 'k--+', 'k:+', 'k-o', 'k--o', 'k:o' ]
 
 import wrowser.FigurePlotter
-if __name__ == '__main__': wrowser.FigurePlotter.plotGraphs(PlotParameters)
+if __name__ == '__main__': wrowser.FigurePlotter.loadCampaignAndPlotGraphs(PlotParameters)
 
