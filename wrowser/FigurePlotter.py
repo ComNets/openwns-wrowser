@@ -35,21 +35,6 @@ def loadCampaignAndPlotGraphs(PlotParameters):
         for hatch in ['/','\\','|','-','+','x','.','//','\\' ]:
             yield hatch
 
-    def prettyPrint(labels):
-        '''
-        Give a pretty string of parameter names.
-        '''
-        def pPString(string):
-           if string in PlotParameters.parameterNames:
-                return PlotParameters.parameterNames[string]
-           else:
-                return string
-
-        out = ''
-        for k,v in labels.iteritems():
-           out += pPString(k) + ': ' + str(v) + ' '
-        return out
-
     ## Get the campaign
     dbConfig = simDbConf.Configuration()
     dbConfig.read()
@@ -116,7 +101,8 @@ def loadCampaignAndPlotGraphs(PlotParameters):
             os._exit(1)
         X=[x  for x,y in graph.points]
         Y=[y*PlotParameters.scaleFactorY+PlotParameters.moveY  for x,y in graph.points]
-        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=prettyPrint(graph.sortkey)+PlotParameters.probeLegendSuffix[probeNr], marker=PlotParameters.marker)
+        key = PlotParameters.legendLabelMapping.keys()[i]
+        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=PlotParameters.legendLabelMapping[key])
         try:
           if PlotParameters.type == 'Param': 
             if PlotParameters.confidence :
@@ -125,6 +111,8 @@ def loadCampaignAndPlotGraphs(PlotParameters):
                     e = graph.confidenceIntervalDict[X[i]]
                     errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
         except: None
+        i+=1
+
     if PlotParameters.doClip:
         axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])    
     scalex = PlotParameters.scale[0] 

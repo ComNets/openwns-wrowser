@@ -786,7 +786,6 @@ class XDFFigure(ProbeFigure, LineGraphs):
         exp.graphs = self.getGraphs()
         exp.graphType=self.probeGraphControl.probeFunction() #"XDF" #self.graph.figureConfig.title[0:5]
         exp.campaignId = self.campaignId
-
         return exp
  
 class LREFigure(ProbeFigure, LineGraphs):
