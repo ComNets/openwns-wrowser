@@ -503,9 +503,6 @@ class Export:
             self.originalPlots = graphControl.isPlotNotAggregatedGraphs()
         self.simParams=simParams
         self.graph=graph
-        print "canvas:"
-        pprint.pprint(self.graph.canvas.axes.get_ylim())
-        pprint.pprint(self.graph.canvas.axes.get_xlim())
  
         self.filterExpr=self.getExpression() 
         self.marker = graph.figureConfig.marker

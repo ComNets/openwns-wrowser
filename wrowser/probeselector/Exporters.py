@@ -70,8 +70,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
                 out.write("  "+name + " = " + str(value))
             out.write(comment+"\n")
 
-        def createPlotAll(path):
-            newlocation=path+"/plotAll.py"
+        def createPlotAll(newlocation):
             plotAll = open(newlocation,"w")
             plotAll.write(set_path)
             template = open('./exportTemplates/plotAll.py',"r")
@@ -86,7 +85,9 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         location = filename.rpartition('/')
         file=location[-1]
         path=location[0]
-        createPlotAll(path)
+        newlocation=path+"/plotAll.py"
+        if not os.path.exists(newlocation):
+            createPlotAll(newlocation)
         if not filename.endswith('.py'):
             filename += '.py'
         else:
@@ -147,11 +148,6 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         cmd="outf="+filename+" ; cat ./exportTemplates/readDBandPlot >> $outf ; chmod u+x $outf"
         #print "cmd=",cmd
         subprocess.call(cmd, shell=True)
-        if not os.path.exists(path+"/plotAll.py") :
-            print "create plotAll.py script"
-            import shutil
-            shutil.copy('./exportTemplates/plotAll.py',path+"/plotAll.py")
-        
 
 class Matlab:
 
