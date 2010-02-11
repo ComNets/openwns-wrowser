@@ -171,6 +171,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.campaignId = campaignId
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
+            self.setWindowTitle(self.windowTitle()+" "+self.campaignTitle)
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
                                                         Dialogues.Progress("Reading data", 0, self.workspace).setCurrentAndMaximum,
@@ -290,7 +291,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
-        figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.campaignTitle, self.menuFigure, self.workspace)
+        figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.show()
 
@@ -921,10 +922,10 @@ class TableFigure(ProbeFigure, TableGraphs):
         return graphs
 
 class ParameterFigure(Figure, LineGraphs):
-    def __init__(self, campaigns, campaignId, campaignTitle, menu, *qwidgetArgs):
+    def __init__(self, campaigns, campaignId, menu, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
-        self.graph.figureConfig.title = "Parameter Figure "+campaignTitle
+        self.graph.figureConfig.title = "Parameter Figure "
         self.campaignId = campaignId
         self.parameterGraphControl = Widgets.ParameterGraphControl(self.graphControl)
         self.graphControlLayout.addWidget(self.parameterGraphControl)
