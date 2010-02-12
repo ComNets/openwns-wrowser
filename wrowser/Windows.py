@@ -1089,39 +1089,28 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
     @QtCore.pyqtSignature("")
     def on_actionDisplayErrAndOut_triggered(self):
         path=self.view.model().getPath(self.view.currentIndex())
-        stderr_data=file(path+"/stderr").readlines()
-        stdout_data=file(path+"/stdout").readlines()
+        if path is None:
+            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol, hence the database does not contain the correct path to the probe file")
+        else:
+            stderr_data=file(path+"/stderr").readlines()
+            stdout_data=file(path+"/stdout").readlines()
 
-        listWidget = QtGui.QListWidget(self)
-        listWidget.addItem(QtGui.QListWidgetItem("stderr:"))
-        for line in stderr_data :
-            listWidget.addItem(QtGui.QListWidgetItem(line))
-        listWidget.addItem(QtGui.QListWidgetItem("stdout:"))
-        for line in stdout_data :
-            listWidget.addItem(QtGui.QListWidgetItem(line))
-        dialog = QtGui.QDialog(self)
-        layout = QtGui.QVBoxLayout()
-        layout.addWidget(listWidget)
-        dialog.setLayout(layout)
-        dialog.showMaximized()
-#        QtGui.QMessageBox.information(self, "Scenario details", errAndOut)
-#        self.view.model().printTable()
-#        from Windows import ProbeInfo
-#        campaign = self.probes.model().campaign
-#        probeName = self.probes.model().getProbeName(self.probes.currentIndex())
-#        probeInfo = ProbeInfo(campaign, probeName)
-#        self.probeInfoWindows.append(probeInfo)
-#        probeInfo.show()
-#        errAndOut = "stderr: \n"
-#        for line in stderr_data :
-#            errAndOut += line
-#        errAndOut = "stdout: \n"
-#        for line in stdout_data :
-#            errAndOut += line
-#        label = QtGui.QLabel(QtCore.QString(errAndOut)) 
-#        scrollArea = QtGui.QScrollArea()
-#        scrollArea.setWidget(label)
-#        scrollArea.showMaximized()
-#layout.addWidget(label)
-#        layout.setWidget(scrollArea)
+            listWidget = QtGui.QListWidget(self)
+            item =QtGui.QListWidgetItem("stderr:")
+            item.setTextAlignment(QtCore.Qt.AlignHCenter)
+            item.setBackgroundColor(QtCore.Qt.yellow)
+            listWidget.addItem(item)
+            for line in stderr_data :
+                listWidget.addItem(QtGui.QListWidgetItem(line))
+            item =QtGui.QListWidgetItem("stdout:")
+            item.setTextAlignment(QtCore.Qt.AlignHCenter)
+            item.setBackgroundColor(QtCore.Qt.yellow)
+            listWidget.addItem(item)
+            for line in stdout_data :
+                listWidget.addItem(QtGui.QListWidgetItem(line))
+            dialog = QtGui.QDialog(self)
+            layout = QtGui.QVBoxLayout()
+            layout.addWidget(listWidget)
+            dialog.setLayout(layout)
+            dialog.showMaximized()
 

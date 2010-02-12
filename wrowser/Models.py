@@ -406,10 +406,15 @@ class ProbeData(QtCore.QAbstractTableModel):
     def getPath(self, index):
         print "get path to scenario"
         print "current row: ",index.row()
-        print "path = ",self.probeData[1][1]['filename'].rpartition('/')[0]
-        return "/net/storage/KSW/rrr/campaign/sdmaTest3/simulations/48377"
-# print "path = ",self.probeData[1][22]
-        #return self.probeNamesUnionFiltered[index.row()]
+        try:
+            path = self.probeData[index.row()][1]['filename'].rpartition('/')[0] 
+            print "path = ",path
+            if path.find('scratch'):
+                print "the scenario was queued with an old simcontrol.py, hence the database does not contain the path to your scenario folder"
+            return "/net/storage/KSW/rrr/campaign/sdmaTest3/simulations/48377"
+        except:
+            print "the scenario has no enty for the probe file, it seems that the scenario is crashed or not finishec"
+            return None
 
     def printTable(self):
         for row in range(self.rowCount()):
