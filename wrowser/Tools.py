@@ -49,6 +49,20 @@ def uniqElements(probeNames):
        uniqParts.append(".".join(probe.split('.')[uniqStart:]))
     return uniqParts
 
+class ParameterWriter:
+    out = None
+    def __init__(self, outstream):
+        self.out = outstream
+
+    def write(self, name, value, comment=''):
+        if len(comment)>0:
+            comment = " #"+comment
+        if type(value) == str : 
+            self.out.write("  "+name + " = \'" + value + "\'")
+        else:
+            self.out.write("  "+name + " = " + str(value))
+        self.out.write(comment+"\n")
+
 
 class Chameleon:
     """Class with variable attributes.

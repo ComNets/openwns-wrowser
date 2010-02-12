@@ -62,14 +62,6 @@ class PythExport:
 import sys
 import os
 sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
-        def writeParam(out, name, value, comment='' ):
-            if len(comment)>0:
-                  comment = " #"+comment
-            if type(value) == str : 
-                out.write("  "+name + " = \'" + value + "\'")
-            else:
-                out.write("  "+name + " = " + str(value))
-            out.write(comment+"\n")
 
         def createPlotAll(newlocation):
             plotAll = open(newlocation,"w")
@@ -109,56 +101,58 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         out = open(filename, "w")
         out.write(set_path)
         out.write("class PlotParameters : \n");
-        writeParam(out,"probeName",export.probeName)
-        writeParam(out,"probeLegendSuffix",wrowser.Tools.uniqElements(export.probeName))
 
-        writeParam(out,"confidence",export.confidence)
-        writeParam(out,"aggregate",export.aggregate)
-        writeParam(out,"originalPlots",export.originalPlots)
-        writeParam(out,"aggrParam",export.aggrParam)
-        writeParam(out,"fileName",file)
-        writeParam(out,"type", export.graphType)
-        writeParam(out,"campaignId", str(export.campaignId))
-        writeParam(out,"xLabel",export.graphs[0].axisLabels[0])
+        pw = wrowser.Tools.ParameterWriter(out)
+        pw.write("probeName",export.probeName)
+        pw.write("probeLegendSuffix",wrowser.Tools.uniqElements(export.probeName))
+
+        pw.write("confidence",export.confidence)
+        pw.write("aggregate",export.aggregate)
+        pw.write("originalPlots",export.originalPlots)
+        pw.write("aggrParam",export.aggrParam)
+        pw.write("fileName",file)
+        pw.write("type", export.graphType)
+        pw.write("campaignId", str(export.campaignId))
+        pw.write("xLabel",export.graphs[0].axisLabels[0])
         if typ == 'Param':
-            writeParam(out,"confidenceLevel",export.confidenceLevel)                
-            writeParam(out,"yLabel",export.graphs[0].axisLabels[1])
-            writeParam(out,"parameterName",export.paramName)
-            writeParam(out,"probeEntry",export.probeEntry)
-            writeParam(out,"useXProbe",export.useXProbe)
-            writeParam(out,"useYProbe",export.useYProbe)
+            pw.write("confidenceLevel",export.confidenceLevel)                
+            pw.write("yLabel",export.graphs[0].axisLabels[1])
+            pw.write("parameterName",export.paramName)
+            pw.write("probeEntry",export.probeEntry)
+            pw.write("useXProbe",export.useXProbe)
+            pw.write("useYProbe",export.useYProbe)
             if export.useXProbe:
-                writeParam(out, "xProbeName",export.xProbeName)
-                writeParam(out, "xProbeEntry",export.xProbeEntry)
+                pw.write( "xProbeName",export.xProbeName)
+                pw.write( "xProbeEntry",export.xProbeEntry)
             plotScript="./exportTemplates/readDBandPlot"
         else:
-            #writeParam(out,"yLabel","P(X)")
-            writeParam(out,"yLabel",export.graph.canvas.axes.get_ylabel())
+            #pw.write("yLabel","P(X)")
+            pw.write("yLabel",export.graph.canvas.axes.get_ylabel())
             plotScript="./exportTemplates/readDBandPlotXDF"
 
-        writeParam(out,"filterExpression",export.filterExpr)
+        pw.write("filterExpression",export.filterExpr)
         
-        writeParam(out,"doClip",True)
-        writeParam(out,"minX",export.graph.canvas.axes.get_xlim()[0])
-        writeParam(out,"maxX",export.graph.canvas.axes.get_xlim()[1])
-        writeParam(out,"minY",export.graph.canvas.axes.get_ylim()[0])
-        writeParam(out,"maxY",export.graph.canvas.axes.get_ylim()[1])
-        writeParam(out,"moveX",0)
-        writeParam(out,"moveY",0)
+        pw.write("doClip",True)
+        pw.write("minX",export.graph.canvas.axes.get_xlim()[0])
+        pw.write("maxX",export.graph.canvas.axes.get_xlim()[1])
+        pw.write("minY",export.graph.canvas.axes.get_ylim()[0])
+        pw.write("maxY",export.graph.canvas.axes.get_ylim()[1])
+        pw.write("moveX",0)
+        pw.write("moveY",0)
 
         #graph config:
-        writeParam(out,"grid",export.grid)
-        writeParam(out,"scale",export.scale)
-        writeParam(out,"marker",export.marker)
-        writeParam(out,"legend", True) #export.legend)
-        writeParam(out,"legendPosition","best","alternatives: upper right, upper left, lower left, lower right, right, center left, center right, lower center, upper center, center or (x,y) with x,y in [0-1]")
-        writeParam(out,"showTitle",False)                
-        writeParam(out,"figureTitle",export.title)                
-        writeParam(out,"scaleFactorX",1,"1/1e6 #bit to MBit")                
-        writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
-        writeParam(out,"color",True)            
+        pw.write("grid",export.grid)
+        pw.write("scale",export.scale)
+        pw.write("marker",export.marker)
+        pw.write("legend", True) #export.legend)
+        pw.write("legendPosition","best","alternatives: upper right, upper left, lower left, lower right, right, center left, center right, lower center, upper center, center or (x,y) with x,y in [0-1]")
+        pw.write("showTitle",False)                
+        pw.write("figureTitle",export.title)                
+        pw.write("scaleFactorX",1,"1/1e6 #bit to MBit")                
+        pw.write("scaleFactorY",1,"1/1e6 #bit to MBit")                
+        pw.write("color",True)            
         writeLegendLabelMapping(out)  
-        writeParam(out,"plotOrder",range(len(graphs))) 
+        pw.write("plotOrder",range(len(graphs))) 
         template = open('./exportTemplates/readDBandPlot') 
         out.writelines(template.readlines())
         out.close()
