@@ -1,7 +1,10 @@
   color_sytles = ['b-', 'r-', 'g-', 'c-', 'm-','b--', 'r--', 'g--', 'c--', 'm--']
   bw_styles = ['k-', 'k--', 'k:', 'k-+', 'k--+', 'k:+', 'k-o', 'k--o', 'k:o' ]
   #additional plots are defined as done here
-  #additional_plots = [ {'x': [1,400], 'y':[200,200], 'label':'a line' , 'style':'b--'}, {'x': [1,400], 'y':[1*.98,400*0.98], 'label':'98 % line' , 'style':'g--'} ]
+  additional_plots = [ 
+    #{'x': [1,400], 'y':[200,200], 'label':'a horizontal line' , 'style':'b--'}, 
+    #{'x': [1,400], 'y':[1*.98,400*0.98], 'label':'98 % line' , 'style':'g--'} 
+  ]
 
 import wrowser.FigurePlotter
 if __name__ == '__main__': wrowser.FigurePlotter.loadCampaignAndPlotGraphs(PlotParameters)
