@@ -10,6 +10,7 @@ from wrowser.probeselector import PostgresReader
 from wrowser.probeselector import Interface
 from wrowser.probeselector import Representations
 from wrowser.probeselector import Errors
+from wrowser.probeselector.Interface import Facade
 
 from matplotlib import rc
 from matplotlib.figure import Figure
@@ -93,6 +94,7 @@ def loadCampaignAndPlotGraphs(PlotParameters):
         print "no graphs to plot"
     for graph in graphList:
         labels.append(str(graph.sortkey))
+        
         try:
             style=ls.next()
         except StopIteration:
@@ -100,7 +102,7 @@ def loadCampaignAndPlotGraphs(PlotParameters):
             os._exit(1)
         X=[x  for x,y in graph.points]
         Y=[y*PlotParameters.scaleFactorY+PlotParameters.moveY  for x,y in graph.points]
-        key = PlotParameters.legendLabelMapping.keys()[i]
+        key = Facade.getGraphDescription(graph) #PlotParameters.legendLabelMapping.keys()[i]
         plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=PlotParameters.legendLabelMapping[key])
         try:
           if PlotParameters.type == 'Param': 
