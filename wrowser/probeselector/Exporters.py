@@ -132,7 +132,8 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
                 writeParam(out, "xProbeEntry",export.xProbeEntry)
             plotScript="./exportTemplates/readDBandPlot"
         else:
-            writeParam(out,"yLabel","P(X)")
+            #writeParam(out,"yLabel","P(X)")
+            writeParam(out,"yLabel",export.graph.canvas.axes.get_ylabel())
             plotScript="./exportTemplates/readDBandPlotXDF"
 
         writeParam(out,"filterExpression",export.filterExpr)
@@ -156,7 +157,8 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         writeParam(out,"scaleFactorX",1,"1/1e6 #bit to MBit")                
         writeParam(out,"scaleFactorY",1,"1/1e6 #bit to MBit")                
         writeParam(out,"color",True)            
-        writeLegendLabelMapping(out)   
+        writeLegendLabelMapping(out)  
+        writeParam(out,"plotOrder",range(len(graphs))) 
         template = open('./exportTemplates/readDBandPlot') 
         out.writelines(template.readlines())
         out.close()
