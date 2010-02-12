@@ -83,10 +83,11 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
 
         def writeLegendLabelMapping(out):
             out.write("  legendLabelMapping = {\n")
-
+            nr=0
             for grp in graphs :
                 label = Facade.getGraphDescription(grp)
-                out.write("    \" "+label+"\":\""+label+"\" ,\n")
+                out.write("    \""+label+"\":\""+label+"\" , #graph "+str(nr)+"\n")
+                nr+=1
             out.write("  }\n")
      
 

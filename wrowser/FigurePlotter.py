@@ -80,7 +80,6 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     try:
      if PlotParameters.type == 'Param': 
         if PlotParameters.useXProbe:
-            print "probe wird fuer x benutzt"
             graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots, useXProbe = PlotParameters.useXProbe, xProbeName = PlotParameters.xProbeName, xProbeEntry = PlotParameters.xProbeEntry)
         else:
             graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots)
@@ -92,7 +91,8 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     i=0
     if len(graphList)==0:
         print "no graphs to plot"
-    for graph in graphList:
+    for graphNum in PlotParameters.plotOrder :
+        graph = graphList[graphNum]
         labels.append(str(graph.sortkey))
         
         try:
