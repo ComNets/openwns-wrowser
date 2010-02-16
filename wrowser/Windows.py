@@ -356,8 +356,6 @@ class SimulationParameters(QtGui.QDockWidget):
                     toggleButton = QtGui.QPushButton("toggle")
                     toggleButton.setFixedSize(toggleButton.minimumSizeHint())
                     self.connect(toggleButton, QtCore.SIGNAL("clicked()"), self.on_toggle)
-                    #self.connect(toggleButton, QtCore.SIGNAL("clicked()"), self, QtCore.SIGNAL("toggle("+str(row)+")"))
-                    #self.connect(toggleButton, QtCore.SIGNAL("toggle(int)"),self.on_toggle)
                     self.simulationParametersView.setIndexWidget(self.simulationParametersModel.index(row,1),toggleButton)            
 
         @QtCore.pyqtSignature("const QString&")
