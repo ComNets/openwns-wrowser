@@ -134,6 +134,17 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             for value in self.parameterValues[parameterName]:
                 self.parameterValueCheckStates[parameterName][value] = True
 
+    def toggleCheckboxes(self,row=10):
+        print "row: ", row
+        toggleParam=self.parameterNames[row]
+        print "toggle parameter: ",toggleParam
+        isValueSelected = False
+        for value in self.parameterValues[toggleParam] :
+            newValue = not self.parameterValueCheckStates[toggleParam][value] 
+            if newValue: isValueSelected = True
+            self.parameterValueCheckStates[toggleParam][value] = newValue
+        if not isValueSelected : self.parameterValueCheckStates[toggleParam][self.parameterValues[toggleParam][0]]=True
+
     def setCampaign(self, campaign, onlyNumeric = False):
         Debug.printCall(self, (campaign, onlyNumeric))
         self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
@@ -405,13 +416,13 @@ class ProbeData(QtCore.QAbstractTableModel):
 
     def getPath(self, index):
         print "get path to scenario"
-        print "current row: ",index.row()
         try:
             path = self.probeData[index.row()][1]['filename'].rpartition('/')[0] 
             print "path = ",path
             if path.find('scratch'):
                 print "the scenario was queued with an old simcontrol.py, hence the database does not contain the path to your scenario folder"
-            return "/net/storage/KSW/rrr/campaign/sdmaTest3/simulations/48377"
+                return "/net/storage/KSW/rrr/campaign/sdmaTest3/simulations/48377"
+            return path
         except:
             print "the scenario has no enty for the probe file, it seems that the scenario is crashed or not finishec"
             return None
