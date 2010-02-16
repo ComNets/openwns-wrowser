@@ -56,6 +56,18 @@ def getCampaignsDict():
         campaignsDict['%s (%s, db use: %s, quota: %s)' % (line[1], line[0], line[5], line[6])][line[2]] = (line[3], line[4], line[7], authorization)
     return campaignsDict
 
+def getCampaignInfo(campaign_id):
+    print "getting Campaign:",campaign_id
+    config = conf.Configuration()
+    config.read()
+        
+    db.Database.connectConf(config)
+    cursor = db.Database.getCursor()
+    cursor.execute('SELECT id, title, description FROM campaigns WHERE id = \'%s\' ' % campaign_id)
+    campaignInfo = cursor.fetchall()
+    print "campaignInfo=",campaignInfo
+    return campaignInfo 
+ 
 
 def setCampaign(campaign):
     if len(campaign) != 1:

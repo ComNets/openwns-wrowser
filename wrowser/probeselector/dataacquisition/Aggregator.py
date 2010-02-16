@@ -237,8 +237,8 @@ def maximum(graph):
 def weightedXDF(graph):
     points = list()
     for x, yList in graph.pointsDict.iteritems():
-        totalY = reduce(lambda x, y: x + y[0]*y[1].trials, [0] + yList)
-        totalTrials = reduce(lambda x, y: x + y[1].trials, [0] + yList)
+        totalY = reduce(lambda x, y: x + y[0], [0] + yList)
+        totalTrials = len(yList)
         points.append((x, totalY/totalTrials))
     return points
 

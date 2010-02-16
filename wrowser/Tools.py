@@ -32,6 +32,38 @@ def classAndInstanceDict(instance):
     """
     return dict(instance.__class__.__dict__.items() + instance.__dict__.items())
 
+def uniqElements(probeNames):
+    def numCommonElements(probeNames):
+        for i in range(len(probeNames[0].split(';')[0].split('.'))) :
+            prefix = probeNames[0].split('.')[0:i]
+            for probe in probeNames :
+                if prefix != probe.split('.')[0:i] :
+                    return i-1
+            i+=1 
+        return i-1
+
+    uniqParts = []
+    uniqStart = numCommonElements(probeNames)
+    for probe in probeNames :
+       probeNameParts=len(probe.split('.'))  
+       uniqParts.append(".".join(probe.split('.')[uniqStart:]))
+    return uniqParts
+
+class ParameterWriter:
+    out = None
+    def __init__(self, outstream):
+        self.out = outstream
+
+    def write(self, name, value, comment=''):
+        if len(comment)>0:
+            comment = " #"+comment
+        if type(value) == str : 
+            self.out.write("  "+name + " = \'" + value + "\'")
+        else:
+            self.out.write("  "+name + " = " + str(value))
+        self.out.write(comment+"\n")
+
+
 class Chameleon:
     """Class with variable attributes.
 
@@ -198,23 +230,25 @@ def renderLineSampleImage(line, width, dpi = 100):
     for attribute in attributes:
         lineAttributes[attribute] = getattr(line, "get_" + attribute)()
 
-    height = lineAttributes["linewidth"]
+    height = max(lineAttributes["linewidth"], lineAttributes["markersize"] * 1.4 + 2 + 2*lineAttributes["markeredgewidth"])
+    pixmapWidth = int(width + lineAttributes["markersize"] * 1.4 + 2 + 2*lineAttributes["markeredgewidth"]) + 1
+    markerSize = lineAttributes["markersize"]
     if(useValue):
-        renderer = Renderer(width, height, Value(dpi))
+        renderer = Renderer(pixmapWidth, height, Value(dpi))
     else:
-        renderer = Renderer(width, height, dpi)
+        renderer = Renderer(pixmapWidth, height, dpi)
 
-    linePos = height / 2 + 1
-    sampleLine = Line2D([0, width], [linePos, linePos], **lineAttributes)
+    linePos = int(height / 2 + 1)
+    sampleLine = Line2D([markerSize, pixmapWidth - markerSize], [linePos, linePos], **lineAttributes)
     sampleLine.draw(renderer)
 
     lineImageStr = renderer.tostring_argb()
     lineARGB = [map(ord, lineImageStr[i:i+4]) for i in xrange(0, len(lineImageStr), 4)]
 
-    image = QtGui.QImage(width, height, QtGui.QImage.Format_ARGB32)
-    for x in xrange(width):
+    image = QtGui.QImage(pixmapWidth, height, QtGui.QImage.Format_ARGB32)
+    for x in xrange(pixmapWidth):
         for y in xrange(int(height)):
-            argb = lineARGB[x + y * width]
+            argb = lineARGB[x + y * pixmapWidth]
             image.setPixel(x, y, QtGui.qRgba(argb[1], argb[2], argb[3], argb[0]))
     return image
 

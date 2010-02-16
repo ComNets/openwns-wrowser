@@ -41,6 +41,8 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
 
 import scenario.plotterFactory
 import scenario.widgets
+import inspect
+import pprint
 
 from ui.Windows_Main_ui import Ui_Windows_Main
 class Main(QtGui.QMainWindow, Ui_Windows_Main):
@@ -54,6 +56,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.campaigns = Observable()
         self.reader = None
+        self.campaignId = None
 
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
@@ -165,7 +168,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         campaignDbDialogue.showMaximized()
         if campaignDbDialogue.exec_() == QtGui.QDialog.Accepted:
             campaignId = campaignDbDialogue.getCampaign()
+            self.campaignId = campaignId
             Campaigns.setCampaign([campaignId])
+            self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
+            self.setWindowTitle(self.windowTitle()+" "+self.campaignTitle)
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
                                                         Dialogues.Progress("Reading data", 0, self.workspace).setCurrentAndMaximum,
@@ -261,7 +267,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
-        figureWindow = XDFFigure(self.campaigns, self.menuFigure, self.workspace)
+        figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.show()
 
@@ -285,7 +291,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
-        figureWindow = ParameterFigure(self.campaigns, self.menuFigure, self.workspace)
+        figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.show()
 
@@ -449,6 +455,63 @@ class DirectoryNavigation(QtGui.QDockWidget):
         self.internalWidget = self.__class__.Widget(campaigns, root, parent, self)
         self.setWidget(self.internalWidget)
 
+class Export:
+    graphs=[]
+    graph = None
+    probeName = None
+    paramName = None
+    probeEntry = None
+    useXProbe = False
+    useYProbe = True
+    xProbeName = None
+    xProbeEntry = None
+    aggregate = False
+    originalPlots = False
+    aggrParam = ''
+    filterExpr = None
+    simParams = None
+    confidence = False
+    confidenceLevel = None
+    graphType = None
+    campaignId = None
+    #config
+    marker = None
+    scale = None
+    grid = None
+    legend = None
+    title = None
+
+    def getExpression(self):
+        fExpr = ''
+        for key in self.simParams :
+            fExpr+=key+" in ["
+            for value in self.simParams[key]:
+                if type(value) == str :
+                    fExpr+='"'+value+'", '
+                else:
+                    fExpr+=str(value)+", "
+            fExpr=fExpr[0:len(fExpr)-2] #cut last comma
+            fExpr+="] and "
+        return fExpr[0:len(fExpr)-5] #cut last conjunction operator
+
+    def __init__(self,graphControl,simParams,graph):
+        self.probeName = graphControl.getAllSelectedProbeNames() # graphControl.yProbeNames()[0]
+        self.confidence = graphControl.isShowConfidenceLevels()
+        self.aggregate = graphControl.isAggregateParameter()
+        if self.aggregate :
+            self.aggrParam = graphControl.aggregationParameter()
+            self.originalPlots = graphControl.isPlotNotAggregatedGraphs()
+        self.simParams=simParams
+        self.graph=graph
+ 
+        self.filterExpr=self.getExpression() 
+        self.marker = graph.figureConfig.marker
+        self.scale= graph.figureConfig.scale
+        self.grid = graph.figureConfig.grid
+        self.legend = graph.figureConfig.legend
+        self.title = graph.figureConfig.title
+ 
+
 from ui.Windows_Figure_ui import Ui_Windows_Figure
 class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
@@ -459,7 +522,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.campaigns = campaigns
         self.menu = menu
 
-        self.setWindowTitle(windowTitle)
+        self.setWindowTitle(windowTitle+"campaignTitle")
         self.setupMenu()
 
         self.graphControlLayout = QtGui.QVBoxLayout(self.graphControl)
@@ -518,6 +581,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
     @QtCore.pyqtSignature("")
     def on_export_clicked(self):
         from probeselector import Exporters
+        export = self.getExport()
 
         formatDialogue = Dialogues.SelectItem("Export Format", "Select format", Exporters.directory.keys(), self, Dialogues.SelectItem.RadioButtons)
         if formatDialogue.exec_() == QtGui.QDialog.Accepted:
@@ -528,12 +592,15 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
             if fileDialogue.exec_() == QtGui.QDialog.Accepted:
                 filename = str(fileDialogue.selectedFiles()[0])
                 progressDialogue = Dialogues.Progress("Exporting to " + filename, 0)
-                Exporters.directory[format].export(filename, self.getGraphs(), progressDialogue.setCurrentAndMaximum, progressDialogue.reset)
+                Exporters.directory[format].export(filename, export , progressDialogue.setCurrentAndMaximum, progressDialogue.reset) 
 
     @QtCore.pyqtSignature("bool")
     def on_draw_clicked(self, checked):
         self.graph.setGraphs(self.getGraphs())
 
+    def getExport(self):
+        print "export"
+ 
 class LineGraphs(Observing):
 
     def __init__(self):
@@ -585,6 +652,7 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
         ProbeFigure.__init__(self, campaigns, menu, "LogEval Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "LogEval Probe Figure"
+        self.probeGraphControl.aggregateframe.hide()
 
     @staticmethod
     def getProbeTypes():
@@ -619,6 +687,7 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
         ProbeFigure.__init__(self, campaigns, menu, "TimeSeries Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "TimeSeries Probe Figure"
+        self.probeGraphControl.aggregateframe.hide()
 
     @staticmethod
     def getProbeTypes():
@@ -649,10 +718,11 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
 class XDFFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, menu, *qwidgetArgs):
+    def __init__(self, campaigns, campaignId, menu, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
+        self.campaignId = campaignId
 
         self.probeGraphControl.setProbeFunctions(["PDF", "CDF", "CCDF"], initialIndex = 1)
 
@@ -710,12 +780,21 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
         return graphs
 
+    def getExport(self):
+        simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
+        exp = Export(self.probeGraphControl,simParams,self.graph)
+        exp.graphs = self.getGraphs()
+        exp.graphType=self.probeGraphControl.probeFunction() #"XDF" #self.graph.figureConfig.title[0:5]
+        exp.campaignId = self.campaignId
+        return exp
+ 
 class LREFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "(D)LRE Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "(D)LRE Probe Figure"
+        self.probeGraphControl.aggregateframe.hide()
 
         self.probeFunctions = ["ordinate",
                                "relative error",
@@ -761,6 +840,8 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
     def __init__(self, campaigns, menu, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "BatchMeans Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
+        self.probeGraphControl.aggregateframe.hide()
+        
         self.graph.figureConfig.title = "BatchMeans Probe Figure"
 
         self.probeFunctions = ["CDF",
@@ -842,12 +923,11 @@ class TableFigure(ProbeFigure, TableGraphs):
         return graphs
 
 class ParameterFigure(Figure, LineGraphs):
-
-    def __init__(self, campaigns, menu, *qwidgetArgs):
+    def __init__(self, campaigns, campaignId, menu, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
-        self.graph.figureConfig.title = "Parameter Figure"
-
+        self.graph.figureConfig.title = "Parameter Figure "
+        self.campaignId = campaignId
         self.parameterGraphControl = Widgets.ParameterGraphControl(self.graphControl)
         self.graphControlLayout.addWidget(self.parameterGraphControl)
 
@@ -874,7 +954,8 @@ class ParameterFigure(Figure, LineGraphs):
         self.parameterGraphControl.setYProbeEntriesModel(self.yProbeEntriesModel)
 
     def on_drawCampaign_changed(self, campaign):
-        self.simulationParametersModel.setCampaign(self.campaigns.draw)
+        Debug.printCall(self, campaign)
+        self.simulationParametersModel.setCampaign(self.campaigns.draw,True)
         self.xProbesModel.setCampaign(self.campaigns.draw)
         self.yProbesModel.setCampaign(self.campaigns.draw)
         self.xProbeEntriesModel.setCampaign(self.campaigns.draw)
@@ -906,11 +987,10 @@ class ParameterFigure(Figure, LineGraphs):
 
             aggregationParameter = self.parameterGraphControl.aggregationParameter()
             parameterNames = list(campaign.getChangingParameterNames() - set([parameterName, aggregationParameter]))
-            if self.parameterGraphControl.isShowConfidenceLevels() and yProbeEntry == 'mean':
-                confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
-                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
-            else:
-                scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.mapping[yProbeEntry])
+
+            confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
+            showConfidenceLevel = self.parameterGraphControl.isShowConfidenceLevels()
+            scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
 
             progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
 
@@ -972,6 +1052,23 @@ class ParameterFigure(Figure, LineGraphs):
 
         return graphs
 
+    def getExport(self):
+        simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
+        exp = Export(self.parameterGraphControl,simParams,self.graph)
+        exp.paramName=self.parameterGraphControl.parameterName()
+        exp.probeEntry=self.parameterGraphControl.yProbeEntryName()
+        exp.graphs = self.getGraphs()
+        exp.useXProbe = self.parameterGraphControl.isXUseProbeEntry()
+        exp.useYProbe = self.parameterGraphControl.isYUseProbeEntry() 
+        if exp.useXProbe :
+            exp.xProbeName = self.parameterGraphControl.xProbeNames()[0]
+            exp.xProbeEntry =  self.parameterGraphControl.xProbeEntryName()
+        exp.graphType="Param" 
+        exp.confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
+        exp.campaignId = self.campaignId
+
+        return exp
+
 from ui.Windows_ProbeInfo_ui import Ui_Windows_ProbeInfo
 class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
@@ -985,6 +1082,36 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
         self.model = Models.ProbeData(campaign, probeName)
         self.view.setModel(self.model)
+        # Upcoming feature - not yet ready for release in official version
+        #self.view.addAction(self.actionDisplayErrAndOut)
         for column in xrange(self.model.columnCount()):
             self.view.resizeColumnToContents(column)
+
+    @QtCore.pyqtSignature("")
+    def on_actionDisplayErrAndOut_triggered(self):
+        path=self.view.model().getPath(self.view.currentIndex())
+        if path is None:
+            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol, hence the database does not contain the correct path to the probe file")
+        else:
+            stderr_data=file(path+"/stderr").readlines()
+            stdout_data=file(path+"/stdout").readlines()
+
+            listWidget = QtGui.QListWidget(self)
+            item =QtGui.QListWidgetItem("stderr:")
+            item.setTextAlignment(QtCore.Qt.AlignHCenter)
+            item.setBackgroundColor(QtCore.Qt.yellow)
+            listWidget.addItem(item)
+            for line in stderr_data :
+                listWidget.addItem(QtGui.QListWidgetItem(line))
+            item =QtGui.QListWidgetItem("stdout:")
+            item.setTextAlignment(QtCore.Qt.AlignHCenter)
+            item.setBackgroundColor(QtCore.Qt.yellow)
+            listWidget.addItem(item)
+            for line in stdout_data :
+                listWidget.addItem(QtGui.QListWidgetItem(line))
+            dialog = QtGui.QDialog(self)
+            layout = QtGui.QVBoxLayout()
+            layout.addWidget(listWidget)
+            dialog.setLayout(layout)
+            dialog.showMaximized()
 
