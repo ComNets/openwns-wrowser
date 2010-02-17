@@ -90,7 +90,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 "Open File",
                 os.getcwd(),
                 "Config Files (*.py)"))
-
+        if self.viewScenarioFilename == '' :  return 
         try:
             p = scenario.plotterFactory.create(self.viewScenarioFilename)
         except scenario.plotterFactory.InvalidConfig:
@@ -111,7 +111,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
 
-            self.actionOpenDatabase.setEnabled(False)
             self.actionOpenCampaignDatabase.setEnabled(False)
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
@@ -133,30 +132,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.viewScenarioCanvas.clear()
 
             p.plotCut(self.viewScenarioCanvas, fileToPlot, fillValue, x1, y1, x2, y2)
-
-    @QtCore.pyqtSignature("")
-    def on_actionOpenDatabase_triggered(self):
-        from probeselector import SQLReaders, Representations, Interface
-
-        databaseDialogue = Dialogues.OpenDatabase(self.workspace)
-        if databaseDialogue.exec_() == QtGui.QDialog.Accepted:
-            uri = databaseDialogue.getURI(withPassword = True)
-            noPasswordUri = databaseDialogue.getURI(withPassword = False)
-            self.reader = SQLReaders.CampaignReader(uri,
-                                                    Interface.DoNotSelectProbeSelectUI(),
-                                                    Dialogues.Progress("Reading data", 0, self.workspace).setCurrentAndMaximum,
-                                                    True)
-            campaign = Representations.Campaign(*self.reader.read())
-            self.campaigns.original = Interface.Facade(campaign)
-
-            self.simulationParameters = SimulationParameters(self.campaigns, self)
-            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
-            self.menuNew.setEnabled(True)
-            self.actionOpenDatabase.setEnabled(False)
-            self.actionOpenCampaignDatabase.setEnabled(False)
-            self.actionOpenDSV.setEnabled(False)
-            self.actionOpenDirectory.setEnabled(False)
-            self.actionCloseDataSource.setEnabled(True)
 
     @QtCore.pyqtSignature("")
     def on_actionOpenCampaignDatabase_triggered(self):
@@ -182,7 +157,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.simulationParameters = SimulationParameters(self.campaigns, self)
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
             self.menuNew.setEnabled(True)
-            self.actionOpenDatabase.setEnabled(False)
             self.actionOpenCampaignDatabase.setEnabled(False)
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
@@ -209,7 +183,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 self.simulationParameters = SimulationParameters(self.campaigns, self)
                 self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
                 self.menuNew.setEnabled(True)
-                self.actionOpenDatabase.setEnabled(False)
                 self.actionOpenCampaignDatabase.setEnabled(False)
                 self.actionOpenDSV.setEnabled(False)
                 self.actionOpenDirectory.setEnabled(False)
@@ -220,7 +193,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     def on_actionOpenDirectory_triggered(self):
         self.directoryNavigation = DirectoryNavigation(self.campaigns, os.getcwd(), self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
-        self.actionOpenDatabase.setEnabled(False)
         self.actionOpenCampaignDatabase.setEnabled(False)
         self.actionOpenDSV.setEnabled(False)
         self.actionOpenDirectory.setEnabled(False)
@@ -237,7 +209,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         for window in self.workspace.windowList():
             window.close()
         self.campaigns = Observable()
-        self.actionOpenDatabase.setEnabled(True)
         self.actionOpenCampaignDatabase.setEnabled(True)
         self.actionOpenDSV.setEnabled(True)
         self.actionOpenDirectory.setEnabled(True)
