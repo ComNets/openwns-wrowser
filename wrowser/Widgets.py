@@ -428,7 +428,7 @@ class LineGraph(Graph, Observing):
             self.lines.append(self.canvas.axes.plot(x, y, style, label = label, marker = self.figureConfig.marker))
             self.labels.append(label)
             try:
-                if len(graph.confidenceIntervalDict) > 0:
+                if len(graph.confidenceIntervalDict) > 0 and self.figureConfig.scale[2]=='linear':
                     for i in range(len(x)):
                         e = graph.confidenceIntervalDict[x[i]]
                         self.canvas.axes.errorbar(x[i], y[i], yerr=e , fmt=style)
