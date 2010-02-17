@@ -199,9 +199,15 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
     @QtCore.pyqtSignature("QString")
     def on_simulationParameter_activated(self, parameterName):
+        aggrParam = self.yProbesControl.aggregateParameter.currentText()
         self.aggregateParametersModel =  Models.SimulationParameters(self.yProbesControl.probeFilterValidator.probesModel.campaign, onlyNumeric = True)
         self.aggregateParametersModel.parameterNames.remove(parameterName)
         self.setAggregateParametersModel(self.aggregateParametersModel)
+        if aggrParam != parameterName :
+            for index in range(self.yProbesControl.aggregateParameter.count()) :
+                self.yProbesControl.aggregateParameter.setCurrentIndex(index)     
+                if self.yProbesControl.aggregateParameter.currentText() == aggrParam :
+                    break
 
     @QtCore.pyqtSignature("bool")
     def on_xUseProbeEntry_toggled(self, checked):
