@@ -735,6 +735,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
+        self.probeGraphControl.confidenceparameterframe.hide()
         self.campaignId = campaignId
 
         self.probeGraphControl.setProbeFunctions(["PDF", "CDF", "CCDF"], initialIndex = 1)
