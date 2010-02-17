@@ -135,9 +135,7 @@ class SimulationParameters(QtCore.QAbstractItemModel):
                 self.parameterValueCheckStates[parameterName][value] = True
 
     def toggleCheckboxes(self,row=10):
-        print "row: ", row
         toggleParam=self.parameterNames[row]
-        print "toggle parameter: ",toggleParam
         isValueSelected = False
         for value in self.parameterValues[toggleParam] :
             newValue = not self.parameterValueCheckStates[toggleParam][value] 

@@ -349,14 +349,16 @@ class SimulationParameters(QtGui.QDockWidget):
             self.observe(self.on_drawCampaignChanged, self.campaigns, "draw")
             self.campaigns.expressionFiltered = self.campaigns.original
             self.campaigns.draw = self.campaigns.original
-            for row in xrange(self.simulationParametersModel.rowCount()):                
+            self.toggleButtons = { }
+            for row in xrange(self.simulationParametersModel.rowCount()):
                 node = self.simulationParametersModel.index(row, 0)
                 self.simulationParametersView.setExpanded(node , True)
                 if self.simulationParametersModel.rowCount(node) > 1 : 
                     toggleButton = QtGui.QPushButton("toggle")
                     toggleButton.setFixedSize(toggleButton.minimumSizeHint())
+                    self.toggleButtons[toggleButton]=row
                     self.connect(toggleButton, QtCore.SIGNAL("clicked()"), self.on_toggle)
-                    self.simulationParametersView.setIndexWidget(self.simulationParametersModel.index(row,1),toggleButton)            
+                    self.simulationParametersView.setIndexWidget(self.simulationParametersModel.index(row,1),toggleButton)
 
         @QtCore.pyqtSignature("const QString&")
         def on_filterEdit_textEdited(self, text):
@@ -366,14 +368,10 @@ class SimulationParameters(QtGui.QDockWidget):
         def on_simulationParametersModel_dataChanged(self, topLeft, bottomRight):
             self.filterCampaigns()
 
-        @QtCore.pyqtSignature("const int")
-        def on_toggle(self,row=0):
-            print "toggle"
-            index = self.simulationParametersView.currentIndex()
-            print "ind row: ", index.row()
-            if index.isValid() :
-                self.simulationParametersModel.toggleCheckboxes(index.row())
-                self.filterCampaigns()
+        def on_toggle(self):
+            row = self.toggleButtons[self.sender()]
+            self.simulationParametersModel.toggleCheckboxes(row)
+            self.filterCampaigns()
 
         def on_expressionFilteredCampaignChanged(self, campaign):
             Debug.printCall(self, campaign)
