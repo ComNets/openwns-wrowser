@@ -124,11 +124,9 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
             if export.useXProbe:
                 pw.write( "xProbeName",export.xProbeName)
                 pw.write( "xProbeEntry",export.xProbeEntry)
-            plotScript="./exportTemplates/readDBandPlot"
         else:
             #pw.write("yLabel","P(X)")
             pw.write("yLabel",export.graph.canvas.axes.get_ylabel())
-            plotScript="./exportTemplates/readDBandPlotXDF"
 
         pw.write("filterExpression",export.filterExpr)
         

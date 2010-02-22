@@ -27,7 +27,7 @@
 ###############################################################################
 
 import sys
-import os.path
+import os
 import traceback
 
 from PyQt4 import QtGui
@@ -41,6 +41,7 @@ if "wrowser" in os.listdir(searchPath):
     print "Prepending %s to sys.path" % searchPath
     sys.path.insert(0, searchPath)
 
+os.chdir(searchPath)
 import wrowser.Windows
 
 def wrowserExceptHook(eType, eValue, eTraceback):
