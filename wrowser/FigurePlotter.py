@@ -22,7 +22,7 @@ from scipy.special import erf
 
 def loadCampaignAndPlotGraphs(PlotParameters):
     def lineStyle():
-        
+
         for style in PlotParameters.color_sytles :
             yield style
 
@@ -42,19 +42,16 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     simDb.Database.connectConf(dbConfig)
     simDbSetCampaign([int(PlotParameters.campaignId)])
     campaignReader = PostgresReader.CampaignReader(int(PlotParameters.campaignId), Interface.DoNotSelectProbeSelectUI())
-    print 'Accessing charts from database server with campaignId: ' + str(PlotParameters.campaignId) + '\n\n'
+    print 'Accessing charts from database server with campaignId: ' + str(PlotParameters.campaignId)
 
 
     print "Reading Campaign"
     campaign = Representations.Campaign(*campaignReader.read())
-    print "Creating Facade"
+    print "Creating Facade:",
     ch = Interface.Facade(campaign)
     print "done"
 
-    print ch.getParameterNames()
-    print ch.getProbeNames()
-
-    outputdir = 'FIGURES'
+    outputdir = 'figures'
     if not os.path.exists(outputdir) :
         os.makedirs(outputdir)
 
@@ -78,13 +75,13 @@ def loadCampaignAndPlotGraphs(PlotParameters):
 
     probeNr = 0
     try:
-     if PlotParameters.type == 'Param': 
+     if PlotParameters.type == 'Param':
         if PlotParameters.useXProbe:
             graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots, useXProbe = PlotParameters.useXProbe, xProbeName = PlotParameters.xProbeName, xProbeEntry = PlotParameters.xProbeEntry)
         else:
             graphList = filteredFacade.getGraphs(PlotParameters.parameterName, PlotParameters.probeName, PlotParameters.probeEntry, PlotParameters.aggrParam, PlotParameters.confidence, PlotParameters.confidenceLevel, plotNotAggregatedGraphs=PlotParameters.originalPlots)
      else:
-        graphList = filteredFacade.getHistograms( PlotParameters.probeName, PlotParameters.type, PlotParameters.aggrParam, plotNotAggregatedGraphs=PlotParameters.originalPlots) #, PlotParameters.aggrParam, PlotParameters.confidence)   
+        graphList = filteredFacade.getHistograms( PlotParameters.probeName, PlotParameters.type, PlotParameters.aggrParam, plotNotAggregatedGraphs=PlotParameters.originalPlots) #, PlotParameters.aggrParam, PlotParameters.confidence)
     except Errors.MultipleErrors, e:
      graphList = e.graphs
 
@@ -94,20 +91,19 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     for graphNum in PlotParameters.plotOrder :
         graph = graphList[graphNum]
         labels.append(str(graph.sortkey))
-        
+
         try:
             style=ls.next()
         except StopIteration:
-            print "You need to define more linestyles or reduce the number of plotted graphs"    
+            print "You need to define more linestyles or reduce the number of plotted graphs"
             os._exit(1)
         X=[x  for x,y in graph.points]
         Y=[y*PlotParameters.scaleFactorY+PlotParameters.moveY  for x,y in graph.points]
         key = Facade.getGraphDescription(graph) #PlotParameters.legendLabelMapping.keys()[i]
-        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=PlotParameters.legendLabelMapping[key])
+        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=PlotParameters.legendLabelMapping[key], marker=PlotParameters.marker)
         try:
-          if PlotParameters.type == 'Param': 
+          if PlotParameters.type == 'Param':
             if PlotParameters.confidence :
-                print "plotting confidence intervals"
                 for i in range(len(X)):
                     e = graph.confidenceIntervalDict[X[i]]
                     errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
@@ -115,13 +111,13 @@ def loadCampaignAndPlotGraphs(PlotParameters):
         i+=1
     for additional in PlotParameters.additional_plots :
         plot(additional['x'], additional['y'] , additional['style'] , label=additional['label'])
-         
+
     if PlotParameters.doClip:
-        axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])    
-    scalex = PlotParameters.scale[0] 
-    scaley = PlotParameters.scale[2] 
+        axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])
+    scalex = PlotParameters.scale[0]
+    scaley = PlotParameters.scale[2]
     if scalex != 'linear' :
-        xbase = PlotParameters.scale[1] 
+        xbase = PlotParameters.scale[1]
         xscale('log',basex=xbase)
     if scaley != 'linear' :
         ybase= PlotParameters.scale[3]
@@ -133,4 +129,4 @@ def loadCampaignAndPlotGraphs(PlotParameters):
         legend(prop = font, loc=PlotParameters.legendPosition) # (0.9, 0.01))
     print 'Plotting: ',PlotParameters.fileName
     savefig(os.path.join(outputdir, PlotParameters.fileName+'.pdf'))
-    savefig(os.path.join(outputdir, PlotParameters.fileName+'.png'))    
+    savefig(os.path.join(outputdir, PlotParameters.fileName+'.png'))

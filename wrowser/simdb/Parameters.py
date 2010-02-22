@@ -352,7 +352,12 @@ class AutoSimulationParameters(Parameters):
 
         self.__currentValuesFinished = False
 
-    def binarySearch(self, maxError = 0.1, exactness=0.05, createSimulations=True, debug=False, maxNumSimulations=25):
+    def cmpRelative(self, input, output):
+        return(float(output)/float(input))
+
+    def binarySearch(self, maxError = 0.1, exactness=0.05, createSimulations=True, debug=False, maxNumSimulations=25, cmpFunction = None):
+        if cmpFunction is None:
+            cmpFunction = self.cmpRelative
         finalResults = []
         stats = dict()
         stats['finished'] = 0
@@ -369,7 +374,7 @@ class AutoSimulationParameters(Parameters):
                     upperBound = max(inputColumn)*2
 
                     for(scenarioId, input, output) in results:
-                        if(float(output)/input > 1-maxError):
+                        if(cmpFunction(input, output) > 1-maxError):
                             lowerBound = max(lowerBound, input)
                         else:
                             upperBound = min(upperBound, input)
@@ -425,7 +430,7 @@ class AutoSimulationParameters(Parameters):
                         lowerBound = min(inputColumn)/2
                         upperBound = max(inputColumn)*2
                         for(scenarioId, input, output) in results:
-                            if(float(output)/input > 1-maxError):
+                            if(cmpFunction(input, output) > 1-maxError):
                                 lowerBound = max(lowerBound, input)
                             else:
                                 upperBound = min(upperBound, input)

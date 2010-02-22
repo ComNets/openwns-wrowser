@@ -28,6 +28,7 @@
 import inspect
 import wrowser.Tools
 import os
+import Graphs
 import subprocess
 import stat
 from Interface import Facade
@@ -55,7 +56,7 @@ class CSV:
 class PythExport:
 
     formatName = "Python"
-    
+
     @staticmethod
     def export(filename, export, progressNotify = None, progressReset = None):
         set_path = """#!/usr/bin/python
@@ -81,10 +82,9 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
                 out.write("    \""+label+"\":\""+label+"\" , #graph "+str(nr)+"\n")
                 nr+=1
             out.write("  }\n")
-     
 
         graphs = export.graphs
-           
+
         typ = export.graphType #"param"
         location = filename.rpartition('/')
         file=location[-1]
@@ -100,12 +100,10 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
 
         out = open(filename, "w")
         out.write(set_path)
-        out.write("class PlotParameters : \n");
+        out.write("class PlotParameters :\n");
 
         pw = wrowser.Tools.ParameterWriter(out)
         pw.write("probeName",export.probeName)
-        pw.write("probeLegendSuffix",wrowser.Tools.uniqElements(export.probeName))
-
         pw.write("confidence",export.confidence)
         pw.write("aggregate",export.aggregate)
         pw.write("originalPlots",export.originalPlots)
@@ -115,7 +113,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         pw.write("campaignId", str(export.campaignId))
         pw.write("xLabel",export.graphs[0].axisLabels[0])
         if typ == 'Param':
-            pw.write("confidenceLevel",export.confidenceLevel)                
+            pw.write("confidenceLevel",export.confidenceLevel)
             pw.write("yLabel",export.graphs[0].axisLabels[1])
             pw.write("parameterName",export.paramName)
             pw.write("probeEntry",export.probeEntry)
@@ -127,9 +125,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         else:
             #pw.write("yLabel","P(X)")
             pw.write("yLabel",export.graph.canvas.axes.get_ylabel())
-
         pw.write("filterExpression",export.filterExpr)
-        
         pw.write("doClip",True)
         pw.write("minX",export.graph.canvas.axes.get_xlim()[0])
         pw.write("maxX",export.graph.canvas.axes.get_xlim()[1])
@@ -144,14 +140,14 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         pw.write("marker",export.marker)
         pw.write("legend", True) #export.legend)
         pw.write("legendPosition","best","alternatives: upper right, upper left, lower left, lower right, right, center left, center right, lower center, upper center, center or (x,y) with x,y in [0-1]")
-        pw.write("showTitle",False)                
-        pw.write("figureTitle",export.title)                
-        pw.write("scaleFactorX",1,"1/1e6 #bit to MBit")                
-        pw.write("scaleFactorY",1,"1/1e6 #bit to MBit")                
-        pw.write("color",True)            
-        writeLegendLabelMapping(out)  
-        pw.write("plotOrder",range(len(graphs))) 
-        template = open('./exportTemplates/readDBandPlot') 
+        pw.write("showTitle",False)
+        pw.write("figureTitle",export.title)
+        pw.write("scaleFactorX",1,"1/1e6 #bit to MBit")
+        pw.write("scaleFactorY",1,"1/1e6 #bit to MBit")
+        pw.write("color",True)
+        writeLegendLabelMapping(out)
+        pw.write("plotOrder",range(len(graphs)))
+        template = open('./exportTemplates/readDBandPlot')
         out.writelines(template.readlines())
         out.close()
         os.chmod(filename,stat.S_IRWXU) #set rwx rights for user
@@ -174,7 +170,7 @@ class Matlab:
 
 % monochrome linestyles
 linestyles = {'k-'; 'k--';  'k:'; ...
-              'k-+'; 'k--+'; 'k:+'; ... 
+              'k-+'; 'k--+'; 'k:+'; ...
               'k-o'; 'k--o'; 'k:o'};
 
 % define the fontSize for the labels
@@ -206,6 +202,17 @@ hold on
             for point in graph.points:
                 out.write(repr(point[1]) + " ")
             out.write("];\n")
+            if(isinstance(graph, Graphs.AggregatedGraph) and len(graph.confidenceIntervalDict) > 0):
+                out.write("ciX = [ ")
+                values = []
+                for (k,v) in graph.confidenceIntervalDict.iteritems():
+                    out.write(repr(k) + " ")
+                    values.append(v)
+                out.write("];\n")
+                out.write("ciY = [ ")
+                for v in values:
+                    out.write(repr(v) + " ")
+                out.write("];\n")
             out.write("leg{size(leg,1)+1,1}='%s';\n" % wrowser.Tools.dict2string(graph.identity.parameters).replace('_',' '))
             out.write("plot(X,Y, linestyles{%d},'LineWidth',lineWidth)\n" % ((index % 9)+1))
         out.write("legend(leg,'Location','NorthEast')\n")

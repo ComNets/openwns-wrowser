@@ -221,8 +221,8 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
                 Configuration.MissingConfigurationEntry), e:
             setattr(cSandbox, 'sandboxPath', "")
             setattr(cSandbox, 'sandboxFlavour', "dbg")
-            cSandbox.writeSandboxConf(owner)            
-        
+            cSandbox.writeSandboxConf(owner)
+
         self.sandboxpath.setText(cSandbox.sandboxPath)
         self.sandboxflavour.setCurrentIndex(self.sandboxflavour.findText(QtCore.QString(cSandbox.sandboxFlavour)))
 
@@ -236,12 +236,12 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
         setattr(c, 'userName', str(self.username.text()))
         setattr(c, 'userPassword', str(self.password.text()))
         c.writeDbAccessConf(filename, owner)
-        
+
         cSandbox = Configuration.SandboxConfiguration()
-        cSandbox.read()        
+        cSandbox.read()
         setattr(cSandbox, 'sandboxPath', str(self.sandboxpath.text()))
         setattr(cSandbox, 'sandboxFlavour', str(self.sandboxflavour.currentText()))
-        cSandbox.writeSandboxConf(owner)            
+        cSandbox.writeSandboxConf(owner)
 
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
@@ -253,8 +253,7 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         self.campaignsModel = Models.CampaignDb(Campaigns.getCampaignsDict())
         self.campaigns.setModel(self.campaignsModel)
-        
-        #self.campaigns.expandAll() #self.campaigns is a QTreeView (see /ui/Dialogues_OpenCampaignDb_ui.py
+
         user = os.getenv("USER")
         userIndex = self.campaignsModel.getUserRow(user)
         if userIndex != -1 :

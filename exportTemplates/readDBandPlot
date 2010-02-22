@@ -1,10 +1,10 @@
-  #plotOrder = [0,2,1,3] # plot first graph 0 , then graph 2 , ... 
-  color_sytles = ['b-', 'r-', 'g-', 'c-', 'm-','b--', 'r--', 'g--', 'c--', 'm--']
+  #plotOrder = [0,2,1,3] # plot first graph 0 , then graph 2 , ...
+  color_sytles = ['b-', 'g-', 'r-', 'c-', 'm-','b--', 'r--', 'g--', 'c--', 'm--']
   bw_styles = ['k-', 'k--', 'k:', 'k-+', 'k--+', 'k:+', 'k-o', 'k--o', 'k:o' ]
   #additional plots are defined as done here
-  additional_plots = [ 
-    #{'x': [1,400], 'y':[200,200], 'label':'a horizontal line' , 'style':'b--'}, 
-    #{'x': [1,400], 'y':[1*.98,400*0.98], 'label':'98 % line' , 'style':'g--'} 
+  additional_plots = [
+    #{'x': [1,400], 'y':[200,200], 'label':'a horizontal line' , 'style':'b--'},
+    #{'x': [1,400], 'y':[1*.98,400*0.98], 'label':'98 % line' , 'style':'g--'}
   ]
 
 import wrowser.FigurePlotter

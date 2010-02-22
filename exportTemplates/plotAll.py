@@ -11,4 +11,4 @@ for fileName in os.listdir('.'):
             print "going to plot the figure"
             wrowser.FigurePlotter.loadCampaignAndPlotGraphs(module.PlotParameters)
         except ImportError :
-            print "this file does not contain PlotParameters class"
+            print "this file does not contain the class 'PlotParameters'"
