@@ -324,9 +324,19 @@ class SimulationParameters(QtGui.QDockWidget):
             for row in xrange(self.simulationParametersModel.rowCount()):
                 node = self.simulationParametersModel.index(row, 0)
                 self.simulationParametersView.setExpanded(node , True)
-                if self.simulationParametersModel.rowCount(node) > 1 : 
-                    toggleButton = QtGui.QPushButton("toggle")
+                if self.simulationParametersModel.rowCount(node) > 2 : 
+                    toggleButton = QtGui.QPushButton("toggle",self.simulationParametersView)
+                    print "rowHeight:",self.simulationParametersView.indexRowSizeHint(self.simulationParametersModel.index(row, 1))
+                    print "sizeHint for toggleButtons height:",toggleButton.minimumSizeHint().height()
+                    font = toggleButton.font()
+                    font.setPixelSize(13)
+                    toggleButton.setFont(font)
                     toggleButton.setFixedSize(toggleButton.minimumSizeHint())
+                    print "font pixelsize: ",toggleButton.fontInfo().pixelSize()
+                    print "font pointsize: ",toggleButton.fontInfo().pointSize()
+                    print "tree view font size: ",self.simulationParametersView.font().pixelSize()
+#                    toggleButton.setMinimumSize()
+#                    toggleButton.setFixedHeight(22)
                     self.toggleButtons[toggleButton]=row
                     self.connect(toggleButton, QtCore.SIGNAL("clicked()"), self.on_toggle)
                     self.simulationParametersView.setIndexWidget(self.simulationParametersModel.index(row,1),toggleButton)

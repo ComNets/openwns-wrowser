@@ -112,6 +112,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         pw.write("type", export.graphType)
         pw.write("campaignId", str(export.campaignId))
         pw.write("xLabel",export.graphs[0].axisLabels[0])
+        pw.write("yLabel",export.graphs[0].axisLabels[1])
         if typ == 'Param':
             pw.write("confidenceLevel",export.confidenceLevel)
             pw.write("yLabel",export.graphs[0].axisLabels[1])
@@ -122,9 +123,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
             if export.useXProbe:
                 pw.write( "xProbeName",export.xProbeName)
                 pw.write( "xProbeEntry",export.xProbeEntry)
-        else:
-            #pw.write("yLabel","P(X)")
-            pw.write("yLabel",export.graph.canvas.axes.get_ylabel())
+
         pw.write("filterExpression",export.filterExpr)
         pw.write("doClip",True)
         pw.write("minX",export.graph.canvas.axes.get_xlim()[0])
