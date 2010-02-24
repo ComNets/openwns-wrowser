@@ -1073,13 +1073,22 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
     @QtCore.pyqtSignature("")
     def on_actionDisplayErrAndOut_triggered(self):
+        def getFileLines(fileName, maxSize):
+            f = open(fileName, "r")
+            maxChars = int(maxSize)
+            size= os.path.getsize(fileName)
+            isHuge = False
+            if size > maxChars :
+                f.seek(maxChars*-1, os.SEEK_END)
+                isHuge = True
+            return f.readlines(), isHuge
+
         path=self.view.model().getPath(self.view.currentIndex())
         if path is None:
             QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol, hence the database does not contain the correct path to the scenario directory")
         else:
             errFile = path + "/stderr"
             outFile = path + "/stdout"
-            anyContent = False
 
             listWidget = QtGui.QListWidget(self)
             try :
@@ -1090,23 +1099,26 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
                 listWidget.addItem(item)
                 for line in stderr_data :
                     listWidget.addItem(QtGui.QListWidgetItem(line))
-                anyContent = True
             except:
                 QtGui.QMessageBox.information(self, "Error encountered", "stderr file is missing or you have no read permission")
 
             try :
-                stdout_data=file(outFile).readlines()
+                maxSize = 1e6
+                stdout_data, isHuge =getFileLines(outFile, maxSize) 
+                if isHuge :
+                    message = "only displaying last "+str(int(maxSize))+" characters of the stdout file"
+                    QtGui.QMessageBox.information(self, "Big file", message)
+
                 item =QtGui.QListWidgetItem("stdout:")
                 item.setTextAlignment(QtCore.Qt.AlignHCenter)
                 item.setBackgroundColor(QtCore.Qt.yellow)
                 listWidget.addItem(item)
                 for line in stdout_data :
                     listWidget.addItem(QtGui.QListWidgetItem(line))
-                anyContent = True
             except:
                 QtGui.QMessageBox.information(self, "Error encountered", "stdout file is missing or you have no read permission")
 
-            if  anyContent : 
+            if  'stderr_data' in locals() or 'stdout_data' in locals() : 
                 dialog = QtGui.QDialog(self)
                 layout = QtGui.QVBoxLayout()
                 layout.addWidget(listWidget)
