@@ -47,12 +47,35 @@ config = conf.Configuration()
 config.read('.campaign.conf')
 db.Database.connectConf(config)
 
-
 def getWrowserDir():
     for cand in sys.path:
         if os.path.isdir(os.path.join(cand, 'wrowser')):
             return cand
     return None
+
+def __getFilteredScenarioIds(cursor, stateSpecial = None):
+
+    query = 'SELECT id FROM scenarios WHERE campaign_id = %d' % config.campaignId
+
+    if(options.state is not None):
+        if('state' in options.state):
+            query += ('AND ( %s )' % options.state)
+        else:
+            query += (' AND state = \'%s\'' % options.state)
+
+    if(stateSpecial is not None):
+        query += (' AND %s' % stateSpecial)
+
+    cursor.execute(query)
+
+    scenarioIds = [ entry[0] for entry in cursor.fetchall() ]
+
+    if(options.expression is not None):
+        scenarioIds = wrowser.Tools.objectFilter(options.expression, scenarioIds, viewGetter=__parametersDict)
+
+    scenarioIds.sort()
+
+    return scenarioIds
 
 def createDatabase(arg = 'unused'):
     subprocess.call(['python ./campaignConfiguration.py'], shell = True)
@@ -61,9 +84,7 @@ def createDatabase(arg = 'unused'):
 
 def createScenarios(arg = 'unused'):
     cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d' % config.campaignId)
-    scenarioIds = [ entry[0] for entry in cursor.fetchall() ]
-    scenarioIds.sort()
+    scenarioIds = __getFilteredScenarioIds(cursor)
     cursor.connection.commit()
 
     wdir = getWrowserDir()
@@ -112,34 +133,14 @@ def removeDatabase(arg = 'unused'):
 
 def removeScenarios(arg = 'unused'):
     cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d' % config.campaignId)
-    scenarioIds = cursor.fetchall()
+    scenarioIds = __getFilteredScenarioIds(cursor)
     cursor.connection.commit()
 
-    for scenario in scenarioIds:
-        simPath = os.path.abspath(os.path.join(os.getcwd(), str(scenario[0])))
+    for scenarioId in scenarioIds:
+        simPath = os.path.abspath(os.path.join(os.getcwd(), str(scenarioId)))
         if os.path.exists(simPath):
             shutil.rmtree(simPath)
     print 'Scenarios successfully removed.'
-
-def removeScenariosFiltered(stringexpression):
-    cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d' % config.campaignId)
-    scenarioIds = [element[0] for element in cursor.fetchall()]
-    cursor.connection.commit()
-
-    filteredScenarios = wrowser.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
-
-    for scenarioId in filteredScenarios:
-        answer = raw_input("Do you want to remove scenario " + str(scenarioId) + "? (Y/n) ")
-        while answer.lower() not in  ["n", "y", '']:
-            answer = raw_input(question + " (Y/n) ")
-        answer = ((answer.lower() == 'y') or (answer == ''))
-        if answer:
-            simPath = os.path.abspath(os.path.join(os.getcwd(), str(scenarioId)))
-            if os.path.exists(simPath):
-                shutil.rmtree(simPath)
-            print 'Removed scenario with id ', scenarioId
 
 def __submitJob(scenarioId):
     cursor = db.Database.getCursor()
@@ -158,12 +159,13 @@ def __submitJob(scenarioId):
     command = os.path.abspath(os.path.join('..', 'sim.py')) + ' -p ' + os.path.abspath(os.getcwd()) + ' -i ' + simId
     if options.skipNullTrials == True:
         command += ' -n'
-    process = subprocess.Popen(['qsub -q %s -N job%s -l s_cpu=%i:%i:00 -l h_cpu=%i:%i:00 -o %s -e %s -m a -M %s@comnets.rwth-aachen.de -v PYTHONPATH=%s %s' % (options.queue,
+    process = subprocess.Popen(['qsub -q %s -N job%s -l s_cpu=%i:%i:00 -l h_cpu=%i:%i:00 -l h_vmem=%i -o %s -e %s -m a -M %s@comnets.rwth-aachen.de -v PYTHONPATH=%s %s' % (options.queue,
                                                                                                                                              simId,
                                                                                                                                              options.cpuTime,
                                                                                                                                              options.cpuMinutes,
                                                                                                                                              options.cpuTime,
                                                                                                                                              options.cpuMinutes + 15,
+                                                                                                                                             options.maxVMem,
                                                                                                                                              os.path.join(simPath, 'stdout'),
                                                                                                                                              os.path.join(simPath, 'stderr'),
                                                                                                                                              pwd.getpwuid(os.getuid())[0],
@@ -192,17 +194,6 @@ def __submitJob(scenarioId):
                    '(%d, %d, %d, \'%s\', \'1900-01-01\' , \'1900-01-01\', \'\', \'\', \'\')' % (config.campaignId, scenarioId, jobId, datetime.datetime.today().isoformat()))
     cursor.connection.commit()
 
-
-def queueAllScenarios(arg):
-    cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND state != \'Queued\' AND state != \'Running\'' % config.campaignId)
-    scenarioIds = cursor.fetchall()
-    cursor.connection.commit()
-
-    for scenario in scenarioIds:
-        __submitJob(scenario[0])
-
-
 def queueSingleScenario(scenarioId):
     cursor = db.Database.getCursor()
     cursor.execute('SELECT state FROM scenarios WHERE campaign_id = %d AND id = %d' % (config.campaignId, scenarioId))
@@ -228,44 +219,34 @@ def __parametersDict(scenarioId):
 
 
 def queueScenarios(stringexpression):
-    cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND state != \'Queued\' AND state != \'Running\'' % config.campaignId)
-    scenarioIds = [element[0] for element in cursor.fetchall()]
-    cursor.connection.commit()
-
-    filteredScenarios = wrowser.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
-
-    for scenarioId in filteredScenarios:
-        __submitJob(scenarioId)
-
-def queueScenariosState(stringexpression):
-    if stringexpression == 'Queued' or stringexpression == 'Running':
+    if(options.state == 'Queued' or options.state == 'Running'):
         print >> sys.stderr, 'Cannot queue jobs which are already queue/running.'
         sys.exit(1)
 
     cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND state = \'%s\' ' % (config.campaignId, stringexpression))
-    scenarioIds = [element[0] for element in cursor.fetchall()]
+    scenarioIds = __getFilteredScenarioIds(cursor, stateSpecial = "state != \'Queued\' AND state != \'Running\'")
     cursor.connection.commit()
 
     if len(scenarioIds) < 1:
-        print  >>sys.stderr, 'No scenarios found with state ', stringexpression
-        print  >>sys.stderr, 'Valid states are Crashed and NotQueued'
+        print  >>sys.stderr, 'No scenarios found matching expression\n', options.expression
+        print  >>sys.stderr, 'and state\n', options.state
         sys.exit(1)
 
     for scenarioId in scenarioIds:
         __submitJob(scenarioId)
 
 def requeueCrashedScenarios(arg = 'unused'):
-    cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND state = \'Crashed\'' % config.campaignId)
-    scenarioIds = cursor.fetchall()
-    cursor.connection.commit()
-    for scenario, in scenarioIds:
-        # remove results from previous simulation runs
-        wrowser.simdb.ProbeDB.removeAllProbesFromDB(scenarioId = scenario)
-        __submitJob(scenario)
+    if(options.state is not None):
+        print >> sys.stderr, 'Cannot filter by scenario state when requeuing crashed scenarios.'
+        sys.exit(1)
 
+    cursor = db.Database.getCursor()
+    scenarioIds = __getFilteredScenarioIds(cursor, stateSpecial = "state = \'Crashed\'")
+    cursor.connection.commit()
+    for scenarioId in scenarioIds:
+        # remove results from previous simulation runs
+        wrowser.simdb.ProbeDB.removeAllProbesFromDB(scenarioId = scenarioId)
+        __submitJob(scenario)
 
 def __deleteJob(scenarioId):
     cursor = db.Database.getCursor()
@@ -297,43 +278,17 @@ def __deleteJob(scenarioId):
     cursor.connection.commit()
 
 
-def dequeueAllScenarios(arg = 'unused'):
-    cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND (state = \'Queued\' OR state = \'Running\')' % config.campaignId)
-    scenarioIds = [element[0] for element in cursor.fetchall()]
-    cursor.connection.commit()
-
-    for scenario in scenarioIds:
-        __deleteJob(scenario)
-
-def dequeueScenariosState(stringexpression):
-    if stringexpression == 'NotQueued':
+def dequeueScenarios(arg = 'unused'):
+    if(options.state == 'NotQueued'):
         print >> sys.stderr, 'Cannot dequeue jobs which are already dequeued'
         sys.exit(1)
 
     cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND state = \'%s\' ' % (config.campaignId, stringexpression))
-    scenarioIds = [element[0] for element in cursor.fetchall()]
+    scenarioIds = __getFilteredScenarioIds(cursor, stateSpecial = "(state = \'Queued\' OR state = \'Running\')")
     cursor.connection.commit()
 
-    if len(scenarioIds) < 1:
-        print  >>sys.stderr, 'No scenarios found with state ', stringexpression
-        sys.exit(1)
-
-    for scenario in scenarioIds:
-        __deleteJob(scenario)
-
-def dequeueScenarios(stringexpression):
-    cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND (state = \'Queued\' OR state = \'Running\')' % config.campaignId)
-    scenarioIds = [element[0] for element in cursor.fetchall()]
-    cursor.connection.commit()
-
-    filteredScenarios = wrowser.Tools.objectFilter(stringexpression, scenarioIds, viewGetter = __parametersDict)
-
-    for scenario in filteredScenarios:
-        __deleteJob(scenario)
-
+    for scenarioId in scenarioIds:
+        __deleteJob(scenarioId)
 
 def consistencyCheck(arg = 'unused'):
     cursor = db.Database.getCursor()
@@ -398,22 +353,28 @@ def jobInfo(arg = 'unused'):
         title += parameterName.center(parameterWidth[parameterName])
     print title
     cursor = db.Database.getCursor()
-    for scenarioId in sorted(campaignParameters):
+    if(options.expression is not None):
+        campaignIds = wrowser.Tools.objectFilter(options.expression, campaignParameters.keys(), viewGetter = __parametersDict)
+    else:
+        campaignIds = campaignParameters.keys()
+
+    for scenarioId in sorted(campaignIds):
         cursor.execute('SELECT state, current_job_id FROM scenarios WHERE scenarios.campaign_id = %d AND scenarios.id = %d' % (config.campaignId, scenarioId))
         (state, sgeJobId) = cursor.fetchone()
+        if((options.state is not None) and (options.state != state)):
+            continue
         startDate = stopDate = datetime.datetime(1900, 1, 1)
         hostname = None
         if sgeJobId != 0:
             cursor.execute('SELECT start_date, stop_date, hostname FROM jobs WHERE sge_job_id = %d' % sgeJobId)
             (startDate, stopDate, hostname) = cursor.fetchone()
-        line = str(scenarioId).rjust(3) + '  '
-        line += state.center(10)
+        line = str(scenarioId).rjust(3) + '  ' + state.center(10)
         if not startDate.year == 1900:
-                line += startDate.strftime('%d.%m.%y %H:%M:%S').center(20)
+            line += startDate.strftime('%d.%m.%y %H:%M:%S').center(20)
         else:
             line += str().center(20)
         if not stopDate.year == 1900:
-                line += stopDate.strftime('%d.%m.%y %H:%M:%S').center(20)
+            line += stopDate.strftime('%d.%m.%y %H:%M:%S').center(20)
         else:
             line += str().center(20)
         if not startDate.year == 1900:
@@ -451,28 +412,11 @@ def jobInfo(arg = 'unused'):
 
 def executeLocally(expression):
     cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND (state != \'Queued\' OR state != \'Running\')' % config.campaignId)
-    scenarioIds = [element[0] for element in cursor.fetchall()]
+    scenarioIds = __getFilteredScenarioIds(cursor, stateSpecial = "(state != \'Queued\' OR state != \'Running\')")
     cursor.connection.commit()
 
-    filteredScenarios = [instance for instance in scenarioIds if eval(expression, {}, __parametersDict(instance))]
-
-    for scenario in filteredScenarios:
+    for scenario in scenarioIds:
         __execute(scenario)
-
-def executeLocallyState(stringexpression):
-    cursor = db.Database.getCursor()
-    cursor.execute('SELECT id FROM scenarios WHERE campaign_id = %d AND state = \'%s\' ' % (config.campaignId, stringexpression))
-    scenarioIds = [element[0] for element in cursor.fetchall()]
-    cursor.connection.commit()
-
-    if len(scenarioIds) < 1:
-        print  >>sys.stderr, 'No scenarios found with state ', stringexpression
-        print  >>sys.stderr, 'Valid states are Crashed and NotQueued'
-        sys.exit(1)
-
-    for scenarioId in scenarioIds:
-        __execute(scenarioId)
 
 def __execute(scenario):
     print 'Executing scenario with id: %i' % scenario
@@ -530,12 +474,6 @@ parser.add_option('', '--remove-scenarios',
                   callback_args = (removeScenarios,),
                   help = 'remove scenario folders')
 
-parser.add_option('', '--remove-scenariosFiltered',
-                  type = 'str', metavar = 'EXPRESSION',
-                  action = 'callback', callback = queue.append,
-                  callback_args = (removeScenariosFiltered,),
-                  help = 'remove scenarios matching EXPRESSION')
-
 parser.add_option('-q', '--queue',
                   type = 'str', dest = 'queue', default = 'cqStadt',
                   help = 'chose queue for jobs (default: cqStadt)', metavar = 'QUEUE')
@@ -543,6 +481,10 @@ parser.add_option('-q', '--queue',
 parser.add_option('-t', '--cpu-time',
                   type = 'int', dest = 'cpuTime', default = 100,
                   help = 'chose time for jobs in hours (default: 100h)', metavar = 'HOURS')
+
+parser.add_option('-m', '--max-vmem',
+                  type = 'int', dest = 'maxVMem', default = 1536,
+                  help = 'chose maximum vmem size (default: 1536 MB)', metavar = 'MB')
 
 parser.add_option('', '--minutes',
                   type = 'int', dest = 'cpuMinutes', default = 0,
@@ -557,60 +499,30 @@ parser.add_option('-n', '--skipNullTrials',
                   help = 'skip importing probes with zero trials into database')
 
 parser.add_option('', '--execute-locally',
-                  type = 'str', metavar = 'EXPRESSION',
                   action = 'callback', callback = queue.append,
                   callback_args = (executeLocally,),
-                  help = 'executes scenarios matching EXPRESSION on the local machine')
+                  help = 'executes scenarios on the local machine')
 
-parser.add_option('', '--execute-locally-with-state',
-                  type = 'str', metavar = 'EXPRESSION',
+parser.add_option('', '--queue-scenarios',
                   action = 'callback', callback = queue.append,
-                  callback_args = (executeLocallyState,),
-                  help = 'executes scenarios where the state (NotQueued, Finished, Running, Crashed) matches EXPRESSION')
-
-parser.add_option('', '--queue-all-scenarios',
-                  action = 'callback', callback = queue.append,
-                  callback_args = (queueAllScenarios,),
-                  help = 'queue all scenarios')
+                  callback_args = (queueScenarios,),
+                  help = 'queue scenarios in the SGE')
 
 parser.add_option('', '--queue-single-scenario',
                   type = "int", metavar = "SCENARIOID",
                   action = 'callback', callback = queue.append,
                   callback_args = (queueSingleScenario,),
-                  help = 'queue scenario with id SCENARIOID')
-
-parser.add_option('', '--queue-scenarios',
-                  type = 'str', metavar = 'EXPRESSION',
-                  action = 'callback', callback = queue.append,
-                  callback_args = (queueScenarios,),
-                  help = 'queue scenarios matching EXPRESSION')
-
-parser.add_option('', '--queue-scenarios-with-state',
-                  type = 'str', metavar = 'EXPRESSION',
-                  action = 'callback', callback = queue.append,
-                  callback_args = (queueScenariosState,),
-                  help = 'queue scenarios where the state (NotQueued, Finished, Running, Crashed) matches EXPRESSION')
+                  help = 'queue scenario with id SCENARIOID (same as --queue-scenarios --restrict-state=\'id=SCENARIOID\'')
 
 parser.add_option('', '--requeue-crashed-scenarios',
                   action = 'callback', callback = queue.append,
                   callback_args = (requeueCrashedScenarios,),
                   help = 'requeue all crashed scenarios')
 
-parser.add_option('', '--dequeue-all-scenarios',
-                  action = 'callback', callback = queue.append,
-                  callback_args = (dequeueAllScenarios,),
-                  help = 'dequeue all scenarios of this campaign')
-
 parser.add_option('', '--dequeue-scenarios',
-                  type = 'str', metavar = 'EXPRESSION',
                   action = 'callback', callback = queue.append,
                   callback_args = (dequeueScenarios,),
-                  help = 'dequeue scenarios matching EXPRESSION')
-parser.add_option('', '--dequeue-scenarios-with-state',
-                  type = 'str', metavar = 'EXPRESSION',
-                  action = 'callback', callback = queue.append,
-                  callback_args = (dequeueScenariosState,),
-                  help = 'dequeue scenarios where the state (Finished, Running, Crashed) matches EXPRESSION')
+                  help = 'dequeue scenarios')
 
 parser.add_option('', '--consistency-check',
                   action = 'callback', callback = queue.append,
@@ -628,6 +540,11 @@ parser.add_option('', '--interval',
                   action = 'store',
                   default = 0,
                   help = 'run command in endless loop with interval length in between')
+parser.add_option('', '--restrict-state', dest = 'state', metavar = 'STATE',
+                  help = 'restrict the action to all scenarios having state STATE.')
+
+parser.add_option('', '--restrict-expression', dest = 'expression', metavar = 'EXPRESSION',
+                  help = 'restrict the action to all scenarios matching the SQL-statement EXPRESSION')
 
 options, args = parser.parse_args()
 if len(args):

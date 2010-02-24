@@ -423,7 +423,9 @@ class DirectoryNavigation(QtGui.QDockWidget):
         @QtCore.pyqtSignature("bool")
         def on_scanButton_clicked(self, checked):
             from probeselector import DirectoryReaders, Representations, Interface
-
+            dirIndex = self.directoryView.selectionModel().currentIndex()
+            self.rootEdit.setText(self.directoryModel.filePath(dirIndex))
+            self.directoryView.setRootIndex(self.directoryModel.index(self.rootEdit.text()))
             directory = str(self.rootEdit.text())
             progressDialogue = Dialogues.Progress("Reading data", 0, self)
             campaign = Representations.Campaign(*DirectoryReaders.CampaignReader(directory,
