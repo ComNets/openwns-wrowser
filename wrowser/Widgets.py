@@ -473,7 +473,7 @@ class LineGraph(Graph, Observing):
 
     def on_figureConfig_scale_changed(self, value):
         self.setScale(*value)
-        self.canvas.axes.autoscale_view()
+        self.plotGraph()
         self.doDraw()
 
     def doDraw(self):
