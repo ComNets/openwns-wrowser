@@ -326,17 +326,7 @@ class SimulationParameters(QtGui.QDockWidget):
                 self.simulationParametersView.setExpanded(node , True)
                 if self.simulationParametersModel.rowCount(node) > 2 : 
                     toggleButton = QtGui.QPushButton("toggle",self.simulationParametersView)
-                    print "rowHeight:",self.simulationParametersView.indexRowSizeHint(self.simulationParametersModel.index(row, 1))
-                    print "sizeHint for toggleButtons height:",toggleButton.minimumSizeHint().height()
-                    font = toggleButton.font()
-                    font.setPixelSize(13)
-                    toggleButton.setFont(font)
                     toggleButton.setFixedSize(toggleButton.minimumSizeHint())
-                    print "font pixelsize: ",toggleButton.fontInfo().pixelSize()
-                    print "font pointsize: ",toggleButton.fontInfo().pointSize()
-                    print "tree view font size: ",self.simulationParametersView.font().pixelSize()
-#                    toggleButton.setMinimumSize()
-#                    toggleButton.setFixedHeight(22)
                     self.toggleButtons[toggleButton]=row
                     self.connect(toggleButton, QtCore.SIGNAL("clicked()"), self.on_toggle)
                     self.simulationParametersView.setIndexWidget(self.simulationParametersModel.index(row,1),toggleButton)
@@ -1085,27 +1075,41 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
     def on_actionDisplayErrAndOut_triggered(self):
         path=self.view.model().getPath(self.view.currentIndex())
         if path is None:
-            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol, hence the database does not contain the correct path to the probe file")
+            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol, hence the database does not contain the correct path to the scenario directory")
         else:
-            stderr_data=file(path+"/stderr").readlines()
-            stdout_data=file(path+"/stdout").readlines()
+            errFile = path + "/stderr"
+            outFile = path + "/stdout"
+            anyContent = False
 
             listWidget = QtGui.QListWidget(self)
-            item =QtGui.QListWidgetItem("stderr:")
-            item.setTextAlignment(QtCore.Qt.AlignHCenter)
-            item.setBackgroundColor(QtCore.Qt.yellow)
-            listWidget.addItem(item)
-            for line in stderr_data :
-                listWidget.addItem(QtGui.QListWidgetItem(line))
-            item =QtGui.QListWidgetItem("stdout:")
-            item.setTextAlignment(QtCore.Qt.AlignHCenter)
-            item.setBackgroundColor(QtCore.Qt.yellow)
-            listWidget.addItem(item)
-            for line in stdout_data :
-                listWidget.addItem(QtGui.QListWidgetItem(line))
-            dialog = QtGui.QDialog(self)
-            layout = QtGui.QVBoxLayout()
-            layout.addWidget(listWidget)
-            dialog.setLayout(layout)
-            dialog.showMaximized()
+            try :
+                stderr_data=file(errFile).readlines()
+                item =QtGui.QListWidgetItem("stderr:")
+                item.setTextAlignment(QtCore.Qt.AlignHCenter)
+                item.setBackgroundColor(QtCore.Qt.yellow)
+                listWidget.addItem(item)
+                for line in stderr_data :
+                    listWidget.addItem(QtGui.QListWidgetItem(line))
+                anyContent = True
+            except:
+                QtGui.QMessageBox.information(self, "Error encountered", "stderr file is missing or you have no read permission")
+
+            try :
+                stdout_data=file(outFile).readlines()
+                item =QtGui.QListWidgetItem("stdout:")
+                item.setTextAlignment(QtCore.Qt.AlignHCenter)
+                item.setBackgroundColor(QtCore.Qt.yellow)
+                listWidget.addItem(item)
+                for line in stdout_data :
+                    listWidget.addItem(QtGui.QListWidgetItem(line))
+                anyContent = True
+            except:
+                QtGui.QMessageBox.information(self, "Error encountered", "stdout file is missing or you have no read permission")
+
+            if  anyContent : 
+                dialog = QtGui.QDialog(self)
+                layout = QtGui.QVBoxLayout()
+                layout.addWidget(listWidget)
+                dialog.setLayout(layout)
+                dialog.showMaximized()
 
