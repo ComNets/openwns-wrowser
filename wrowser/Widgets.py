@@ -344,6 +344,7 @@ class GraphNavigationBar(QtGui.QWidget):
 
         self.toolbar = self.__class__.NavigationToolbar2QTAgg(canvas, self)
         self.toolbar.setObjectName("toolbar")
+        self.toolbar.setFixedHeight(33)
         self.layout.addWidget(self.toolbar)
 
 from ui.Widgets_Graph_ui import Ui_Widgets_Graph
