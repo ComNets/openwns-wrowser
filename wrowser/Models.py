@@ -134,15 +134,6 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             for value in self.parameterValues[parameterName]:
                 self.parameterValueCheckStates[parameterName][value] = True
 
-    def toggleCheckboxes(self,row=10):
-        toggleParam=self.parameterNames[row]
-        isValueSelected = False
-        for value in self.parameterValues[toggleParam] :
-            newValue = not self.parameterValueCheckStates[toggleParam][value] 
-            if newValue: isValueSelected = True
-            self.parameterValueCheckStates[toggleParam][value] = newValue
-        if not isValueSelected : self.parameterValueCheckStates[toggleParam][self.parameterValues[toggleParam][0]]=True
-
     def setCampaign(self, campaign, onlyNumeric = False):
         Debug.printCall(self, (campaign, onlyNumeric))
         self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
@@ -258,6 +249,20 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             self.emit(QtCore.SIGNAL("dataChanged(const QModelIndex&, const QModelIndex&)"), index, index)
             return True
         return False
+
+    def toggleCheckboxes(self,row=10):
+        toggleParam=self.parameterNames[row]
+        for value in self.parameterValues[toggleParam] :
+            newValue = not self.parameterValueCheckStates[toggleParam][value] 
+            self.parameterValueCheckStates[toggleParam][value] = newValue
+        if self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
+            for value in self.parameterValues[toggleParam] :
+                if self.parameterValueCheckStates[toggleParam][value]==False :
+                    self.parameterValueCheckStates[toggleParam][value]=True 
+                    if not self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
+                        break
+                    self.parameterValueCheckStates[toggleParam][value]=False
+
 
 class ProbeNames(QtCore.QAbstractListModel):
     def __init__(self, campaign, probeClasses = [None], parent = None):
