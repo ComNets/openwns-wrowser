@@ -62,7 +62,6 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     print "Found " + str(len(filteredFacade.getScenarios())) + " scenarios"
 
     figure(figsize=(9, 8))
-    grid()
     xlabel(PlotParameters.xLabel,fontproperties = font)
     ylabel(PlotParameters.yLabel,fontproperties = font)
 
@@ -122,6 +121,11 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     if scaley != 'linear' :
         ybase= PlotParameters.scale[3]
         yscale('log',basey=ybase)
+    a = gca()
+    a.get_xaxis().grid(PlotParameters.grid[0], which="major")
+    a.get_xaxis().grid(PlotParameters.grid[1], which="minor")
+    a.get_yaxis().grid(PlotParameters.grid[2], which="major")
+    a.get_yaxis().grid(PlotParameters.grid[3], which="minor")
 
     if PlotParameters.showTitle :
         title(PlotParameters.figureTitle)
