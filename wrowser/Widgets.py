@@ -440,7 +440,6 @@ class LineGraph(Graph, Observing):
                         e = graph.confidenceIntervalDict[x[i]]
                         self.canvas.axes.errorbar(x[i], y[i], yerr=e , fmt=style)
             except: None
-
         self.canvas.axes.set_xlabel("\n".join(xLabels))
         self.canvas.axes.set_ylabel("\n".join(yLabels))
         ymin, ymax = self.canvas.axes.get_ylim()

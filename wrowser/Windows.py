@@ -913,6 +913,7 @@ class ParameterFigure(Figure, LineGraphs):
     def __init__(self, campaigns, campaignId, menu, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
+        self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
         self.campaignId = campaignId
         self.parameterGraphControl = Widgets.ParameterGraphControl(self.graphControl)
@@ -939,6 +940,9 @@ class ParameterFigure(Figure, LineGraphs):
         self.yProbeEntriesModel = Models.ProbeEntries(self.campaigns.draw)
         self.yProbeEntriesModel.changeProbes(self.parameterGraphControl.yProbeNames())
         self.parameterGraphControl.setYProbeEntriesModel(self.yProbeEntriesModel)
+
+    def on_figureConfig_scale_changed(self, value):
+        self.parameterGraphControl.yProbesControl.confidenceparameterframe.setEnabled(self.graph.figureConfig.scale[2]=='linear')
 
     def on_drawCampaign_changed(self, campaign):
         Debug.printCall(self, campaign)
@@ -1087,7 +1091,7 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
         path=self.view.model().getPath(self.view.currentIndex())
         if path is None:
-            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol, hence the database does not contain the correct path to the scenario directory")
+            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol. Hence, the database does not contain the correct path to the scenario directory")
         else:
             errFile = path + "/stderr"
             outFile = path + "/stdout"
