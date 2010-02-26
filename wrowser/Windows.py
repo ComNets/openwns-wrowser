@@ -90,7 +90,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 "Open File",
                 os.getcwd(),
                 "Config Files (*.py)"))
-
+        if self.viewScenarioFilename == '' :  return 
         try:
             p = scenario.plotterFactory.create(self.viewScenarioFilename)
         except scenario.plotterFactory.InvalidConfig:
@@ -111,7 +111,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
 
-            self.actionOpenDatabase.setEnabled(False)
             self.actionOpenCampaignDatabase.setEnabled(False)
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
@@ -133,30 +132,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.viewScenarioCanvas.clear()
 
             p.plotCut(self.viewScenarioCanvas, fileToPlot, fillValue, x1, y1, x2, y2)
-
-    @QtCore.pyqtSignature("")
-    def on_actionOpenDatabase_triggered(self):
-        from probeselector import SQLReaders, Representations, Interface
-
-        databaseDialogue = Dialogues.OpenDatabase(self.workspace)
-        if databaseDialogue.exec_() == QtGui.QDialog.Accepted:
-            uri = databaseDialogue.getURI(withPassword = True)
-            noPasswordUri = databaseDialogue.getURI(withPassword = False)
-            self.reader = SQLReaders.CampaignReader(uri,
-                                                    Interface.DoNotSelectProbeSelectUI(),
-                                                    Dialogues.Progress("Reading data", 0, self.workspace).setCurrentAndMaximum,
-                                                    True)
-            campaign = Representations.Campaign(*self.reader.read())
-            self.campaigns.original = Interface.Facade(campaign)
-
-            self.simulationParameters = SimulationParameters(self.campaigns, self)
-            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
-            self.menuNew.setEnabled(True)
-            self.actionOpenDatabase.setEnabled(False)
-            self.actionOpenCampaignDatabase.setEnabled(False)
-            self.actionOpenDSV.setEnabled(False)
-            self.actionOpenDirectory.setEnabled(False)
-            self.actionCloseDataSource.setEnabled(True)
 
     @QtCore.pyqtSignature("")
     def on_actionOpenCampaignDatabase_triggered(self):
@@ -182,7 +157,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.simulationParameters = SimulationParameters(self.campaigns, self)
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
             self.menuNew.setEnabled(True)
-            self.actionOpenDatabase.setEnabled(False)
             self.actionOpenCampaignDatabase.setEnabled(False)
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
@@ -209,7 +183,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 self.simulationParameters = SimulationParameters(self.campaigns, self)
                 self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
                 self.menuNew.setEnabled(True)
-                self.actionOpenDatabase.setEnabled(False)
                 self.actionOpenCampaignDatabase.setEnabled(False)
                 self.actionOpenDSV.setEnabled(False)
                 self.actionOpenDirectory.setEnabled(False)
@@ -220,7 +193,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     def on_actionOpenDirectory_triggered(self):
         self.directoryNavigation = DirectoryNavigation(self.campaigns, os.getcwd(), self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
-        self.actionOpenDatabase.setEnabled(False)
         self.actionOpenCampaignDatabase.setEnabled(False)
         self.actionOpenDSV.setEnabled(False)
         self.actionOpenDirectory.setEnabled(False)
@@ -237,7 +209,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         for window in self.workspace.windowList():
             window.close()
         self.campaigns = Observable()
-        self.actionOpenDatabase.setEnabled(True)
         self.actionOpenCampaignDatabase.setEnabled(True)
         self.actionOpenDSV.setEnabled(True)
         self.actionOpenDirectory.setEnabled(True)
@@ -349,8 +320,16 @@ class SimulationParameters(QtGui.QDockWidget):
             self.observe(self.on_drawCampaignChanged, self.campaigns, "draw")
             self.campaigns.expressionFiltered = self.campaigns.original
             self.campaigns.draw = self.campaigns.original
+            self.toggleButtons = { }
             for row in xrange(self.simulationParametersModel.rowCount()):
-                self.simulationParametersView.setExpanded(self.simulationParametersModel.index(row, 0), True)
+                node = self.simulationParametersModel.index(row, 0)
+                self.simulationParametersView.setExpanded(node , True)
+                if self.simulationParametersModel.rowCount(node) > 2 : 
+                    toggleButton = QtGui.QPushButton("toggle",self.simulationParametersView)
+                    toggleButton.setFixedSize(toggleButton.minimumSizeHint())
+                    self.toggleButtons[toggleButton]=row
+                    self.connect(toggleButton, QtCore.SIGNAL("clicked()"), self.on_toggle)
+                    self.simulationParametersView.setIndexWidget(self.simulationParametersModel.index(row,1),toggleButton)
 
         @QtCore.pyqtSignature("const QString&")
         def on_filterEdit_textEdited(self, text):
@@ -358,6 +337,11 @@ class SimulationParameters(QtGui.QDockWidget):
 
         @QtCore.pyqtSignature("const QModelIndex&, const QModelIndex&")
         def on_simulationParametersModel_dataChanged(self, topLeft, bottomRight):
+            self.filterCampaigns()
+
+        def on_toggle(self):
+            row = self.toggleButtons[self.sender()]
+            self.simulationParametersModel.toggleCheckboxes(row)
             self.filterCampaigns()
 
         def on_expressionFilteredCampaignChanged(self, campaign):
@@ -439,7 +423,9 @@ class DirectoryNavigation(QtGui.QDockWidget):
         @QtCore.pyqtSignature("bool")
         def on_scanButton_clicked(self, checked):
             from probeselector import DirectoryReaders, Representations, Interface
-
+            dirIndex = self.directoryView.selectionModel().currentIndex()
+            self.rootEdit.setText(self.directoryModel.filePath(dirIndex))
+            self.directoryView.setRootIndex(self.directoryModel.index(self.rootEdit.text()))
             directory = str(self.rootEdit.text())
             progressDialogue = Dialogues.Progress("Reading data", 0, self)
             campaign = Representations.Campaign(*DirectoryReaders.CampaignReader(directory,
@@ -722,6 +708,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
+        self.probeGraphControl.confidenceparameterframe.hide()
         self.campaignId = campaignId
 
         self.probeGraphControl.setProbeFunctions(["PDF", "CDF", "CCDF"], initialIndex = 1)
@@ -926,6 +913,7 @@ class ParameterFigure(Figure, LineGraphs):
     def __init__(self, campaigns, campaignId, menu, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
+        self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
         self.campaignId = campaignId
         self.parameterGraphControl = Widgets.ParameterGraphControl(self.graphControl)
@@ -952,6 +940,9 @@ class ParameterFigure(Figure, LineGraphs):
         self.yProbeEntriesModel = Models.ProbeEntries(self.campaigns.draw)
         self.yProbeEntriesModel.changeProbes(self.parameterGraphControl.yProbeNames())
         self.parameterGraphControl.setYProbeEntriesModel(self.yProbeEntriesModel)
+
+    def on_figureConfig_scale_changed(self, value):
+        self.parameterGraphControl.yProbesControl.confidenceparameterframe.setEnabled(self.graph.figureConfig.scale[2]=='linear')
 
     def on_drawCampaign_changed(self, campaign):
         Debug.printCall(self, campaign)
@@ -1082,36 +1073,61 @@ class ProbeInfo(QtGui.QWidget, Ui_Windows_ProbeInfo):
 
         self.model = Models.ProbeData(campaign, probeName)
         self.view.setModel(self.model)
-        # Upcoming feature - not yet ready for release in official version
-        #self.view.addAction(self.actionDisplayErrAndOut)
+        self.view.addAction(self.actionDisplayErrAndOut)
         for column in xrange(self.model.columnCount()):
             self.view.resizeColumnToContents(column)
 
     @QtCore.pyqtSignature("")
     def on_actionDisplayErrAndOut_triggered(self):
+        def getFileLines(fileName, maxSize):
+            f = open(fileName, "r")
+            maxChars = int(maxSize)
+            size= os.path.getsize(fileName)
+            isHuge = False
+            if size > maxChars :
+                f.seek(maxChars*-1, os.SEEK_END)
+                isHuge = True
+            return f.readlines(), isHuge
+
         path=self.view.model().getPath(self.view.currentIndex())
         if path is None:
-            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol, hence the database does not contain the correct path to the probe file")
+            QtGui.QMessageBox.information(self, "Error encountered", "Either the scenario is crashed/not terminated or the scenario was queued with an old version of simcontrol. Hence, the database does not contain the correct path to the scenario directory")
         else:
-            stderr_data=file(path+"/stderr").readlines()
-            stdout_data=file(path+"/stdout").readlines()
+            errFile = path + "/stderr"
+            outFile = path + "/stdout"
 
             listWidget = QtGui.QListWidget(self)
-            item =QtGui.QListWidgetItem("stderr:")
-            item.setTextAlignment(QtCore.Qt.AlignHCenter)
-            item.setBackgroundColor(QtCore.Qt.yellow)
-            listWidget.addItem(item)
-            for line in stderr_data :
-                listWidget.addItem(QtGui.QListWidgetItem(line))
-            item =QtGui.QListWidgetItem("stdout:")
-            item.setTextAlignment(QtCore.Qt.AlignHCenter)
-            item.setBackgroundColor(QtCore.Qt.yellow)
-            listWidget.addItem(item)
-            for line in stdout_data :
-                listWidget.addItem(QtGui.QListWidgetItem(line))
-            dialog = QtGui.QDialog(self)
-            layout = QtGui.QVBoxLayout()
-            layout.addWidget(listWidget)
-            dialog.setLayout(layout)
-            dialog.showMaximized()
+            try :
+                stderr_data=file(errFile).readlines()
+                item =QtGui.QListWidgetItem("stderr:")
+                item.setTextAlignment(QtCore.Qt.AlignHCenter)
+                item.setBackgroundColor(QtCore.Qt.yellow)
+                listWidget.addItem(item)
+                for line in stderr_data :
+                    listWidget.addItem(QtGui.QListWidgetItem(line))
+            except:
+                QtGui.QMessageBox.information(self, "Error encountered", "stderr file is missing or you have no read permission")
+
+            try :
+                maxSize = 1e6
+                stdout_data, isHuge =getFileLines(outFile, maxSize) 
+                if isHuge :
+                    message = "only displaying last "+str(int(maxSize))+" characters of the stdout file"
+                    QtGui.QMessageBox.information(self, "Big file", message)
+
+                item =QtGui.QListWidgetItem("stdout:")
+                item.setTextAlignment(QtCore.Qt.AlignHCenter)
+                item.setBackgroundColor(QtCore.Qt.yellow)
+                listWidget.addItem(item)
+                for line in stdout_data :
+                    listWidget.addItem(QtGui.QListWidgetItem(line))
+            except:
+                QtGui.QMessageBox.information(self, "Error encountered", "stdout file is missing or you have no read permission")
+
+            if  'stderr_data' in locals() or 'stdout_data' in locals() : 
+                dialog = QtGui.QDialog(self)
+                layout = QtGui.QVBoxLayout()
+                layout.addWidget(listWidget)
+                dialog.setLayout(layout)
+                dialog.showMaximized()
 

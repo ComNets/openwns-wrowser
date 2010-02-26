@@ -112,6 +112,7 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         pw.write("type", export.graphType)
         pw.write("campaignId", str(export.campaignId))
         pw.write("xLabel",export.graphs[0].axisLabels[0])
+        pw.write("yLabel",export.graphs[0].axisLabels[1])
         if typ == 'Param':
             pw.write("confidenceLevel",export.confidenceLevel)
             pw.write("yLabel",export.graphs[0].axisLabels[1])
@@ -122,17 +123,15 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
             if export.useXProbe:
                 pw.write( "xProbeName",export.xProbeName)
                 pw.write( "xProbeEntry",export.xProbeEntry)
-            plotScript="./exportTemplates/readDBandPlot"
-        else:
-            pw.write("yLabel",export.graph.canvas.axes.get_ylabel())
-            plotScript="./exportTemplates/readDBandPlotXDF"
 
         pw.write("filterExpression",export.filterExpr)
+        pw.write("scaleFactorX",1,"1/1e6 #bit to MBit")
+        pw.write("scaleFactorY",1,"1/1e6 #bit to MBit")
         pw.write("doClip",True)
-        pw.write("minX",export.graph.canvas.axes.get_xlim()[0])
-        pw.write("maxX",export.graph.canvas.axes.get_xlim()[1])
-        pw.write("minY",export.graph.canvas.axes.get_ylim()[0])
-        pw.write("maxY",export.graph.canvas.axes.get_ylim()[1])
+        out.write("  minX = "+str(export.graph.canvas.axes.get_xlim()[0])+ " * scaleFactorX \n");
+        out.write("  maxX = "+str(export.graph.canvas.axes.get_xlim()[1])+ " * scaleFactorX \n");
+        out.write("  minY = "+str(export.graph.canvas.axes.get_ylim()[0])+ " * scaleFactorY \n");
+        out.write("  maxY = "+str(export.graph.canvas.axes.get_ylim()[1])+ " * scaleFactorY \n");
         pw.write("moveX",0)
         pw.write("moveY",0)
 
@@ -144,8 +143,6 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         pw.write("legendPosition","best","alternatives: upper right, upper left, lower left, lower right, right, center left, center right, lower center, upper center, center or (x,y) with x,y in [0-1]")
         pw.write("showTitle",False)
         pw.write("figureTitle",export.title)
-        pw.write("scaleFactorX",1,"1/1e6 #bit to MBit")
-        pw.write("scaleFactorY",1,"1/1e6 #bit to MBit")
         pw.write("color",True)
         writeLegendLabelMapping(out)
         pw.write("plotOrder",range(len(graphs)))

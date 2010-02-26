@@ -78,7 +78,6 @@
     <property name="title" >
      <string>&amp;File</string>
     </property>
-    <addaction name="actionOpenDatabase" />
     <addaction name="actionOpenCampaignDatabase" />
     <addaction name="actionOpenDSV" />
     <addaction name="actionOpenDirectory" />

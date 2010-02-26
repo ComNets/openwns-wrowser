@@ -199,9 +199,15 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
     @QtCore.pyqtSignature("QString")
     def on_simulationParameter_activated(self, parameterName):
+        aggrParam = self.yProbesControl.aggregateParameter.currentText()
         self.aggregateParametersModel =  Models.SimulationParameters(self.yProbesControl.probeFilterValidator.probesModel.campaign, onlyNumeric = True)
         self.aggregateParametersModel.parameterNames.remove(parameterName)
         self.setAggregateParametersModel(self.aggregateParametersModel)
+        if aggrParam != parameterName :
+            for index in range(self.yProbesControl.aggregateParameter.count()) :
+                self.yProbesControl.aggregateParameter.setCurrentIndex(index)     
+                if self.yProbesControl.aggregateParameter.currentText() == aggrParam :
+                    break
 
     @QtCore.pyqtSignature("bool")
     def on_xUseProbeEntry_toggled(self, checked):
@@ -338,6 +344,7 @@ class GraphNavigationBar(QtGui.QWidget):
 
         self.toolbar = self.__class__.NavigationToolbar2QTAgg(canvas, self)
         self.toolbar.setObjectName("toolbar")
+        self.toolbar.setFixedHeight(33)
         self.layout.addWidget(self.toolbar)
 
 from ui.Widgets_Graph_ui import Ui_Widgets_Graph
@@ -428,12 +435,11 @@ class LineGraph(Graph, Observing):
             self.lines.append(self.canvas.axes.plot(x, y, style, label = label, marker = self.figureConfig.marker))
             self.labels.append(label)
             try:
-                if len(graph.confidenceIntervalDict) > 0:
+                if len(graph.confidenceIntervalDict) > 0 and self.figureConfig.scale[2]=='linear':
                     for i in range(len(x)):
                         e = graph.confidenceIntervalDict[x[i]]
                         self.canvas.axes.errorbar(x[i], y[i], yerr=e , fmt=style)
             except: None
-
         self.canvas.axes.set_xlabel("\n".join(xLabels))
         self.canvas.axes.set_ylabel("\n".join(yLabels))
         ymin, ymax = self.canvas.axes.get_ylim()
@@ -467,7 +473,7 @@ class LineGraph(Graph, Observing):
 
     def on_figureConfig_scale_changed(self, value):
         self.setScale(*value)
-        self.canvas.axes.autoscale_view()
+        self.plotGraph()
         self.doDraw()
 
     def doDraw(self):

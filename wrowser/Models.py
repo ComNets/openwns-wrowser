@@ -251,6 +251,20 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             return True
         return False
 
+    def toggleCheckboxes(self,row=10):
+        toggleParam=self.parameterNames[row]
+        for value in self.parameterValues[toggleParam] :
+            newValue = not self.parameterValueCheckStates[toggleParam][value] 
+            self.parameterValueCheckStates[toggleParam][value] = newValue
+        if self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
+            for value in self.parameterValues[toggleParam] :
+                if self.parameterValueCheckStates[toggleParam][value]==False :
+                    self.parameterValueCheckStates[toggleParam][value]=True 
+                    if not self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
+                        break
+                    self.parameterValueCheckStates[toggleParam][value]=False
+
+
 class ProbeNames(QtCore.QAbstractListModel):
     def __init__(self, campaign, probeClasses = [None], parent = None):
         QtCore.QAbstractListModel.__init__(self, parent)
@@ -406,15 +420,14 @@ class ProbeData(QtCore.QAbstractTableModel):
 
     def getPath(self, index):
         print "get path to scenario"
-        print "current row: ",index.row()
         try:
-            path = self.probeData[index.row()][1]['filename'].rpartition('/')[0] 
-            print "path = ",path
-            if path.find('scratch'):
-                print "the scenario was queued with an old simcontrol.py, hence the database does not contain the path to your scenario folder"
-            return "/net/storage/KSW/rrr/campaign/sdmaTest3/simulations/48377"
+            path = self.probeData[index.row()][1]['filename'] 
+            if path.find('scratch') != -1 :
+                #print "the scenario was queued with an old simcontrol.py, hence the database does not contain the path to your scenario folder"
+                return None 
+            return path
         except:
-            print "the scenario has no enty for the probe file, it seems that the scenario is crashed or not finishec"
+            #print "the scenario has no entry for the probe file, it seems that the scenario is crashed or not finished"
             return None
 
     def printTable(self):
