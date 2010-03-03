@@ -56,6 +56,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.campaigns = Observable()
         self.reader = None
+        self.readerStopped = False
         self.campaignId = None
 
         self.workspace = QtGui.QWorkspace(self)
@@ -147,11 +148,16 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
             self.setWindowTitle(self.windowTitle()+" "+self.campaignTitle)
+            progressDialog = Dialogues.Progress("Reading data", 0, self.workspace)
+            progressDialog.connect(progressDialog, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
-                                                        Dialogues.Progress("Reading data", 0, self.workspace).setCurrentAndMaximum,
+                                                        progressDialog.setCurrentAndMaximum,
                                                         True)
             campaign = Representations.Campaign(*self.reader.read())
+            if self.readerStopped:
+                self.readerStopped = False
+                return
             self.campaigns.original = Interface.Facade(campaign)
 
             self.simulationParameters = SimulationParameters(self.campaigns, self)
@@ -161,6 +167,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
             self.actionCloseDataSource.setEnabled(True)
+
+    def on_cancelClicked(self):
+        self.readerStopped = True
+        self.reader.stop()
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDSV_triggered(self):

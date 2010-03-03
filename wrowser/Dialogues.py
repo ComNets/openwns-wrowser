@@ -36,146 +36,6 @@ import Models
 import Debug
 import time
 
-from ui.Dialogues_OpenDatabase_ui import Ui_Dialogues_OpenDatabase
-class OpenDatabase(QtGui.QDialog, Ui_Dialogues_OpenDatabase, Observing):
-
-    class URIValidator(QtGui.QRegExpValidator):
-
-        def __init__(self, fileSchemes, hostSchemes, parent = None):
-            self.fixupScheme = fileSchemes[0]
-            fileSchemeRegExp = "(" + "|".join(fileSchemes) + ")" + "://" + "/[\w/\.]+(\?[\w=]*)?"
-            hostSchemeRegExp = "(" + "|".join(hostSchemes) + ")" + "://" + "(\w*(:\w*)?@)?\w+(:\d*)?/[\w/\.]+(\?[\w=]*)?"
-            regExp = QtCore.QRegExp("^(" + fileSchemeRegExp + "|" + hostSchemeRegExp + ")")
-            QtGui.QRegExpValidator.__init__(self, regExp, parent)
-
-        def validate(self, text, pos):
-            return QtGui.QRegExpValidator.validate(self, text, pos)
-
-    fileDatabases = {"SQLite": "sqlite"}
-    serverDatabases = {"MySQL": "mysql",
-                       "PostreSQL": "postgres",
-                       "Firebird": "firebird",
-                       "MAX DB": "maxdb",
-                       "MSSQL": "mssql",
-                       "SyBase": "sybase"}
-    schemes = dict(fileDatabases.items() + serverDatabases.items())
-    schemeNames = dict(zip(schemes.values(), schemes.keys()))
-
-    fileDatabaseDialogueConfig = {"hostEdit": False,
-                                  "portEdit": False,
-                                  "databaseOpenButton": True,
-                                  "userEdit": False,
-                                  "passwordEdit": False}
-
-    serverDatabaseDialogueConfig = {"hostEdit": True,
-                                    "portEdit": True,
-                                    "databaseOpenButton": False,
-                                    "userEdit": True,
-                                    "passwordEdit": True}
-
-
-    def __init__(self, *args):
-        QtGui.QDialog.__init__(self, *args)
-        self.setupUi(self)
-
-        self.databaseTypeCombo.addItems(self.fileDatabases.keys() + self.serverDatabases.keys())
-
-        self.uriEditValidator = self.__class__.URIValidator(self.fileDatabases.values(), self.serverDatabases.values())
-        self.uriEdit.setValidator(self.uriEditValidator)
-
-        self.lineEdits = {"user" : self.userEdit,
-                          "password" : self.passwordEdit,
-                          "host" : self.hostEdit,
-                          "port" : self.portEdit,
-                          "database" : self.databaseEdit}
-
-        self.uri = URI(scheme = self.schemes[str(self.databaseTypeCombo.itemText(0))],
-                       database = str(self.databaseEdit.text()))
-
-        self.observe(self.on_uri_changed, self.uri)
-
-        self.connect(self.databaseTypeCombo, QtCore.SIGNAL("activated(const QString&)"),
-                     self.on_databaseTypeCombo_activated)
-
-        for uriAttrib, lineEdit in self.lineEdits.items():
-            handlerName = "on_" + uriAttrib + "Edit_textEdited"
-            setattr(self, handlerName, self.onTextEditedHandler(uriAttrib))
-            self.connect(lineEdit, QtCore.SIGNAL("textEdited(const QString&)"),
-                         getattr(self, handlerName))
-        self.on_databaseTypeCombo_activated(self.databaseTypeCombo.currentText())
-
-    def on_uri_changed(self, attrib, value, uri):
-        Debug.printCall(self, (attrib, value, uri))
-        self.uriEdit.setText(str(uri))
-        if attrib == "scheme":
-            index = self.databaseTypeCombo.findText(self.schemeNames[value])
-            self.databaseTypeCombo.setCurrentIndex(index)
-        if self.lineEdits.has_key(attrib):
-            lineEdit = self.lineEdits[attrib]
-            if not lineEdit.hasFocus():
-                lineEdit.setText(value)
-        self.uriEdit.emit(QtCore.SIGNAL("textChanged(const QString&)"), str(uri))
-
-    @QtCore.pyqtSignature("const QString&")
-    def on_databaseTypeCombo_activated(self, item):
-        Debug.printCall(self, item)
-        item = str(item)
-        if self.fileDatabases.has_key(item):
-            for attribName, enabled in self.fileDatabaseDialogueConfig.items():
-                widget = getattr(self, attribName)
-                widget.setEnabled(enabled)
-                if not enabled and isinstance(widget, QtGui.QLineEdit):
-                    widget.clear()
-        elif self.serverDatabases.has_key(item):
-            for attribName, enabled in self.serverDatabaseDialogueConfig.items():
-                widget = getattr(self, attribName)
-                widget.setEnabled(enabled)
-                if not enabled and isinstance(widget, QtGui.QLineEdit):
-                    widget.clear()
-        else:
-            raise Exception("Programming Error")
-        self.uri.scheme = self.schemes[item]
-
-    @QtCore.pyqtSignature("")
-    def on_uriEdit_editingFinished(self):
-        Debug.printCall(self)
-        if self.uriEdit.hasAcceptableInput():
-            text = str(self.uriEdit.text())
-            self.uri.parse(text)
-
-    @QtCore.pyqtSignature("")
-    def on_databaseEdit_editingFinished(self):
-        Debug.printCall(self)
-        text = str(self.databaseEdit.text())
-        if self.uri.scheme in self.fileDatabases.values() and not text.startswith("/"):
-            text = os.path.abspath(text)
-            self.databaseEdit.setText(text)
-            self.databaseEdit.emit(QtCore.SIGNAL("textEdited(const QString&)"), text)
-
-    @QtCore.pyqtSignature("bool")
-    def on_databaseOpenButton_clicked(self, checked):
-        Debug.printCall(self, checked)
-        fileDialogue = QtGui.QFileDialog(self, "Select a campaign", os.getcwd(), "Database files (*.db)")
-        fileDialogue.setAcceptMode(QtGui.QFileDialog.AcceptOpen)
-        fileDialogue.setFileMode(QtGui.QFileDialog.ExistingFile)
-        fileDialogue.setViewMode(QtGui.QFileDialog.Detail)
-        if fileDialogue.exec_() == QtGui.QDialog.Accepted:
-            fileName = fileDialogue.selectedFiles()[0]
-            self.databaseEdit.setText(fileName)
-            self.databaseEdit.emit(QtCore.SIGNAL("textEdited(const QString&)"), fileName)
-
-    def onTextEditedHandler(self, uriAttrib):
-
-        @QtCore.pyqtSignature("const QString&")
-        def onTextEdited(text):
-            Debug.printCall(self, (uriAttrib, str(text)))
-            setattr(self.uri, uriAttrib, str(text))
-
-        return onTextEdited
-
-    def getURI(self, withPassword = False):
-        return self.uri.toString(withPassword)
-
 from ui.Dialogues_Preferences_ui import Ui_Dialogues_Preferences
 class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
 
@@ -302,7 +162,8 @@ class OpenDSV(QtGui.QDialog, Ui_Dialogues_OpenDSV):
 class Progress(QtGui.QProgressDialog):
     def __init__(self, labelText, minShow, *args):
         QtGui.QProgressDialog.__init__(self, *args)
-        self.setCancelButton(None)
+#        self.setCancelButton(None)
+        self.setCancelButtonText("Cancel")
         self.labelText = labelText
         self.setLabelText(labelText)
         self.setMinimumDuration(minShow)
