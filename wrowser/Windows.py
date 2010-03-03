@@ -367,13 +367,17 @@ class SimulationParameters(QtGui.QDockWidget):
         def filterCampaignBySelection(self, campaign):
             return campaign.filteredBySelection(self.simulationParametersModel.getValueSelection())
 
+    def closeEvent(self, event):
+        self.mainWindow.on_actionCloseDataSource_triggered()
+
     def __init__(self, campaigns, *args):
         QtGui.QDockWidget.__init__(self, "Simulation Parameters", *args)
+        self.mainWindow= args[0]
         self.internalWidget = self.__class__.Widget(campaigns)
         self.setWidget(self.internalWidget)
 
 
-class DirectoryNavigation(QtGui.QDockWidget):
+class DirectoryNavigation(QtGui.QDockWidget,Observing):
 
     from ui.Windows_DirectoryNavigation_ui import Ui_Windows_DirectoryNavigation
     class Widget(QtGui.QWidget, Ui_Windows_DirectoryNavigation):
@@ -396,7 +400,6 @@ class DirectoryNavigation(QtGui.QDockWidget):
             self.rootEdit.setValidator(self.rootEditValidator)
             self.rootEdit.setText(root)
             self.connect(self.rootEdit, QtCore.SIGNAL("textEdited(const QString&)"), self.on_rootEdit_textEdited)
-
             self.directoryModel = QtGui.QDirModel([], QtCore.QDir.Dirs | QtCore.QDir.NoDotAndDotDot, QtCore.QDir.Name, self)
             self.directoryView.setModel(self.directoryModel)
             self.directoryView.setRootIndex(self.directoryModel.index(root))
@@ -436,9 +439,13 @@ class DirectoryNavigation(QtGui.QDockWidget):
             self.mainWindow.menuNew.setEnabled(True)
             self.mainWindow.actionNewParameter.setEnabled(False)
 
+    def closeEvent(self, event):
+        self.mainWindow.on_actionCloseDataSource_triggered()
+
     def __init__(self, campaigns, root, parent, *args):
         QtGui.QDockWidget.__init__(self, "Directory Navigation", parent, *args)
         self.internalWidget = self.__class__.Widget(campaigns, root, parent, self)
+        self.mainWindow = parent
         self.setWidget(self.internalWidget)
 
 class Export:
