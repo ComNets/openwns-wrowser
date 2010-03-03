@@ -322,7 +322,6 @@ class ProbeNames(QtCore.QAbstractListModel):
         indexes = []
         for probe in probeList :
             if probe in self.probeNamesUnionFiltered: 
-                print "found ",probe," at: ",self.probeNamesUnionFiltered.index(probe)
                 indexes.append(self.createIndex(self.probeNamesUnionFiltered.index(probe),0))
         return indexes            
 

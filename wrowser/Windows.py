@@ -630,8 +630,14 @@ class ProbeFigure(Figure):
         self.probeGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
 
     def on_drawCampaign_changed(self, campaign):
+        selectedProbes = self.probeGraphControl.probeNames()
+        selectionModel = self.probeGraphControl.probesView().selectionModel()
+        self.probeGraphControl.probesView().clearSelection()
         self.probesModel.setCampaign(self.campaigns.draw)
-
+        itemsToSelect = self.probesModel.getProbeIndexes(selectedProbes)
+        for selection in itemsToSelect:
+            selectionModel.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
+ 
 class LogEvalFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, *qwidgetArgs):
@@ -947,34 +953,29 @@ class ParameterFigure(Figure, LineGraphs):
     def on_drawCampaign_changed(self, campaign):
         Debug.printCall(self, campaign)
         self.simulationParametersModel.setCampaign(self.campaigns.draw,True)
-        selectedYProbes = self.parameterGraphControl.yProbeNames()
-        print "selected y probes: ",selectedYProbes
-#if self.parameterGraphControl.isXUseProbeEntry:
         selectedXProbes = self.parameterGraphControl.xProbeNames()
-        print "selected x probes: ",selectedXProbes
+        selectedYProbes = self.parameterGraphControl.yProbeNames()
         selectionModelX = self.parameterGraphControl.xProbesView().selectionModel()
- 
         selectionModelY = self.parameterGraphControl.yProbesView().selectionModel()
 
-        self.parameterGraphControl.yProbesView().clearSelection()
         self.parameterGraphControl.xProbesView().clearSelection()
+        self.parameterGraphControl.yProbesView().clearSelection()
+
         self.xProbesModel.setCampaign(self.campaigns.draw)
         self.yProbesModel.setCampaign(self.campaigns.draw)
         
-        itemsToSelectY = self.yProbesModel.getProbeIndexes(selectedYProbes)
-        for selection in itemsToSelectY:
-            selectionModelY.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
-        self.parameterGraphControl.yProbesView().setSelectionModel(selectionModelY)
-
         itemsToSelectX = self.xProbesModel.getProbeIndexes(selectedXProbes)
         for selection in itemsToSelectX:
             selectionModelX.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
         self.parameterGraphControl.xProbesView().setSelectionModel(selectionModelX)
 
+        itemsToSelectY = self.yProbesModel.getProbeIndexes(selectedYProbes)
+        for selection in itemsToSelectY:
+            selectionModelY.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
+        self.parameterGraphControl.yProbesView().setSelectionModel(selectionModelY)
+
         self.xProbeEntriesModel.setCampaign(self.campaigns.draw)
         self.yProbeEntriesModel.setCampaign(self.campaigns.draw)
-        print "selected y Probes:", self.parameterGraphControl.yProbeNames()
-        print "selected x Probes:", self.parameterGraphControl.xProbeNames()
 
     def getGraphs(self):
         import probeselector.Graphs
