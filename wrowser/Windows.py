@@ -947,24 +947,34 @@ class ParameterFigure(Figure, LineGraphs):
     def on_drawCampaign_changed(self, campaign):
         Debug.printCall(self, campaign)
         self.simulationParametersModel.setCampaign(self.campaigns.draw,True)
-        selectedProbes = self.parameterGraphControl.getAllSelectedProbeNames()
-        print "selected probes: ",selectedProbes
-        selectedIndexes = self.parameterGraphControl.yProbesView().selectedIndexes()
-        selectionModel = self.parameterGraphControl.yProbesView().selectionModel()
-        selectionModelIndexes = selectionModel.selectedIndexes()
+        selectedYProbes = self.parameterGraphControl.yProbeNames()
+        print "selected y probes: ",selectedYProbes
+#if self.parameterGraphControl.isXUseProbeEntry:
+        selectedXProbes = self.parameterGraphControl.xProbeNames()
+        print "selected x probes: ",selectedXProbes
+        selectionModelX = self.parameterGraphControl.xProbesView().selectionModel()
+ 
+        selectionModelY = self.parameterGraphControl.yProbesView().selectionModel()
 
         self.parameterGraphControl.yProbesView().clearSelection()
+        self.parameterGraphControl.xProbesView().clearSelection()
         self.xProbesModel.setCampaign(self.campaigns.draw)
         self.yProbesModel.setCampaign(self.campaigns.draw)
         
-        itemsToSelect = self.yProbesModel.getProbeIndexes(selectedProbes)
-        for selection in itemsToSelect:
-            selectionModel.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
-        self.parameterGraphControl.yProbesView().setSelectionModel(selectionModel)
+        itemsToSelectY = self.yProbesModel.getProbeIndexes(selectedYProbes)
+        for selection in itemsToSelectY:
+            selectionModelY.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
+        self.parameterGraphControl.yProbesView().setSelectionModel(selectionModelY)
+
+        itemsToSelectX = self.xProbesModel.getProbeIndexes(selectedXProbes)
+        for selection in itemsToSelectX:
+            selectionModelX.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
+        self.parameterGraphControl.xProbesView().setSelectionModel(selectionModelX)
 
         self.xProbeEntriesModel.setCampaign(self.campaigns.draw)
         self.yProbeEntriesModel.setCampaign(self.campaigns.draw)
-        print "selected Probes:", self.parameterGraphControl.getAllSelectedProbeNames()
+        print "selected y Probes:", self.parameterGraphControl.yProbeNames()
+        print "selected x Probes:", self.parameterGraphControl.xProbeNames()
 
     def getGraphs(self):
         import probeselector.Graphs
