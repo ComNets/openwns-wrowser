@@ -117,7 +117,6 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
 
     def setModel(self, model):
         from Tools import ProbeFilterValidator
-
         self.probes.setModel(model)
         self.probes.selectionModel().select(model.index(0, 0),
                                             QtGui.QItemSelectionModel.Select)
