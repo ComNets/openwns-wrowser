@@ -974,12 +974,15 @@ class ParameterFigure(Figure, LineGraphs):
         selectedYProbes = self.parameterGraphControl.yProbeNames()
         selectionModelX = self.parameterGraphControl.xProbesView().selectionModel()
         selectionModelY = self.parameterGraphControl.yProbesView().selectionModel()
-
+        selectedYProbeEntry = self.parameterGraphControl.yProbeEntry.currentIndex()
+        selectedXProbeEntry = self.parameterGraphControl.xProbeEntry.currentIndex()
         self.parameterGraphControl.xProbesView().clearSelection()
         self.parameterGraphControl.yProbesView().clearSelection()
 
         self.xProbesModel.setCampaign(self.campaigns.draw)
         self.yProbesModel.setCampaign(self.campaigns.draw)
+        self.xProbeEntriesModel.setCampaign(self.campaigns.draw)
+        self.yProbeEntriesModel.setCampaign(self.campaigns.draw)
         
         itemsToSelectX = self.xProbesModel.getProbeIndexes(selectedXProbes)
         for selection in itemsToSelectX:
@@ -990,9 +993,8 @@ class ParameterFigure(Figure, LineGraphs):
         for selection in itemsToSelectY:
             selectionModelY.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
         self.parameterGraphControl.yProbesView().setSelectionModel(selectionModelY)
-
-        self.xProbeEntriesModel.setCampaign(self.campaigns.draw)
-        self.yProbeEntriesModel.setCampaign(self.campaigns.draw)
+        self.parameterGraphControl.yProbeEntry.setCurrentIndex(selectedYProbeEntry)
+        self.parameterGraphControl.xProbeEntry.setCurrentIndex(selectedXProbeEntry)
 
     def getGraphs(self):
         import probeselector.Graphs

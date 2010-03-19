@@ -39,6 +39,10 @@ class CampaignReader:
 
         self.path = os.path.abspath(directory)
         self.progressNotify = progressNotify
+        self.stopped = False
+
+    def stop(self):
+        self.stopped = True
 
     def read(self):
         directories = [self.path]
@@ -50,6 +54,8 @@ class CampaignReader:
         scenarios = []
         maxIndex = len(directories)
         for index, directory in enumerate(directories):
+            if self.stopped :
+                break
             Scenario = Representations.Scenario
             scenario = Scenario(ScenarioReader(os.path.abspath(directory)),
                                 {"directory": directory},
