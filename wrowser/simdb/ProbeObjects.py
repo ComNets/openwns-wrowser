@@ -85,9 +85,10 @@ class Moments:
     tableValues = ['filename', 'name', 'alt_name', 'description', 'minimum', 'maximum', 'trials',
                    'mean', 'variance', 'relative_variance', 'standard_deviation', 'relative_standard_deviation',
                    'skewness', 'moment2', 'moment3', 'sum_of_all_values', 'sum_of_all_values_square', 'sum_of_all_values_cubic']
-    valueNames = [name for name in tableValues if name not in ['filename', 'name', 'alt_name', 'description']]
+    valueNames = [name for name in tableValues if name not in [ 'name', 'alt_name', 'description']]
     tableColumns = tableValues + ['id', 'campaign_id', 'scenario_id']
     probeType = "Moments"
+    probeInfoNames = ['scenario_id'] + valueNames
 
 
 class PDFs:
@@ -99,6 +100,7 @@ class PDFs:
                    'min_x', 'max_x', 'number_of_bins', 'underflows', 'overflows']
     valueNames = [name for name in tableValues if name not in ['filename', 'name', 'alt_name', 'description']]
     tableColumns = tableValues + ['id', 'campaign_id', 'scenario_id']
+    probeInfoNames = ['scenario_id'] + valueNames
     probeType = "PDF"
     __histogram = None
 
@@ -143,6 +145,7 @@ class LogEvals:
                    'skewness', 'moment2', 'moment3', 'sum_of_all_values', 'sum_of_all_values_square', 'sum_of_all_values_cubic']
     valueNames = [name for name in tableValues if name not in ['filename', 'name', 'alt_name', 'description']]
     tableColumns = tableValues + ['id', 'campaign_id', 'scenario_id']
+    probeInfoNames = ['scenario_id'] + valueNames
     probeType = "LogEval"
 
     __entries = None

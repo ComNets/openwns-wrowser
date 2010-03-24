@@ -31,5 +31,9 @@ import sys
 import wrowser.simdb.Parameters
 
 params = wrowser.simdb.Parameters.Parameters()
-params.read(int(os.path.basename(os.getcwd())))
+p = params.read(int(os.path.basename(os.getcwd())))
+
+if __name__ == '__main__':
+    for (key, value) in p.items():
+        print "%s: %s" % (key, str(value.getValue()))
 

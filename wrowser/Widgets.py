@@ -112,6 +112,9 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
             self.confidenceLevel.setEnabled(False)
             self.confidencelevellabel.setEnabled(False)
 
+    def isShowConfidenceLevels(self):
+        return self.confidencecheckBox.isChecked()
+
     def setModel(self, model):
         from Tools import ProbeFilterValidator
 
@@ -171,6 +174,13 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
     def isPlotNotAggregatedGraphs(self):
         return self.originalgraphcheckBox.isChecked()
 
+    def getSelectedProbeName(self):
+        return self.probes.model().getProbeName(self.probes.currentIndex()) #"testPDF_Probe"
+
+    def getAllSelectedProbeNames(self):
+        return self.probeNames()
+
+
 from ui.Widgets_ParameterGraphControl_ui import Ui_Widgets_ParameterGraphControl
 class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
@@ -189,9 +199,15 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
 
     @QtCore.pyqtSignature("QString")
     def on_simulationParameter_activated(self, parameterName):
+        aggrParam = self.yProbesControl.aggregateParameter.currentText()
         self.aggregateParametersModel =  Models.SimulationParameters(self.yProbesControl.probeFilterValidator.probesModel.campaign, onlyNumeric = True)
         self.aggregateParametersModel.parameterNames.remove(parameterName)
         self.setAggregateParametersModel(self.aggregateParametersModel)
+        if aggrParam != parameterName :
+            for index in range(self.yProbesControl.aggregateParameter.count()) :
+                self.yProbesControl.aggregateParameter.setCurrentIndex(index)     
+                if self.yProbesControl.aggregateParameter.currentText() == aggrParam :
+                    break
 
     @QtCore.pyqtSignature("bool")
     def on_xUseProbeEntry_toggled(self, checked):
@@ -308,6 +324,12 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
     def getConfidenceLevel(self):
         return self.yProbesControl.confidenceLevel.value()
 
+    def getSelectedProbeName(self):
+        return self.yProbeNames()[0]  
+
+    def getAllSelectedProbeNames(self):
+        return self.yProbeNames()
+
 class GraphNavigationBar(QtGui.QWidget):
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg
 
@@ -322,6 +344,7 @@ class GraphNavigationBar(QtGui.QWidget):
 
         self.toolbar = self.__class__.NavigationToolbar2QTAgg(canvas, self)
         self.toolbar.setObjectName("toolbar")
+        self.toolbar.setFixedHeight(33)
         self.layout.addWidget(self.toolbar)
 
 from ui.Widgets_Graph_ui import Ui_Widgets_Graph
@@ -412,12 +435,11 @@ class LineGraph(Graph, Observing):
             self.lines.append(self.canvas.axes.plot(x, y, style, label = label, marker = self.figureConfig.marker))
             self.labels.append(label)
             try:
-                if len(graph.confidenceIntervalDict) > 0:
+                if len(graph.confidenceIntervalDict) > 0 and self.figureConfig.scale[2]=='linear':
                     for i in range(len(x)):
                         e = graph.confidenceIntervalDict[x[i]]
                         self.canvas.axes.errorbar(x[i], y[i], yerr=e , fmt=style)
             except: None
-
         self.canvas.axes.set_xlabel("\n".join(xLabels))
         self.canvas.axes.set_ylabel("\n".join(yLabels))
         ymin, ymax = self.canvas.axes.get_ylim()
@@ -425,6 +447,9 @@ class LineGraph(Graph, Observing):
             self.canvas.axes.set_ylim(0, ymax)
         self.setGrid(*self.figureConfig.grid)
         self.legendModel.updateLinesNLabels(self.lines, self.labels)
+        self.setScale(*(self.figureConfig.scale))
+        if self.figureConfig.legend:
+            self.setLegend(True)
 
     def on_figureConfig_title_changed(self, value):
         self.canvas.axes.set_title(value)
@@ -448,7 +473,7 @@ class LineGraph(Graph, Observing):
 
     def on_figureConfig_scale_changed(self, value):
         self.setScale(*value)
-        self.canvas.axes.autoscale_view()
+        self.plotGraph()
         self.doDraw()
 
     def doDraw(self):

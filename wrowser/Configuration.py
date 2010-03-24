@@ -173,6 +173,10 @@ class Configuration(object):
         self.parser.set('User', 'name', getattr(self, 'userName'))
         self.parser.set('User', 'password', getattr(self, 'userPassword'))
 
+        wnsDir = os.environ['HOME']+"/.wns"
+        if not os.path.exists(wnsDir) :
+            os.makedirs(wnsDir)
+
         config = file(dbAccessConfFile, 'w')
         config.write('# Keep this file private. Do NOT change file access permissions. Security hazard!\n\n')
         self.parser.write(config)

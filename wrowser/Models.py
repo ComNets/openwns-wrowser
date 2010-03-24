@@ -26,8 +26,8 @@
 ###############################################################################
 
 import copy
+import wrowser.Tools
 
-from Tools import convert
 
 from PyQt4 import QtCore, QtGui
 
@@ -53,7 +53,7 @@ class CampaignDb(QtCore.QAbstractItemModel):
         return len(self.headerNames)
 
     def rowCount(self, parent = QtCore.QModelIndex()):
-        if parent.isValid() and parent.internalId() == -1:
+        if parent.isValid() and parent.internalId() == 1000000001:
             userName = self.sortedCampaignIdsKeys[parent.row()]
             return len(self.campaignIds[userName])
         elif not parent.isValid():
@@ -64,24 +64,25 @@ class CampaignDb(QtCore.QAbstractItemModel):
     def parent(self, index = QtCore.QModelIndex()):
         if not index.isValid():
             return QtCore.QModelIndex()
-        elif index.internalId() == -1:
+        elif index.internalId() == 1000000001:
             return QtCore.QModelIndex()
-        elif index.internalId() > -1:
+        elif index.internalId() < 1000000000:
             return self.index(index.internalId(), 0, QtCore.QModelIndex())
+        print index.internalId()
         return QtCore.QModelIndex()
 
     def index(self, row, column, parent = QtCore.QModelIndex()):
         if not parent.isValid():
-            return self.createIndex(row, column, -1)
-        elif parent.internalId() == -1:
+            return self.createIndex(row, column, 1000000001)
+        elif parent.internalId() == 1000000001:
             return self.createIndex(row, column, parent.row())
         else:
-            return self.createIndex(row, column, -2)
+            return self.createIndex(row, column, 1000000000)
 
     def flags(self, index):
         if not index.isValid():
             return QtCore.Qt.ItemIsEnabled
-        if index.internalId() > -1:
+        if index.internalId() < 1000000000:
             userName = self.sortedCampaignIdsKeys[index.internalId()]
             if sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][3]:
                 return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
@@ -95,24 +96,31 @@ class CampaignDb(QtCore.QAbstractItemModel):
         return QtCore.QVariant(self.headerNames[section])
 
     def data(self, index, role = QtCore.Qt.DisplayRole):
-        if not index.isValid() or index.internalId() == -2:
+        if not index.isValid() or index.internalId() == 1000000000:
             return QtCore.QVariant()
 
         if role == QtCore.Qt.DisplayRole:
-            if index.internalId() == -1 and index.column() == 0:
+            if index.internalId() == 1000000001 and index.column() == 0:
                 return QtCore.QVariant(self.sortedCampaignIdsKeys[index.row()])
-            elif index.internalId() > -1 and index.column() == 1:
+            elif index.internalId() < 1000000000 and index.column() == 1:
                 userName = self.sortedCampaignIdsKeys[index.internalId()]
                 return QtCore.QVariant(sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][0])
-            elif index.internalId() > -1 and index.column() == 2:
+            elif index.internalId() < 1000000000 and index.column() == 2:
                 userName = self.sortedCampaignIdsKeys[index.internalId()]
                 return QtCore.QVariant(sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][1])
-            elif index.internalId() > -1 and index.column() == 3:
+            elif index.internalId() < 1000000000 and index.column() == 3:
                 userName = self.sortedCampaignIdsKeys[index.internalId()]
                 return QtCore.QVariant(sorted(self.campaignIds[userName].values(), key = lambda x: x[0].lower())[index.row()][2])
 
         return QtCore.QVariant()
 
+    def getUserRow(self, user):
+        for i in range(self.rowCount()):
+            desc = str(self.data(self.index(i,0)).toString()) 
+            if desc.find(user) != -1 :
+                return self.index(i,0)
+        return -1
+ 
 class SimulationParameters(QtCore.QAbstractItemModel):
 
     headerNames = ["Parameter", "Values"]
@@ -149,11 +157,17 @@ class SimulationParameters(QtCore.QAbstractItemModel):
     def getValueSelection(self):
         return self.__getValueSelection(self.parameterValueCheckStates)
 
+    def getParameterValues(self):
+        return self.parameterValues
+
+    def getCheckStates(self):
+        return self.parameterValueCheckStates
+
     def columnCount(self, parent = QtCore.QModelIndex()):
         return len(self.headerNames)
 
     def rowCount(self, parent = QtCore.QModelIndex()):
-        if parent.isValid() and parent.internalId() == -1:
+        if parent.isValid() and parent.internalId() == 1000000001:
             parameterName = self.parameterNames[parent.row()]
             return len(self.parameterValues[parameterName])
         elif not parent.isValid():
@@ -164,24 +178,24 @@ class SimulationParameters(QtCore.QAbstractItemModel):
     def parent(self, index = QtCore.QModelIndex()):
         if not index.isValid():
             return QtCore.QModelIndex()
-        elif index.internalId() == -1:
+        elif index.internalId() == 1000000001:
             return QtCore.QModelIndex()
-        elif index.internalId() > -1:
+        elif index.internalId() < 1000000000:
             return self.index(index.internalId(), 0, QtCore.QModelIndex())
         return QtCore.QModelIndex()
 
     def index(self, row, column, parent = QtCore.QModelIndex()):
         if not parent.isValid():
-            return self.createIndex(row, column, -1)
-        elif parent.internalId() == -1:
+            return self.createIndex(row, column, 1000000001)
+        elif parent.internalId() == 1000000001:
             return self.createIndex(row, column, parent.row())
         else:
-            return self.createIndex(row, column, -2)
+            return self.createIndex(row, column, 1000000000)
 
     def flags(self, index):
         if not index.isValid():
             return QtCore.Qt.ItemIsEnabled
-        if index.internalId() > -1:
+        if index.internalId() < 1000000000:
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
@@ -191,17 +205,17 @@ class SimulationParameters(QtCore.QAbstractItemModel):
         return QtCore.QVariant(self.headerNames[section])
 
     def data(self, index, role = QtCore.Qt.DisplayRole):
-        if not index.isValid() or index.internalId() == -2:
+        if not index.isValid() or index.internalId() == 1000000000:
             return QtCore.QVariant()
 
         if role == QtCore.Qt.DisplayRole:
-            if index.internalId() == -1 and index.column() == 0:
+            if index.internalId() == 1000000001 and index.column() == 0:
                 return QtCore.QVariant(self.parameterNames[index.row()])
-            elif index.internalId() > -1 and index.column() == 1:
+            elif index.internalId() < 1000000000 and index.column() == 1:
                 parameterName = self.parameterNames[index.internalId()]
                 values = self.parameterValues[parameterName]
                 return QtCore.QVariant(values[index.row()])
-        elif role == QtCore.Qt.CheckStateRole and index.internalId() > -1 and index.column() == 1:
+        elif role == QtCore.Qt.CheckStateRole and index.internalId() < 1000000000 and index.column() == 1:
             parameterName = self.parameterNames[index.internalId()]
             value = self.parameterValues[parameterName][index.row()]
             if self.parameterValueCheckStates[parameterName][value]:
@@ -215,7 +229,7 @@ class SimulationParameters(QtCore.QAbstractItemModel):
         if not index.isValid():
             return False
 
-        if role == QtCore.Qt.CheckStateRole and index.internalId() > -1 and index.column() == 1:
+        if role == QtCore.Qt.CheckStateRole and index.internalId() < 1000000000 and index.column() == 1:
             state = value.toInt()[0]
             parameterName = self.parameterNames[index.internalId()]
             parameterValue = self.parameterValues[parameterName][index.row()]
@@ -236,6 +250,20 @@ class SimulationParameters(QtCore.QAbstractItemModel):
             self.emit(QtCore.SIGNAL("dataChanged(const QModelIndex&, const QModelIndex&)"), index, index)
             return True
         return False
+
+    def toggleCheckboxes(self,row=10):
+        toggleParam=self.parameterNames[row]
+        for value in self.parameterValues[toggleParam] :
+            newValue = not self.parameterValueCheckStates[toggleParam][value] 
+            self.parameterValueCheckStates[toggleParam][value] = newValue
+        if self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
+            for value in self.parameterValues[toggleParam] :
+                if self.parameterValueCheckStates[toggleParam][value]==False :
+                    self.parameterValueCheckStates[toggleParam][value]=True 
+                    if not self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
+                        break
+                    self.parameterValueCheckStates[toggleParam][value]=False
+
 
 class ProbeNames(QtCore.QAbstractListModel):
     def __init__(self, campaign, probeClasses = [None], parent = None):
@@ -317,7 +345,7 @@ class ProbeEntries(QtCore.QAbstractListModel):
         for index, entry in enumerate(self.probeEntries):
             if entry == text:
                 return index
-        return -1
+        return 1000000001
 
     def changeProbes(self, probeNames):
         self.probeNames = probeNames
@@ -349,12 +377,13 @@ class ProbeData(QtCore.QAbstractTableModel):
         QtCore.QAbstractListModel.__init__(self, parent)
         self.campaign = campaign
         self.probeName = probeName
-        self.probeData = campaign.getAllProbeData(probeName)
+        self.probeData = campaign.getAllProbeDataExtended(probeName)
         self.parameterNames = list(campaign.getParameterNames())
-        self.valueNames = set()
+        #self.valueNames = set()
+        self.probeInfoNames = set()
         for data in self.probeData:
-            self.valueNames |= set(data[1].keys())
-        self.headerNames = self.parameterNames + list(self.valueNames)
+            self.probeInfoNames |= set(data[1].keys())
+        self.headerNames = self.parameterNames + list(self.probeInfoNames)
 
     def rowCount(self, parent = QtCore.QModelIndex()):
         if parent.isValid():
@@ -380,14 +409,33 @@ class ProbeData(QtCore.QAbstractTableModel):
             key = self.headerNames[index.column()]
             if key in self.parameterNames:
                 return QtCore.QVariant(self.probeData[index.row()][0][key])
-            elif key in self.valueNames:
+            elif key in self.probeInfoNames:
                 if self.probeData[index.row()][1].has_key(key):
                     return QtCore.QVariant(self.probeData[index.row()][1][key])
         if role == QtCore.Qt.ForegroundRole:
             key = self.headerNames[index.column()]
-            if key in self.valueNames:
+            if key in self.probeInfoNames:
                 return QtCore.QVariant(QtGui.QColor("blue"))
         return QtCore.QVariant()
+
+    def getPath(self, index):
+        print "get path to scenario"
+        try:
+            path = self.probeData[index.row()][1]['filename'] 
+            if path.find('scratch') != -1 :
+                #print "the scenario was queued with an old simcontrol.py, hence the database does not contain the path to your scenario folder"
+                return None 
+            return path
+        except:
+            #print "the scenario has no entry for the probe file, it seems that the scenario is crashed or not finished"
+            return None
+
+    def printTable(self):
+        for row in range(self.rowCount()):
+            for col in range(self.columnCount()):
+                desc = str(self.data(self.index(row,col)).toString()) 
+                print "col:",col
+                print "desc:",desc
 
 class Legend(QtCore.QAbstractListModel):
 
@@ -398,7 +446,9 @@ class Legend(QtCore.QAbstractListModel):
 
     def updateLinesNLabels(self, lines, labels):
         from Tools import renderLineSampleImage
-
+        if len(labels)>0 :
+            labels = wrowser.Tools.uniqElements(labels)
+        
         if len(lines) != len(labels):
             raise Exception("Models.Legend: " + str(len(lines)) + " graphs, but " + str(len(labels)) + " labels!?")
 
