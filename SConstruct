@@ -64,10 +64,10 @@ pyuic_src_files = ['ui/Windows_Main.ui',
 pyrcc_src_files = ['ui/wrowser.qrc',]
 
 for srcfile in pyuic_src_files:
-    env.Pyuic(source=srcfile, target=os.path.join('wrowser', srcfile.split('.')[0] + "_ui.py"))
+    env.Pyuic(source=srcfile, target=os.path.join('openwns', 'wrowser', srcfile.split('.')[0] + "_ui.py"))
 
 for srcfile in pyrcc_src_files:
-    env.Pyrcc(source=srcfile, target=os.path.join('wrowser', srcfile.split('.')[0] + "_rc.py"))
+    env.Pyrcc(source=srcfile, target=os.path.join('openwns', 'wrowser', srcfile.split('.')[0] + "_rc.py"))
 
 env.Alias("install-python", ".")
 env.Default("install-python")

@@ -36,13 +36,13 @@ from PyQt4 import QtGui
 p = sys.path[0]
 searchPath = os.path.dirname(sys.path[0])
 
-if "wrowser" in os.listdir(searchPath):
+if "openwns" in os.listdir(searchPath):
     print "Local installation of wrowser found."
     print "Prepending %s to sys.path" % searchPath
     sys.path.insert(0, searchPath)
 
 os.chdir(searchPath)
-import wrowser.Windows
+import openwns.wrowser.Windows
 
 def wrowserExceptHook(eType, eValue, eTraceback):
     message = "".join(traceback.format_exception(eType, eValue, eTraceback))
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     application.setWindowIcon(QtGui.QIcon(":/icons/icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
-    widget = wrowser.Windows.Main()
+    widget = openwns.wrowser.Windows.Main()
     widget.show()
     sys.excepthook = wrowserExceptHook
     sys.exit(application.exec_())

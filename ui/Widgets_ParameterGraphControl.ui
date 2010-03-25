@@ -215,7 +215,7 @@
   <customwidget>
    <class>ProbeGraphControl</class>
    <extends>QWidget</extends>
-   <header>wrowser.Widgets.h</header>
+   <header>openwns.wrowser.Widgets.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
