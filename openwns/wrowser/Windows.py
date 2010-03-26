@@ -147,7 +147,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.campaignId = campaignId
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
-            self.setWindowTitle(self.windowTitle()+" "+self.campaignTitle)
+            windowTitleElements = self.windowTitle().split(' ')
+            self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
             progressDialog = Dialogues.Progress("Reading data", 0, self.workspace)
             progressDialog.connect(progressDialog, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
             self.reader = PostgresReader.CampaignReader(campaignId,
