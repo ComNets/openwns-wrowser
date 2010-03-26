@@ -25,9 +25,9 @@
 #
 ###############################################################################
 
-import wrowser.probeselector.Errors as Errors
-import wrowser.probeselector.Interface
-import wrowser.probeselector.Graphs as Graphs
+import openwns.wrowser.probeselector.Errors as Errors
+import openwns.wrowser.probeselector.Interface
+import openwns.wrowser.probeselector.Graphs as Graphs
 
 import Probe
 import Compose
@@ -43,7 +43,7 @@ class Scenario:
     def __call__(self, scenario, graphs, errors):
 
         def acquire(probe = None):
-            scenarioParameterValues = wrowser.probeselector.Interface.Facade.getScenarioParameterValues(scenario, self.parameterNames)
+            scenarioParameterValues = openwns.wrowser.probeselector.Interface.Facade.getScenarioParameterValues(scenario, self.parameterNames)
             graphParameters = dict(zip(self.parameterNames, scenarioParameterValues))
             if probe == None:
                 probeName = None

@@ -25,7 +25,7 @@
 #
 ###############################################################################
 
-import wrowser.probeselector.Errors as Errors
+import openwns.wrowser.probeselector.Errors as Errors
 
 def defaultGraphWriter(x, y, graph):
     graph.points.append((x, y))
