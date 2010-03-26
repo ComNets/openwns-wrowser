@@ -131,6 +131,10 @@ class CampaignReader:
         self.campaignId = campaignId
         self.progressNotify = progressNotify
         self.prefetchProbeNames = prefetchProbeNames
+        self.stopped = False
+
+    def stop(self):
+        self.stopped = True
 
     def read(self):
         parametersReader = Parameters(campaignId = self.campaignId)
@@ -140,6 +144,8 @@ class CampaignReader:
         campaignProbes = CampaignProbes(self.campaignId, self.progressNotify)
         maxIndex = len(scenarioParametersDict.items())
         for index, scenario in enumerate(scenarioParametersDict.items()):
+            if self.stopped :
+                break
             scenarioId, scenarioParameters = scenario
             del scenarioParameters["campaignId"]
             scenarioParameters2 = dict()
@@ -150,5 +156,5 @@ class CampaignReader:
             scenarios.append(scenarioData)
             if callable(self.progressNotify) and ( (index % 10) == 0 or index==(maxIndex-1)) :
                 self.progressNotify(index + 1, maxIndex, "reading id " + str(scenarioId))
-#self.progressNotify(maxIndex, maxIndex, "reading id " + str(scenarioId))
+        #self.progressNotify(maxIndex, maxIndex, "reading id " + str(scenarioId))
         return scenarios, parameters

@@ -319,6 +319,13 @@ class ProbeNames(QtCore.QAbstractListModel):
         self.__setupProbeNames()
         self.emit(QtCore.SIGNAL("modelReset()"))
 
+    def getProbeIndexes(self, probeList):
+        indexes = []
+        for probe in probeList :
+            if probe in self.probeNamesUnionFiltered: 
+                indexes.append(self.createIndex(self.probeNamesUnionFiltered.index(probe),0))
+        return indexes            
+
 class ProbeEntries(QtCore.QAbstractListModel):
     def __init__(self, campaign, parent = None):
         QtCore.QAbstractListModel.__init__(self, parent)

@@ -56,6 +56,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.campaigns = Observable()
         self.reader = None
+        self.readerStopped = False
         self.campaignId = None
 
         self.workspace = QtGui.QWorkspace(self)
@@ -147,11 +148,16 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
             self.setWindowTitle(self.windowTitle()+" "+self.campaignTitle)
+            progressDialog = Dialogues.Progress("Reading data", 0, self.workspace)
+            progressDialog.connect(progressDialog, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
-                                                        Dialogues.Progress("Reading data", 0, self.workspace).setCurrentAndMaximum,
+                                                        progressDialog.setCurrentAndMaximum,
                                                         True)
             campaign = Representations.Campaign(*self.reader.read())
+            if self.readerStopped:
+                self.readerStopped = False
+                return
             self.campaigns.original = Interface.Facade(campaign)
 
             self.simulationParameters = SimulationParameters(self.campaigns, self)
@@ -161,6 +167,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
             self.actionCloseDataSource.setEnabled(True)
+
+    def on_cancelClicked(self):
+        self.readerStopped = True
+        self.reader.stop()
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDSV_triggered(self):
@@ -367,13 +377,17 @@ class SimulationParameters(QtGui.QDockWidget):
         def filterCampaignBySelection(self, campaign):
             return campaign.filteredBySelection(self.simulationParametersModel.getValueSelection())
 
+    def closeEvent(self, event):
+        self.mainWindow.on_actionCloseDataSource_triggered()
+
     def __init__(self, campaigns, *args):
         QtGui.QDockWidget.__init__(self, "Simulation Parameters", *args)
+        self.mainWindow= args[0]
         self.internalWidget = self.__class__.Widget(campaigns)
         self.setWidget(self.internalWidget)
 
 
-class DirectoryNavigation(QtGui.QDockWidget):
+class DirectoryNavigation(QtGui.QDockWidget,Observing):
 
     from ui.Windows_DirectoryNavigation_ui import Ui_Windows_DirectoryNavigation
     class Widget(QtGui.QWidget, Ui_Windows_DirectoryNavigation):
@@ -396,7 +410,6 @@ class DirectoryNavigation(QtGui.QDockWidget):
             self.rootEdit.setValidator(self.rootEditValidator)
             self.rootEdit.setText(root)
             self.connect(self.rootEdit, QtCore.SIGNAL("textEdited(const QString&)"), self.on_rootEdit_textEdited)
-
             self.directoryModel = QtGui.QDirModel([], QtCore.QDir.Dirs | QtCore.QDir.NoDotAndDotDot, QtCore.QDir.Name, self)
             self.directoryView.setModel(self.directoryModel)
             self.directoryView.setRootIndex(self.directoryModel.index(root))
@@ -436,9 +449,13 @@ class DirectoryNavigation(QtGui.QDockWidget):
             self.mainWindow.menuNew.setEnabled(True)
             self.mainWindow.actionNewParameter.setEnabled(False)
 
+    def closeEvent(self, event):
+        self.mainWindow.on_actionCloseDataSource_triggered()
+
     def __init__(self, campaigns, root, parent, *args):
         QtGui.QDockWidget.__init__(self, "Directory Navigation", parent, *args)
         self.internalWidget = self.__class__.Widget(campaigns, root, parent, self)
+        self.mainWindow = parent
         self.setWidget(self.internalWidget)
 
 class Export:
@@ -630,8 +647,14 @@ class ProbeFigure(Figure):
         self.probeGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
 
     def on_drawCampaign_changed(self, campaign):
+        selectedProbes = self.probeGraphControl.probeNames()
+        selectionModel = self.probeGraphControl.probesView().selectionModel()
+        self.probeGraphControl.probesView().clearSelection()
         self.probesModel.setCampaign(self.campaigns.draw)
-
+        itemsToSelect = self.probesModel.getProbeIndexes(selectedProbes)
+        for selection in itemsToSelect:
+            selectionModel.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
+ 
 class LogEvalFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, *qwidgetArgs):
@@ -947,10 +970,31 @@ class ParameterFigure(Figure, LineGraphs):
     def on_drawCampaign_changed(self, campaign):
         Debug.printCall(self, campaign)
         self.simulationParametersModel.setCampaign(self.campaigns.draw,True)
+        selectedXProbes = self.parameterGraphControl.xProbeNames()
+        selectedYProbes = self.parameterGraphControl.yProbeNames()
+        selectionModelX = self.parameterGraphControl.xProbesView().selectionModel()
+        selectionModelY = self.parameterGraphControl.yProbesView().selectionModel()
+        selectedYProbeEntry = self.parameterGraphControl.yProbeEntry.currentIndex()
+        selectedXProbeEntry = self.parameterGraphControl.xProbeEntry.currentIndex()
+        self.parameterGraphControl.xProbesView().clearSelection()
+        self.parameterGraphControl.yProbesView().clearSelection()
+
         self.xProbesModel.setCampaign(self.campaigns.draw)
         self.yProbesModel.setCampaign(self.campaigns.draw)
         self.xProbeEntriesModel.setCampaign(self.campaigns.draw)
         self.yProbeEntriesModel.setCampaign(self.campaigns.draw)
+        
+        itemsToSelectX = self.xProbesModel.getProbeIndexes(selectedXProbes)
+        for selection in itemsToSelectX:
+            selectionModelX.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
+        self.parameterGraphControl.xProbesView().setSelectionModel(selectionModelX)
+
+        itemsToSelectY = self.yProbesModel.getProbeIndexes(selectedYProbes)
+        for selection in itemsToSelectY:
+            selectionModelY.setCurrentIndex(selection,QtGui.QItemSelectionModel.Select)
+        self.parameterGraphControl.yProbesView().setSelectionModel(selectionModelY)
+        self.parameterGraphControl.yProbeEntry.setCurrentIndex(selectedYProbeEntry)
+        self.parameterGraphControl.xProbeEntry.setCurrentIndex(selectedXProbeEntry)
 
     def getGraphs(self):
         import probeselector.Graphs
