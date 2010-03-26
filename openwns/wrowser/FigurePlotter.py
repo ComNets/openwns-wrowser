@@ -23,13 +23,18 @@ from scipy.special import erf
 def loadCampaignAndPlotGraphs(PlotParameters):
     def lineStyle():
 
-        for style in PlotParameters.color_sytles :
+        for style in PlotParameters.color_styles :
             yield style
 
-    def lineStyleSW():
+    def lineStyleBW():
 
         for style in PlotParameters.bw_styles :
             yield style
+
+    def markerBW():
+
+        for marker in PlotParameters.bw_markers :
+            yield marker
 
     def hatches():
 
@@ -70,7 +75,7 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     if PlotParameters.color:
         ls = lineStyle()
     else:
-        ls = lineStyleSW()
+        markerBW = markerBW()
 
     probeNr = 0
     try:
@@ -87,19 +92,24 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     i=0
     if len(graphList)==0:
         print "no graphs to plot"
+    marker=PlotParameters.marker
     for graphNum in PlotParameters.plotOrder :
         graph = graphList[graphNum]
         labels.append(str(graph.sortkey))
 
         try:
-            style=ls.next()
+            if PlotParameters.color:
+                style=ls.next()
+            else:
+                style='k'
+                marker=markerBW.next()
         except StopIteration:
             print "You need to define more linestyles or reduce the number of plotted graphs"
             os._exit(1)
         X=[x  for x,y in graph.points]
         Y=[y*PlotParameters.scaleFactorY+PlotParameters.moveY  for x,y in graph.points]
         key = Facade.getGraphDescription(graph) #PlotParameters.legendLabelMapping.keys()[i]
-        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=PlotParameters.legendLabelMapping[key], marker=PlotParameters.marker)
+        plot([x*PlotParameters.scaleFactorX+PlotParameters.moveX  for x in X ], Y , style , label=PlotParameters.legendLabelMapping[key],marker=marker)
         try:
           if PlotParameters.type == 'Param':
             if PlotParameters.confidence :
@@ -132,5 +142,5 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     if PlotParameters.legend:
         legend(prop = font, loc=PlotParameters.legendPosition) # (0.9, 0.01))
     print 'Plotting: ',PlotParameters.fileName
-    savefig(os.path.join(outputdir, PlotParameters.fileName+'.pdf'))
-    savefig(os.path.join(outputdir, PlotParameters.fileName+'.png'))
+    for format in PlotParameters.outputFormats :
+        savefig(os.path.join(outputdir, PlotParameters.fileName+'.'+format))
