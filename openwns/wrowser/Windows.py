@@ -541,7 +541,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
         self.observe(self.on_drawCampaign_changed, self.campaigns, "draw")
         self.painter = QtGui.QPainter()
-        self.image = QtGui.QImage("image.png")
         self.printer = QtGui.QPrinter(QtGui.QPrinter.HighResolution)
         self.printer.setPageSize(QtGui.QPrinter.Letter)
  
@@ -604,12 +603,12 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
     @QtCore.pyqtSignature("")
     def on_printit_clicked(self):
-        print "print clicked"
         #mydoc = QtGui.QTextDocument("hello world")
         #form = QtGui.QPrintDialog(self.printer, self)
         #if form.exec_():
         #    mydoc.print_(self.printer)
- 
+        self.graph.saveGraph() 
+        self.image = QtGui.QImage("figure.png")
         if self.image.isNull(): return
         form = QtGui.QPrintDialog(self.printer, self)
         if form.exec_():
@@ -617,17 +616,15 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
             #self.painter = QtGui.QPainter()
             self.painter.begin(self.printer)
             rect = self.painter.viewport()
-            self.printer.setPrintProgram("lpr")
+            os.putenv("PRINTER",str(self.printer.printerName()))
+            self.printer.setPrintProgram("lpr")            
             size = self.image.size()
-            print "the image has following properties: width=",size.width()," height=",size.height()
-            print "the viewport has following properties: width=",rect.width()," height=",rect.height()
             size.scale(rect.size(), QtCore.Qt.KeepAspectRatio)
-            print "the image has following properties: width=",size.width()," height=",size.height()
             self.painter.setViewport(rect.x(),rect.y(),size.width(),size.height())
             self.painter.setWindow(self.image.rect())
             self.painter.drawImage(0,0,self.image)
             self.painter.end()
-        print "end"
+        os.remove("figure.png")
 
     @QtCore.pyqtSignature("bool")
     def on_draw_clicked(self, checked):
