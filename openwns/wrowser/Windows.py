@@ -607,7 +607,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         #form = QtGui.QPrintDialog(self.printer, self)
         #if form.exec_():
         #    mydoc.print_(self.printer)
-        self.graph.saveGraph() 
+        self.graph.saveGraph()
         self.image = QtGui.QImage("figure.png")
         if self.image.isNull(): return
         form = QtGui.QPrintDialog(self.printer, self)
