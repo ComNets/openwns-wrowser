@@ -543,6 +543,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.painter = QtGui.QPainter()
         self.printer = QtGui.QPrinter(QtGui.QPrinter.HighResolution)
         self.printer.setPageSize(QtGui.QPrinter.Letter)
+        self.printer.setPrintProgram("lpr")            
  
     @staticmethod
     def cleanLayout(layout):
@@ -607,24 +608,22 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         #form = QtGui.QPrintDialog(self.printer, self)
         #if form.exec_():
         #    mydoc.print_(self.printer)
-        self.graph.saveGraph()
-        self.image = QtGui.QImage("figure.png")
+        imageFile="figure.png"
+        self.graph.saveGraph(imageFile)
+        self.image = QtGui.QImage(imageFile)
         if self.image.isNull(): return
         form = QtGui.QPrintDialog(self.printer, self)
         if form.exec_():
-            #self.painter = QtGui.QPainter(self.printer)
-            #self.painter = QtGui.QPainter()
             self.painter.begin(self.printer)
             rect = self.painter.viewport()
             os.putenv("PRINTER",str(self.printer.printerName()))
-            self.printer.setPrintProgram("lpr")            
             size = self.image.size()
             size.scale(rect.size(), QtCore.Qt.KeepAspectRatio)
             self.painter.setViewport(rect.x(),rect.y(),size.width(),size.height())
             self.painter.setWindow(self.image.rect())
             self.painter.drawImage(0,0,self.image)
             self.painter.end()
-        os.remove("figure.png")
+        os.remove(imageFile)
 
     @QtCore.pyqtSignature("bool")
     def on_draw_clicked(self, checked):
