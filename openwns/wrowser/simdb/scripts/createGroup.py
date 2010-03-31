@@ -29,10 +29,25 @@
 
 #! /usr/bin/python
 
-import simdb.Database as db
 import getpass
 import os
 import sys
+
+def searchPath(path, file):
+    while file not in os.listdir(path):
+        if path == os.sep:
+            return None
+        path, tail = os.path.split(path)
+    return os.path.abspath(path)
+
+searchPath = searchPath(os.getcwd(), 'openwns')
+
+if searchPath is not None:
+    print "Local installation of wrowser found."
+    print "Prepending %s to sys.path" % searchPath
+    sys.path.insert(0, searchPath)
+
+import openwns.wrowser.simdb.Database as db
 
 hostname = 'localhost'
 dbName = 'simdb'

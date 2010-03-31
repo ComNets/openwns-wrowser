@@ -253,7 +253,7 @@ class Lres:
 
 
 class DlreHistograms:
-    tableName = 'lre_histograms'
+    tableName = 'dlre_histograms'
     tableValues = ['ordinate', 'abscissa', 'relative_error', 'mean_local_correlation_coefficient', 'deviation_from_mean_local_cc',
                    'number_of_trials_per_interval', 'number_of_transitions_per_interval', 'relative_error_within_limit']
     tableColumns = tableValues + ['id', 'campaign_id', 'probe_id']

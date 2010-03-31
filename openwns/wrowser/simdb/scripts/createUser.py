@@ -32,15 +32,19 @@ import pwd
 import os
 import sys
 
-def searchPath(path, rootSign):
-	while rootSign not in os.listdir(path):
-		if path == os.sep:
-			return None
-		path, tail = os.path.split(path)
-	path, tail = os.path.split(path)
-	return os.path.abspath(path)
+def searchPath(path, file):
+    while file not in os.listdir(path):
+        if path == os.sep:
+            return None
+        path, tail = os.path.split(path)
+    return os.path.abspath(path)
 
-sys.path.append(searchPath(os.path.abspath(os.path.dirname(sys.argv[0])), 'Configuration.py'))
+searchPath = searchPath(os.getcwd(), 'openwns')
+
+if searchPath is not None:
+    print "Local installation of wrowser found."
+    print "Prepending %s to sys.path" % searchPath
+    sys.path.insert(0, searchPath)
 
 import openwns.wrowser.simdb.Database as db
 
