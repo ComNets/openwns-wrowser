@@ -147,7 +147,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.campaignId = campaignId
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
-            self.setWindowTitle(self.windowTitle()+" "+self.campaignTitle)
+            windowTitleElements = self.windowTitle().split(' ')
+            self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
             progressDialog = Dialogues.Progress("Reading data", 0, self.workspace)
             progressDialog.connect(progressDialog, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
             self.reader = PostgresReader.CampaignReader(campaignId,
@@ -238,43 +239,43 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     def on_actionNewLogEval_triggered(self):
         figureWindow = LogEvalFigure(self.campaigns, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
-        figureWindow.show()
+        figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewTimeSeries_triggered(self):
         figureWindow = TimeSeriesFigure(self.campaigns, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
-        figureWindow.show()
+        figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
         figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
-        figureWindow.show()
+        figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewLRE_triggered(self):
         figureWindow = LREFigure(self.campaigns, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
-        figureWindow.show()
+        figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewBatchMeans_triggered(self):
         figureWindow = BatchMeansFigure(self.campaigns, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
-        figureWindow.show()
+        figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewTable_triggered(self):
         figureWindow = TableFigure(self.campaigns, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
-        figureWindow.show()
+        figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
         figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self.workspace)
         self.workspace.addWindow(figureWindow)
-        figureWindow.show()
+        figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionAboutQt_triggered(self):
@@ -539,7 +540,11 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.graphDisplayLayout.setObjectName("graphDisplayLayout")
 
         self.observe(self.on_drawCampaign_changed, self.campaigns, "draw")
-
+        self.painter = QtGui.QPainter()
+        self.printer = QtGui.QPrinter(QtGui.QPrinter.HighResolution)
+        self.printer.setPageSize(QtGui.QPrinter.Letter)
+        self.printer.setPrintProgram("lpr")            
+ 
     @staticmethod
     def cleanLayout(layout):
         for index in xrange(layout.count()):
@@ -596,6 +601,25 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
                 filename = str(fileDialogue.selectedFiles()[0])
                 progressDialogue = Dialogues.Progress("Exporting to " + filename, 0)
                 Exporters.directory[format].export(filename, export , progressDialogue.setCurrentAndMaximum, progressDialogue.reset) 
+
+    @QtCore.pyqtSignature("")
+    def on_printit_clicked(self):
+        imageFile="figure.png"
+        self.graph.saveGraph(imageFile)
+        self.image = QtGui.QImage(imageFile)
+        if self.image.isNull(): return
+        form = QtGui.QPrintDialog(self.printer, self)
+        if form.exec_():
+            self.painter.begin(self.printer)
+            rect = self.painter.viewport()
+            os.putenv("PRINTER",str(self.printer.printerName()))
+            size = self.image.size()
+            size.scale(rect.size(), QtCore.Qt.KeepAspectRatio)
+            self.painter.setViewport(rect.x(),rect.y(),size.width(),size.height())
+            self.painter.setWindow(self.image.rect())
+            self.painter.drawImage(0,0,self.image)
+            self.painter.end()
+        os.remove(imageFile)
 
     @QtCore.pyqtSignature("bool")
     def on_draw_clicked(self, checked):

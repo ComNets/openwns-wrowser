@@ -401,6 +401,9 @@ class LineGraph(Graph, Observing):
         self.setScale(*(self.figureConfig.scale))
         self.setLegend(self.figureConfig.legend)
 
+    def saveGraph(self,imageFile):
+        self.canvas.print_figure(imageFile)
+
     def plotGraph(self):
         from probeselector.Interface import Facade
 
