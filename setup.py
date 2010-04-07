@@ -18,7 +18,9 @@ setup(name='openWNS-Wrowser',
                 'openwns.wrowser.simdb.scripts',
                 'openwns.wrowser.probeselector',
                 'openwns.wrowser.probeselector.dataacquisition',
-                'openwns.wrowser.scenario'],
-      scripts=['bin/wrowser'],
+                'wrowser.scenario',
+		'wrowser.scenario.templates',
+		'wrowser.playgroundPlugins.SimulationCampaign'],
+    scripts=['bin/wrowser'],
      )
 
