@@ -87,6 +87,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         thisPluginPath = os.path.dirname(__file__)
         shutil.copy(os.path.join(thisPluginPath, 'simcontrol.py'), os.path.join(absPathToOpenWNS,'bin'))
         shutil.copy(os.path.join(thisPluginPath, 'sim.py'), os.path.join(absPathToOpenWNS, 'bin'))
+        os.system("chmod u+x " + os.path.join(absPathToOpenWNS, 'bin', 'sim.py'))
 
         directory = "".join(self.args)
         # Import playground stuff
@@ -139,6 +140,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
 
         PrepareCampaign.updateSubCampaigns(directory)
         shutil.copy(os.path.join(os.path.dirname(__file__),"sim.py"), directory)
+        os.system("chmod u+x " + os.path.join(directory, "sim.py"))
 
         logFileHandle.write("Simulation campaign directory successfully set up.\n\n")
         logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
