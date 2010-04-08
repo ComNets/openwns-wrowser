@@ -83,7 +83,9 @@ def createNewSubCampaign(directory):
 
     os.mkdir(subCampaignDir)
     shutil.copy(os.path.join(os.path.dirname(__file__), 'simcontrol.py'), subCampaignDir)
+    os.system("chmod u+x " + os.path.join(subCampaignDir, 'simcontrol.py'))
     shutil.copy(os.path.join(os.path.dirname(__file__), 'campaignConfiguration.py'), subCampaignDir)
+    os.system("chmod u+x " + os.path.join(subCampaignDir, 'campaignConfiguration.py'))
 
     campaignTitle = raw_input('Please enter a name for the campaign: ')
     campaignDescription = raw_input('Please enter a short description of the campaign: ')
@@ -103,3 +105,4 @@ def updateSubCampaigns(directory):
         if os.path.exists(path):
             shutil.copy(os.path.join('sandbox', 'default', 'lib', 'python2.4', 'site-packages', 'pywns', 'simdb', 'scripts', 'simcontrol.py'),
                         os.path.join(path))
+            os.system("chmod u+x " + path)
