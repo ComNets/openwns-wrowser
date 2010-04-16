@@ -544,6 +544,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.printer = QtGui.QPrinter(QtGui.QPrinter.HighResolution)
         self.printer.setPageSize(QtGui.QPrinter.Letter)
         self.printer.setPrintProgram("lpr")            
+        self.readerStopped = False
  
     @staticmethod
     def cleanLayout(layout):
@@ -629,6 +630,11 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
     def on_draw_clicked(self, checked):
         self.graph.setGraphs(self.getGraphs())
 
+    def on_cancelClicked(self):
+        print "cancel acquiring clicked"
+        self.readerStopped = True
+        self.campaigns.draw.stopAcquireGraphs()
+
     def getExport(self):
         print "export"
  
@@ -711,10 +717,14 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
                                                 progressReset = progressDialogue.reset)
+
+        if self.readerStopped:
+            self.readerStopped = False
 
         return graphs
 
@@ -746,10 +756,14 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
                                                 progressReset = progressDialogue.reset)
+
+        if self.readerStopped:
+            self.readerStopped = False
 
         return graphs
 
@@ -786,8 +800,8 @@ class XDFFigure(ProbeFigure, LineGraphs):
             aggregationParameter = self.probeGraphControl.aggregationParameter()
             parameterNames = list(campaign.getChangingParameterNames() - set([aggregationParameter]))
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.weightedXDF)
-
             progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
             graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                             progressNotify = progressDialogue.setCurrentAndMaximum,
@@ -796,7 +810,9 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
             graphs += graphsHelp
             errors += errorsHelp
-
+        if self.readerStopped:
+            self.readerStopped = False
+            return graphs
         if self.probeGraphControl.isPlotNotAggregatedGraphs() or not self.probeGraphControl.isAggregateParameter():
             probeDataAcquirer = getattr(dataacquisition.Probe, funType)()
             probeDataAcquirers = dict([(probeName, probeDataAcquirer) for probeName in probeNames])
@@ -805,8 +821,8 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                             parameterNames = parameterNames)
-
             progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
             graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                             progressNotify = progressDialogue.setCurrentAndMaximum,
@@ -816,6 +832,9 @@ class XDFFigure(ProbeFigure, LineGraphs):
             graphs += graphsHelp
             errors += errorsHelp
 
+        if self.readerStopped:
+            self.readerStopped = False
+ 
         return graphs
 
     def getExport(self):
@@ -825,7 +844,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
         exp.graphType=self.probeGraphControl.probeFunction() #"XDF" #self.graph.figureConfig.title[0:5]
         exp.campaignId = self.campaignId
         return exp
- 
+
 class LREFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, *qwidgetArgs):
@@ -866,10 +885,14 @@ class LREFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
                                                 progressReset = progressDialogue.reset)
+
+        if self.readerStopped:
+            self.readerStopped = False
 
         return graphs
 
@@ -917,10 +940,14 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
                                                 progressReset = progressDialogue.reset)
+
+        if self.readerStopped:
+            self.readerStopped = False
 
         return graphs
 
@@ -952,11 +979,15 @@ class TableFigure(ProbeFigure, TableGraphs):
                                                         parameterNames = parameterNames)
 
         progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
                                                 progressReset = progressDialogue.reset,
                                                 graphClass = probeselector.Graphs.TableGraph)
+
+        if self.readerStopped:
+            self.readerStopped = False
 
         return graphs
 
@@ -1056,6 +1087,7 @@ class ParameterFigure(Figure, LineGraphs):
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
 
             progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
             graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                       progressNotify = progressDialogue.setCurrentAndMaximum,
@@ -1065,6 +1097,10 @@ class ParameterFigure(Figure, LineGraphs):
             graphs += graphsHelp
             errors += errorsHelp
 
+        if self.readerStopped:
+            self.readerStopped = False
+            return graphs
+ 
         if self.parameterGraphControl.isPlotNotAggregatedGraphs() or not self.parameterGraphControl.isAggregateParameter():
             if self.parameterGraphControl.isXUseProbeEntry():
                 xProbeName = self.parameterGraphControl.xProbeNames()[0]
@@ -1091,11 +1127,13 @@ class ParameterFigure(Figure, LineGraphs):
                 probeDataAcquirers = {None : dataacquisition.Compose.XY(x = xAcquirer, y = yAcquirer)}
 
             parameterNames = list(campaign.getChangingParameterNames() - set([parameterName]))
+
             if self.parameterGraphControl.isShowConfidenceLevels() and yProbeEntry == 'mean':
                 confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
 
                 progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+                progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
                 graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
@@ -1105,6 +1143,7 @@ class ParameterFigure(Figure, LineGraphs):
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
 
                 progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+                progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
                 graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                                 progressNotify = progressDialogue.setCurrentAndMaximum,
@@ -1112,6 +1151,9 @@ class ParameterFigure(Figure, LineGraphs):
 
             graphs += graphsHelp
             errors += errorsHelp
+
+            if self.readerStopped:
+                self.readerStopped = False
 
         return graphs
 
