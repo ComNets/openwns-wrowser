@@ -605,10 +605,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
     @QtCore.pyqtSignature("")
     def on_printit_clicked(self):
-        #mydoc = QtGui.QTextDocument("hello world")
-        #form = QtGui.QPrintDialog(self.printer, self)
-        #if form.exec_():
-        #    mydoc.print_(self.printer)
         imageFile="figure.png"
         self.graph.saveGraph(imageFile)
         self.image = QtGui.QImage(imageFile)
@@ -631,7 +627,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.graph.setGraphs(self.getGraphs())
 
     def on_cancelClicked(self):
-        print "cancel acquiring clicked"
         self.readerStopped = True
         self.campaigns.draw.stopAcquireGraphs()
 

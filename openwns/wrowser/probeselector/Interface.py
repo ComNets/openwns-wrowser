@@ -303,7 +303,6 @@ class Facade:
             progressReset()
         for index, scenario in enumerate(self.campaign.scenarios):
             if self.stopped: 
-              print "stop acquire graphs"
               self.stopped=False
               return [],errors
             if callable(progressNotify):
@@ -323,7 +322,6 @@ class Facade:
                     progressNotify(index, maxIndex, msg)
                 graph.process()
                 if self.stopped: 
-                  print "stop acquire graphs"
                   self.stopped=False
                   return [],errors
         graphsList.sort(key = operator.attrgetter("sortkey"))
@@ -395,7 +393,6 @@ class Facade:
         return graphs
     
     def stopAcquireGraphs(self):
-        print "Facade - stopAcquireGraphs"
         self.stopped = True
         
     def getHistograms(self, probeNames, function, aggregationParameter = '', progressNotify = None, progressReset = None, plotNotAggregatedGraphs = False):
