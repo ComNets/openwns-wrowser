@@ -5,383 +5,633 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>509</width>
-    <height>339</height>
+    <width>544</width>
+    <height>486</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Configure Graph</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
+    <widget class="QTabWidget" name="tabWidget" >
+     <property name="currentIndex" >
+      <number>1</number>
      </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="titleLabel" >
-       <property name="text" >
-        <string>Title:</string>
-       </property>
-       <property name="buddy" >
-        <cstring>titleEdit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="titleEdit" />
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QGroupBox" name="xaxis" >
-       <property name="title" >
-        <string>X-Axis</string>
-       </property>
-       <layout class="QVBoxLayout" >
-        <property name="margin" >
-         <number>9</number>
-        </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="xgrid" >
-          <property name="title" >
-           <string>Grid</string>
-          </property>
-          <layout class="QVBoxLayout" >
-           <property name="margin" >
-            <number>9</number>
+     <widget class="QWidget" name="tab" >
+      <attribute name="title" >
+       <string>Graph</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="xaxis" >
+           <property name="title" >
+            <string>X-Axis</string>
            </property>
-           <property name="spacing" >
-            <number>6</number>
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>9</number>
+            </property>
+            <property name="topMargin" >
+             <number>9</number>
+            </property>
+            <property name="rightMargin" >
+             <number>9</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>9</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="xgrid" >
+              <property name="title" >
+               <string>Grid</string>
+              </property>
+              <layout class="QVBoxLayout" >
+               <property name="spacing" >
+                <number>6</number>
+               </property>
+               <property name="leftMargin" >
+                <number>9</number>
+               </property>
+               <property name="topMargin" >
+                <number>9</number>
+               </property>
+               <property name="rightMargin" >
+                <number>9</number>
+               </property>
+               <property name="bottomMargin" >
+                <number>9</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="xgridMinor" >
+                 <property name="text" >
+                  <string>Minor</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="xgridMajor" >
+                 <property name="text" >
+                  <string>Major</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" >
+              <property name="spacing" >
+               <number>6</number>
+              </property>
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="xScaleLabel" >
+                <property name="text" >
+                 <string>Scale:</string>
+                </property>
+                <property name="buddy" >
+                 <cstring>xscale</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="xscale" >
+                <item>
+                 <property name="text" >
+                  <string>linear</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text" >
+                  <string>ld</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text" >
+                  <string>ln</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text" >
+                  <string>lg</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="yaxis" >
+           <property name="title" >
+            <string>Y-Axis</string>
            </property>
-           <item>
-            <widget class="QCheckBox" name="xgridMinor" >
-             <property name="text" >
-              <string>Minor</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="xgridMajor" >
-             <property name="text" >
-              <string>Major</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>9</number>
+            </property>
+            <property name="topMargin" >
+             <number>9</number>
+            </property>
+            <property name="rightMargin" >
+             <number>9</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>9</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="ygrid" >
+              <property name="title" >
+               <string>Grid</string>
+              </property>
+              <layout class="QVBoxLayout" >
+               <property name="spacing" >
+                <number>6</number>
+               </property>
+               <property name="leftMargin" >
+                <number>9</number>
+               </property>
+               <property name="topMargin" >
+                <number>9</number>
+               </property>
+               <property name="rightMargin" >
+                <number>9</number>
+               </property>
+               <property name="bottomMargin" >
+                <number>9</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="ygridMinor" >
+                 <property name="text" >
+                  <string>Minor</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="ygridMajor" >
+                 <property name="text" >
+                  <string>Major</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" >
+              <property name="spacing" >
+               <number>6</number>
+              </property>
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="yScaleLabel" >
+                <property name="text" >
+                 <string>Scale:</string>
+                </property>
+                <property name="buddy" >
+                 <cstring>yscale</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="yscale" >
+                <item>
+                 <property name="text" >
+                  <string>linear</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text" >
+                  <string>ld</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text" >
+                  <string>ln</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text" >
+                  <string>lg</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="graph" >
+         <property name="title" >
+          <string>Graph</string>
+         </property>
+         <layout class="QVBoxLayout" >
           <property name="spacing" >
            <number>6</number>
           </property>
+          <property name="leftMargin" >
+           <number>9</number>
+          </property>
+          <property name="topMargin" >
+           <number>9</number>
+          </property>
+          <property name="rightMargin" >
+           <number>9</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>9</number>
+          </property>
           <item>
-           <widget class="QLabel" name="xScaleLabel" >
-            <property name="text" >
-             <string>Scale:</string>
+           <layout class="QHBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
             </property>
-            <property name="buddy" >
-             <cstring>xscale</cstring>
+            <property name="leftMargin" >
+             <number>0</number>
+            </property>
+            <property name="topMargin" >
+             <number>0</number>
+            </property>
+            <property name="rightMargin" >
+             <number>0</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="markerLabel" >
+              <property name="text" >
+               <string>Line markers:</string>
+              </property>
+              <property name="buddy" >
+               <cstring>marker</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="marker" >
+              <item>
+               <property name="text" >
+                <string>None</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>+</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>,</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>.</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>1</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>2</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>3</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>4</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>&lt;</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>></string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>D</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>H</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>^</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>_</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>d</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>h</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>o</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>p</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>s</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>v</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text" >
+                <string>|</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showLegend" >
+            <property name="text" >
+             <string>Show legend</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="table" >
+         <property name="title" >
+          <string>Table</string>
+         </property>
+         <layout class="QHBoxLayout" >
+          <item>
+           <widget class="QCheckBox" name="colorbarCheckBox" >
+            <property name="text" >
+             <string>Colorbar</string>
+            </property>
+            <property name="checked" >
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="xscale" >
+           <widget class="QLabel" name="colormapLabel" >
+            <property name="windowModality" >
+             <enum>Qt::NonModal</enum>
+            </property>
+            <property name="text" >
+             <string>Colormap:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="colormapComboBox" >
             <item>
              <property name="text" >
-              <string>linear</string>
+              <string>jet</string>
              </property>
             </item>
             <item>
              <property name="text" >
-              <string>ld</string>
+              <string>autumn</string>
              </property>
             </item>
             <item>
              <property name="text" >
-              <string>ln</string>
+              <string>BuGn</string>
              </property>
             </item>
             <item>
              <property name="text" >
-              <string>lg</string>
+              <string>gray</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>hot</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Blues</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>gist_heat</string>
              </property>
             </item>
            </widget>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="yaxis" >
-       <property name="title" >
-        <string>Y-Axis</string>
-       </property>
-       <layout class="QVBoxLayout" >
-        <property name="margin" >
-         <number>9</number>
-        </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="ygrid" >
-          <property name="title" >
-           <string>Grid</string>
-          </property>
-          <layout class="QVBoxLayout" >
-           <property name="margin" >
-            <number>9</number>
-           </property>
-           <property name="spacing" >
-            <number>6</number>
-           </property>
-           <item>
-            <widget class="QCheckBox" name="ygridMinor" >
-             <property name="text" >
-              <string>Minor</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="ygridMajor" >
-             <property name="text" >
-              <string>Major</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="yScaleLabel" >
-            <property name="text" >
-             <string>Scale:</string>
-            </property>
-            <property name="buddy" >
-             <cstring>yscale</cstring>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="yscale" >
-            <item>
-             <property name="text" >
-              <string>linear</string>
-             </property>
-            </item>
-            <item>
-             <property name="text" >
-              <string>ld</string>
-             </property>
-            </item>
-            <item>
-             <property name="text" >
-              <string>ln</string>
-             </property>
-            </item>
-            <item>
-             <property name="text" >
-              <string>lg</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="graph" >
-     <property name="title" >
-      <string>Graph</string>
-     </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item>
-       <layout class="QHBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
-        </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item>
-         <widget class="QLabel" name="markerLabel" >
-          <property name="text" >
-           <string>Line markers:</string>
-          </property>
-          <property name="buddy" >
-           <cstring>marker</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="marker" >
-          <item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string>Labels</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="titleLabel" >
            <property name="text" >
-            <string>None</string>
+            <string>Title:</string>
            </property>
-          </item>
-          <item>
+           <property name="buddy" >
+            <cstring>titleEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="titleEdit" />
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="xAxisLabel" >
            <property name="text" >
-            <string>+</string>
+            <string>X Axis</string>
            </property>
-          </item>
-          <item>
+           <property name="buddy" >
+            <cstring>titleEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="xAxisEdit" />
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="yAxisLabel" >
            <property name="text" >
-            <string>,</string>
+            <string>Y Axis</string>
            </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>.</string>
+           <property name="buddy" >
+            <cstring>titleEdit</cstring>
            </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>1</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>2</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>3</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>4</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>&lt;</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>></string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>D</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>H</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>^</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>_</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>d</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>h</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>o</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>p</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>s</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>v</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>x</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>|</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="showLegend" >
-        <property name="text" >
-         <string>Show legend</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="yAxisEdit" />
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -392,7 +642,7 @@
      <property name="sizeHint" >
       <size>
        <width>491</width>
-       <height>16</height>
+       <height>20</height>
       </size>
      </property>
     </spacer>
@@ -410,15 +660,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>titleEdit</tabstop>
-  <tabstop>xgridMinor</tabstop>
-  <tabstop>xgridMajor</tabstop>
-  <tabstop>xscale</tabstop>
-  <tabstop>ygridMinor</tabstop>
-  <tabstop>ygridMajor</tabstop>
-  <tabstop>yscale</tabstop>
-  <tabstop>marker</tabstop>
-  <tabstop>showLegend</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
@@ -452,22 +693,6 @@
     <hint type="destinationlabel" >
      <x>286</x>
      <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>titleEdit</sender>
-   <signal>returnPressed()</signal>
-   <receiver>Dialogues_ConfigureGraph</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>270</x>
-     <y>21</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>254</x>
-     <y>169</y>
     </hint>
    </hints>
   </connection>
