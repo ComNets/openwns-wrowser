@@ -41,6 +41,7 @@ class Facade:
     """
     def __init__(self, campaign):
         self.__campaign = campaign
+        self.stopped = False
 
     def isEmpty(self):
         for parameterName in self.getParameterNames():
@@ -301,6 +302,9 @@ class Facade:
         if callable(progressReset):
             progressReset()
         for index, scenario in enumerate(self.campaign.scenarios):
+            if self.stopped: 
+              self.stopped=False
+              return [],errors
             if callable(progressNotify):
                 msg = "Acquiring data..."
                 msg += "\n" + self.getParameterString(scenario.parameters)
@@ -317,6 +321,9 @@ class Facade:
                     msg += "\n" + str(graph.identity)
                     progressNotify(index, maxIndex, msg)
                 graph.process()
+                if self.stopped: 
+                  self.stopped=False
+                  return [],errors
         graphsList.sort(key = operator.attrgetter("sortkey"))
         return graphsList, errors
 
@@ -384,7 +391,10 @@ class Facade:
             errors += errorsHelp
 
         return graphs
-
+    
+    def stopAcquireGraphs(self):
+        self.stopped = True
+        
     def getHistograms(self, probeNames, function, aggregationParameter = '', progressNotify = None, progressReset = None, plotNotAggregatedGraphs = False):
 
         funType = function

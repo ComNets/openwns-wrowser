@@ -36,4 +36,7 @@ class Figure(Observable):
         self.scale = ("linear", None, "linear", None)
         self.legend = False
         self.title = ""
-
+        self.colormap = "jet"
+        self.colorbar = True
+        self.xAxisTitle = ""
+        self.yAxisTitle = ""

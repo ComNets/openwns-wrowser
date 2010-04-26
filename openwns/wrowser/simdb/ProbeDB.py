@@ -192,7 +192,7 @@ def __writeLreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, curs
         cursor.execute('SELECT currval(\'lres_id_seq\')')
         lreId = cursor.fetchone()[0]
         for element in lreProbe.histogram:
-            cursor.execute('INSERT INTO lre_histograms (campaign_id, probe_id, abscissa, ordinate, relative_error, mean_local_correlation_coefficient, '\
+            cursor.execute('INSERT INTO lre_histograms (campaign_id, probe_id, ordinate, abscissa, relative_error, mean_local_correlation_coefficient, '\
                            'deviation_from_mean_local_cc, number_of_trials_per_interval, number_of_transitions_per_interval, relative_error_within_limit) '\
                            'VALUES (%d, %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%s\')' %
                            (campaignId, lreId, element.ordinate, element.abscissa, element.relativeError, element.meanLocalCorrelationCoefficient, element.deviationFromMeanLocalCC,
