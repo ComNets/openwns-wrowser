@@ -159,13 +159,12 @@ def __submitJob(scenarioId):
     command = os.path.abspath(os.path.join('..', 'sim.py')) + ' -p ' + os.path.abspath(os.getcwd()) + ' -i ' + simId
     if options.skipNullTrials == True:
         command += ' -n'
-    process = subprocess.Popen(['qsub -q %s -N job%s -l s_cpu=%i:%i:00 -l h_cpu=%i:%i:00 -l h_vmem=%i -o %s -e %s -m a -M %s@comnets.rwth-aachen.de -v PYTHONPATH=%s %s' % (options.queue,
+    process = subprocess.Popen(['qsub -q %s -N job%s -l s_cpu=%i:%i:00 -l h_cpu=%i:%i:00 -o %s -e %s -m a -M %s@comnets.rwth-aachen.de -v PYTHONPATH=%s %s' % (options.queue,
                                                                                                                                              simId,
                                                                                                                                              options.cpuTime,
                                                                                                                                              options.cpuMinutes,
                                                                                                                                              options.cpuTime,
                                                                                                                                              options.cpuMinutes + 15,
-                                                                                                                                             options.maxVMem,
                                                                                                                                              os.path.join(simPath, 'stdout'),
                                                                                                                                              os.path.join(simPath, 'stderr'),
                                                                                                                                              pwd.getpwuid(os.getuid())[0],
@@ -481,10 +480,6 @@ parser.add_option('-q', '--queue',
 parser.add_option('-t', '--cpu-time',
                   type = 'int', dest = 'cpuTime', default = 100,
                   help = 'chose time for jobs in hours (default: 100h)', metavar = 'HOURS')
-
-parser.add_option('-m', '--max-vmem',
-                  type = 'int', dest = 'maxVMem', default = 1536,
-                  help = 'chose maximum vmem size (default: 1536 MB)', metavar = 'MB')
 
 parser.add_option('', '--minutes',
                   type = 'int', dest = 'cpuMinutes', default = 0,
