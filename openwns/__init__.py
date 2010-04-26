@@ -17,6 +17,7 @@ if len(validPaths) == 0:
 __path__ = validPaths
 
 for path in validPaths:
+    initPath = os.path.join(path, '__init__.py')
     if not os.path.exists(os.path.join(path, '__openwns__mainModule__')):
         try:
             execfile(initPath)
