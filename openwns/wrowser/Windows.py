@@ -66,6 +66,14 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.connect(self.windowMapper, QtCore.SIGNAL("mapped(QWidget *)"),
                      self.workspace, QtCore.SLOT("setActiveWindow(QWidget *)"))
 
+        cancelButton = QtGui.QPushButton("Cancel")
+        progressIndicator = QtGui.QProgressBar()
+        progressIndicator.setMaximum(100)
+        progressIndicator.setValue(33)
+
+        self.statusbar.showMessage("Halllllllooooooooooooo")
+        self.statusbar.addWidget(cancelButton)
+        self.statusbar.addWidget(progressIndicator)
         # currently disabled
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
@@ -676,7 +684,7 @@ class ProbeFigure(Figure):
         self.probeGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
 
     def on_drawCampaign_changed(self, campaign):
-        selectedProbes = self.probeGraphControl.probeNames()
+        print "ProbeFigure drawCampaign changed"
         selectionModel = self.probeGraphControl.probesView().selectionModel()
         self.probeGraphControl.probesView().clearSelection()
         self.probesModel.setCampaign(self.campaigns.draw)
