@@ -66,14 +66,14 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.connect(self.windowMapper, QtCore.SIGNAL("mapped(QWidget *)"),
                      self.workspace, QtCore.SLOT("setActiveWindow(QWidget *)"))
 
-        cancelButton = QtGui.QPushButton("Cancel")
+        self.cancelButton = QtGui.QPushButton("Cancel")
         progressIndicator = QtGui.QProgressBar()
         progressIndicator.setMaximum(100)
         progressIndicator.setValue(33)
-
-        self.statusbar.showMessage("Halllllllooooooooooooo")
-        self.statusbar.addWidget(cancelButton)
-        self.statusbar.addWidget(progressIndicator)
+        self.progressIndicator = Dialogues.ProgressStatus()
+        #self.statusbar.showMessage("Halllllllooooooooooooo")
+        #self.statusbar.addWidget(self.cancelButton)
+        #self.statusbar.addWidget(progressIndicator)
         # currently disabled
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
@@ -157,13 +157,22 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
             windowTitleElements = self.windowTitle().split(' ')
             self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
-            progressDialog = Dialogues.Progress("Reading data", 0, self.workspace)
-            progressDialog.connect(progressDialog, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+            #progressDialog = Dialogues.ProgressStatus() #Dialogues.Progress("Reading data", 0, self.workspace)
+            self.statusbar.addWidget(self.cancelButton)
+            self.statusbar.addWidget(self.progressIndicator)
+            self.cancelButton.show()
+            self.progressIndicator.show()
+            self.cancelButton.connect(self.cancelButton,QtCore.SIGNAL("clicked()"),self.on_cancelClicked)
+            #progressDialog.connect(progressDialog, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
-                                                        progressDialog.setCurrentAndMaximum,
+                                                        self.progressIndicator.setCurrentAndMaximum,
                                                         True)
             campaign = Representations.Campaign(*self.reader.read())
+            self.statusbar.removeWidget(self.cancelButton)
+            self.statusbar.removeWidget(self.progressIndicator)
+            self.progressIndicator.reset()
+            self.progressIndicator.setValue(0)
             if self.readerStopped:
                 self.readerStopped = False
                 return
@@ -178,6 +187,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.actionCloseDataSource.setEnabled(True)
 
     def on_cancelClicked(self):
+        print "cancel clicked"
         self.readerStopped = True
         self.reader.stop()
 

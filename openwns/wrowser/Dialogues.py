@@ -159,6 +159,36 @@ class OpenDSV(QtGui.QDialog, Ui_Dialogues_OpenDSV):
                       directoryColumn = str(self.directoryColumnEdit.text()),
                       subDirectory = str(self.subDirectoryEdit.text()))
 
+class ProgressStatus(QtGui.QProgressBar):
+    def __init__(self, *args):
+        QtGui.QProgressBar.__init__(self, *args)
+        self.labelText=""
+        self.reset()
+
+    def reset(self):
+        self.setMinimum(0)
+        self.startTime = datetime.datetime.now()
+        QtGui.QProgressBar.reset(self)
+
+    def setCurrentAndMaximum(self, current, maximum, additionalText = ""):
+        import Time
+
+        self.setMaximum(maximum)
+        self.setValue(current)
+        labelText = self.labelText
+        if len(additionalText) > 0:
+            labelText += "\n" + additionalText
+        if maximum > 0 and float(current)/maximum >= 0.01:
+            elapsed = datetime.datetime.now() - self.startTime
+            total = elapsed * maximum / current
+            remaining = total - elapsed
+            labelText += "\napprox. " + Time.Delta(remaining).asString() + " left"
+        #self.setLabelText(labelText)
+        if QtGui.QApplication.hasPendingEvents():
+            QtGui.QApplication.instance().syncX()
+            QtGui.QApplication.instance().processEvents()
+        time.sleep(0.006)
+
 class Progress(QtGui.QProgressDialog):
     def __init__(self, labelText, minShow, *args):
         QtGui.QProgressDialog.__init__(self, *args)
