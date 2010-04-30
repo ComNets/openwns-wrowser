@@ -187,7 +187,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.actionCloseDataSource.setEnabled(True)
 
     def on_cancelClicked(self):
-        print "cancel clicked"
         self.readerStopped = True
         self.reader.stop()
 
@@ -655,6 +654,20 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.mainWindow.progressIndicator.show()
         self.mainWindow.cancelButton.connect(self.mainWindow.cancelButton,QtCore.SIGNAL("clicked()"),self.on_cancelClicked)
 
+    def acquireGraphs(self, scenarioDataAcquirer, graphClass = None): 
+        campaign = self.campaigns.draw
+        if graphClass is None:
+           graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                            progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                            progressReset = self.mainWindow.progressIndicator.reset)
+        else:
+           graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
+                                                            progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                            progressReset = self.mainWindow.progressIndicator.reset,
+                                                            graphClass = probeselector.Graphs.AggregatedGraph)
+        return graphsHelp, errorsHelp
+
+
     def hideProgressBar(self):
         self.mainWindow.statusbar.removeWidget(self.mainWindow.cancelButton)
         self.mainWindow.statusbar.removeWidget(self.mainWindow.progressIndicator)
@@ -743,10 +756,7 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         self.showProgressBar()  
-
-        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                progressReset = self.mainWindow.progressIndicator.reset)
+        graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
         self.hideProgressBar()  
         if self.readerStopped:
@@ -783,9 +793,7 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
         self.showProgressBar()  
 
-        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                progressReset = self.mainWindow.progressIndicator.reset)
+        graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
         self.hideProgressBar()  
         if self.readerStopped:
@@ -829,10 +837,8 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
             self.showProgressBar()  
 
-            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                            progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                            progressReset = self.mainWindow.progressIndicator.reset,
-                                                            graphClass = probeselector.Graphs.AggregatedGraph)
+            graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
+
             graphs += graphsHelp
             errors += errorsHelp
 
@@ -850,9 +856,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
                                                             parameterNames = parameterNames)
             self.showProgressBar()  
 
-            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                            progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                            progressReset = self.mainWindow.progressIndicator.reset)
+            graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer)
 
             graphs += graphsHelp
             errors += errorsHelp
@@ -912,9 +916,7 @@ class LREFigure(ProbeFigure, LineGraphs):
 
         self.showProgressBar()  
 
-        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                progressReset = self.mainWindow.progressIndicator.reset)
+        graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
         self.hideProgressBar()  
         if self.readerStopped:
@@ -967,9 +969,7 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
 
         self.showProgressBar()  
 
-        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                progressReset = self.mainWindow.progressIndicator.reset)
+        graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
         self.hideProgressBar()  
         if self.readerStopped:
@@ -1006,10 +1006,7 @@ class TableFigure(ProbeFigure, TableGraphs):
 
         self.showProgressBar()  
 
-        graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                progressReset = self.mainWindow.progressIndicator.reset,
-                                                graphClass = probeselector.Graphs.TableGraph)
+        graphs, errors = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.TableGraph)
 
         self.hideProgressBar()  
         if self.readerStopped:
@@ -1114,10 +1111,7 @@ class ParameterFigure(Figure, LineGraphs):
 
             self.showProgressBar()  
  
-            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                      progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                      progressReset = self.mainWindow.progressIndicator.reset,
-                                                      graphClass = probeselector.Graphs.AggregatedGraph)
+            graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
 
             graphs += graphsHelp
             errors += errorsHelp
@@ -1159,10 +1153,8 @@ class ParameterFigure(Figure, LineGraphs):
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
 
                 self.showProgressBar()  
-                graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                                progressReset = self.mainWindow.progressIndicator.reset,
-                                                                graphClass = probeselector.Graphs.AggregatedGraph)
+                graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
+
             else:
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
 
@@ -1170,9 +1162,7 @@ class ParameterFigure(Figure, LineGraphs):
                 #progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
                 self.showProgressBar()  
-                graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
-                                                                progressReset = self.mainWindow.progressIndicator.reset)
+                graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer)
 
             graphs += graphsHelp
             errors += errorsHelp
