@@ -255,37 +255,37 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewLogEval_triggered(self):
-        figureWindow = LogEvalFigure(self.campaigns, self.menuFigure, self.workspace)
+        figureWindow = LogEvalFigure(self.campaigns, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewTimeSeries_triggered(self):
-        figureWindow = TimeSeriesFigure(self.campaigns, self.menuFigure, self.workspace)
+        figureWindow = TimeSeriesFigure(self.campaigns, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
-        figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self.workspace)
+        figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewLRE_triggered(self):
-        figureWindow = LREFigure(self.campaigns, self.menuFigure, self.workspace)
+        figureWindow = LREFigure(self.campaigns, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewBatchMeans_triggered(self):
-        figureWindow = BatchMeansFigure(self.campaigns, self.menuFigure, self.workspace)
+        figureWindow = BatchMeansFigure(self.campaigns, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
     @QtCore.pyqtSignature("")
     def on_actionNewTable_triggered(self):
-        figureWindow = TableFigure(self.campaigns, self.menuFigure, self.workspace)
+        figureWindow = TableFigure(self.campaigns, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -537,10 +537,10 @@ class Export:
 from ui.Windows_Figure_ui import Ui_Windows_Figure
 class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
-    def __init__(self, campaigns, menu, windowTitle, *qwidgetArgs):
+    def __init__(self, campaigns, menu, windowTitle, mainWindow, *qwidgetArgs):
         QtGui.QWidget.__init__(self, *qwidgetArgs)
         self.setupUi(self)
-
+        self.mainWindow = mainWindow
         self.campaigns = campaigns
         self.menu = menu
 
@@ -648,6 +648,19 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.readerStopped = True
         self.campaigns.draw.stopAcquireGraphs()
 
+    def showProgressBar(self):
+        self.mainWindow.statusbar.addWidget(self.mainWindow.cancelButton)
+        self.mainWindow.statusbar.addWidget(self.mainWindow.progressIndicator)
+        self.mainWindow.cancelButton.show()
+        self.mainWindow.progressIndicator.show()
+        self.mainWindow.cancelButton.connect(self.mainWindow.cancelButton,QtCore.SIGNAL("clicked()"),self.on_cancelClicked)
+
+    def hideProgressBar(self):
+        self.mainWindow.statusbar.removeWidget(self.mainWindow.cancelButton)
+        self.mainWindow.statusbar.removeWidget(self.mainWindow.progressIndicator)
+        self.mainWindow.progressIndicator.reset()
+        self.mainWindow.progressIndicator.setValue(0)
+
     def getExport(self):
         print "export"
  
@@ -682,8 +695,8 @@ class TableGraphs:
 
 class ProbeFigure(Figure):
 
-    def __init__(self, campaigns, menu, *qwidgetArgs):
-        Figure.__init__(self, campaigns, menu, *qwidgetArgs)
+    def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
+        Figure.__init__(self, campaigns, menu, mainWindow, *qwidgetArgs)
         self.probeGraphControl = Widgets.ProbeGraphControl(self.graphControl)
         self.graphControlLayout.addWidget(self.probeGraphControl)
 
@@ -704,8 +717,8 @@ class ProbeFigure(Figure):
  
 class LogEvalFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, menu, *qwidgetArgs):
-        ProbeFigure.__init__(self, campaigns, menu, "LogEval Probe Figure", *qwidgetArgs)
+    def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
+        ProbeFigure.__init__(self, campaigns, menu, "LogEval Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "LogEval Probe Figure"
         self.probeGraphControl.aggregateframe.hide()
@@ -729,13 +742,13 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+        self.showProgressBar()  
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                progressReset = progressDialogue.reset)
+                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                progressReset = self.mainWindow.progressIndicator.reset)
 
+        self.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -743,8 +756,8 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
 
 class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, menu, *qwidgetArgs):
-        ProbeFigure.__init__(self, campaigns, menu, "TimeSeries Probe Figure", *qwidgetArgs)
+    def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
+        ProbeFigure.__init__(self, campaigns, menu, "TimeSeries Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "TimeSeries Probe Figure"
         self.probeGraphControl.aggregateframe.hide()
@@ -768,13 +781,13 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+        self.showProgressBar()  
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                progressReset = progressDialogue.reset)
+                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                progressReset = self.mainWindow.progressIndicator.reset)
 
+        self.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -782,8 +795,8 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
 class XDFFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, campaignId, menu, *qwidgetArgs):
-        ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", *qwidgetArgs)
+    def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
+        ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
         self.probeGraphControl.confidenceparameterframe.hide()
@@ -813,16 +826,17 @@ class XDFFigure(ProbeFigure, LineGraphs):
             aggregationParameter = self.probeGraphControl.aggregationParameter()
             parameterNames = list(campaign.getChangingParameterNames() - set([aggregationParameter]))
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.weightedXDF)
-            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+
+            self.showProgressBar()  
 
             graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                            progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                            progressReset = progressDialogue.reset,
+                                                            progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                            progressReset = self.mainWindow.progressIndicator.reset,
                                                             graphClass = probeselector.Graphs.AggregatedGraph)
-
             graphs += graphsHelp
             errors += errorsHelp
+
+            self.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
             return graphs
@@ -834,16 +848,15 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                             parameterNames = parameterNames)
-            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+            self.showProgressBar()  
 
             graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                            progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                            progressReset = progressDialogue.reset)
-
+                                                            progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                            progressReset = self.mainWindow.progressIndicator.reset)
 
             graphs += graphsHelp
             errors += errorsHelp
+            self.hideProgressBar()  
 
         if self.readerStopped:
             self.readerStopped = False
@@ -860,8 +873,8 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
 class LREFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, menu, *qwidgetArgs):
-        ProbeFigure.__init__(self, campaigns, menu, "(D)LRE Probe Figure", *qwidgetArgs)
+    def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
+        ProbeFigure.__init__(self, campaigns, menu, "(D)LRE Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self)
         self.graph.figureConfig.title = "(D)LRE Probe Figure"
         self.probeGraphControl.aggregateframe.hide()
@@ -897,13 +910,13 @@ class LREFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+        self.showProgressBar()  
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                progressReset = progressDialogue.reset)
+                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                progressReset = self.mainWindow.progressIndicator.reset)
 
+        self.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -911,8 +924,8 @@ class LREFigure(ProbeFigure, LineGraphs):
 
 class BatchMeansFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, menu, *qwidgetArgs):
-        ProbeFigure.__init__(self, campaigns, menu, "BatchMeans Probe Figure", *qwidgetArgs)
+    def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
+        ProbeFigure.__init__(self, campaigns, menu, "BatchMeans Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self)
         self.probeGraphControl.aggregateframe.hide()
         
@@ -952,13 +965,13 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+        self.showProgressBar()  
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                progressReset = progressDialogue.reset)
+                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                progressReset = self.mainWindow.progressIndicator.reset)
 
+        self.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -966,8 +979,8 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
 
 class TableFigure(ProbeFigure, TableGraphs):
 
-    def __init__(self, campaigns, menu, *qwidgetArgs):
-        ProbeFigure.__init__(self, campaigns, menu, "Table Probe Figure", *qwidgetArgs)
+    def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
+        ProbeFigure.__init__(self, campaigns, menu, "Table Probe Figure", mainWindow, *qwidgetArgs)
         TableGraphs.__init__(self)
 
     @staticmethod
@@ -991,14 +1004,14 @@ class TableFigure(ProbeFigure, TableGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-        progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+        self.showProgressBar()  
 
         graphs, errors = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                progressReset = progressDialogue.reset,
+                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                progressReset = self.mainWindow.progressIndicator.reset,
                                                 graphClass = probeselector.Graphs.TableGraph)
 
+        self.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -1006,7 +1019,7 @@ class TableFigure(ProbeFigure, TableGraphs):
 
 class ParameterFigure(Figure, LineGraphs):
     def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
-        Figure.__init__(self, campaigns, menu, "Parameter Figure", *qwidgetArgs)
+        Figure.__init__(self, campaigns, menu, "Parameter Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self)
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
@@ -1035,7 +1048,6 @@ class ParameterFigure(Figure, LineGraphs):
         self.yProbeEntriesModel = Models.ProbeEntries(self.campaigns.draw)
         self.yProbeEntriesModel.changeProbes(self.parameterGraphControl.yProbeNames())
         self.parameterGraphControl.setYProbeEntriesModel(self.yProbeEntriesModel)
-        self.mainWindow = mainWindow
 
     def on_figureConfig_scale_changed(self, value):
         self.parameterGraphControl.yProbesControl.confidenceparameterframe.setEnabled(self.graph.figureConfig.scale[2]=='linear')
@@ -1100,8 +1112,6 @@ class ParameterFigure(Figure, LineGraphs):
             showConfidenceLevel = self.parameterGraphControl.isShowConfidenceLevels()
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
 
-#            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-#            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
             self.showProgressBar()  
  
             graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
@@ -1148,8 +1158,6 @@ class ParameterFigure(Figure, LineGraphs):
                 confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
 
-                #progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-                #progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
                 self.showProgressBar()  
                 graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                                 progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
@@ -1174,18 +1182,6 @@ class ParameterFigure(Figure, LineGraphs):
                 self.readerStopped = False
 
         return graphs
-    def showProgressBar(self):
-        self.mainWindow.statusbar.addWidget(self.mainWindow.cancelButton)
-        self.mainWindow.statusbar.addWidget(self.mainWindow.progressIndicator)
-        self.mainWindow.cancelButton.show()
-        self.mainWindow.progressIndicator.show()
-        self.mainWindow.cancelButton.connect(self.mainWindow.cancelButton,QtCore.SIGNAL("clicked()"),self.on_cancelClicked)
-
-    def hideProgressBar(self):
-        self.mainWindow.statusbar.removeWidget(self.mainWindow.cancelButton)
-        self.mainWindow.statusbar.removeWidget(self.mainWindow.progressIndicator)
-        self.mainWindow.progressIndicator.reset()
-        self.mainWindow.progressIndicator.setValue(0)
 
     def getExport(self):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
