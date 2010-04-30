@@ -291,7 +291,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
-        figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self.workspace)
+        figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -1005,7 +1005,7 @@ class TableFigure(ProbeFigure, TableGraphs):
         return graphs
 
 class ParameterFigure(Figure, LineGraphs):
-    def __init__(self, campaigns, campaignId, menu, *qwidgetArgs):
+    def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", *qwidgetArgs)
         LineGraphs.__init__(self)
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
@@ -1035,6 +1035,7 @@ class ParameterFigure(Figure, LineGraphs):
         self.yProbeEntriesModel = Models.ProbeEntries(self.campaigns.draw)
         self.yProbeEntriesModel.changeProbes(self.parameterGraphControl.yProbeNames())
         self.parameterGraphControl.setYProbeEntriesModel(self.yProbeEntriesModel)
+        self.mainWindow = mainWindow
 
     def on_figureConfig_scale_changed(self, value):
         self.parameterGraphControl.yProbesControl.confidenceparameterframe.setEnabled(self.graph.figureConfig.scale[2]=='linear')
@@ -1099,17 +1100,19 @@ class ParameterFigure(Figure, LineGraphs):
             showConfidenceLevel = self.parameterGraphControl.isShowConfidenceLevels()
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
 
-            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
-
+#            progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+#            progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+            self.showProgressBar()  
+ 
             graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                      progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                      progressReset = progressDialogue.reset,
+                                                      progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                      progressReset = self.mainWindow.progressIndicator.reset,
                                                       graphClass = probeselector.Graphs.AggregatedGraph)
 
             graphs += graphsHelp
             errors += errorsHelp
-
+            self.hideProgressBar()  
+ 
         if self.readerStopped:
             self.readerStopped = False
             return graphs
@@ -1145,30 +1148,44 @@ class ParameterFigure(Figure, LineGraphs):
                 confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
 
-                progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-                progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
-
+                #progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+                #progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+                self.showProgressBar()  
                 graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                                progressReset = progressDialogue.reset,
+                                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                                progressReset = self.mainWindow.progressIndicator.reset,
                                                                 graphClass = probeselector.Graphs.AggregatedGraph)
             else:
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
 
-                progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-                progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+                #progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
+                #progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
+                self.showProgressBar()  
                 graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
-                                                                progressNotify = progressDialogue.setCurrentAndMaximum,
-                                                                progressReset = progressDialogue.reset)
+                                                                progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
+                                                                progressReset = self.mainWindow.progressIndicator.reset)
 
             graphs += graphsHelp
             errors += errorsHelp
 
+            self.hideProgressBar() 
             if self.readerStopped:
                 self.readerStopped = False
 
         return graphs
+    def showProgressBar(self):
+        self.mainWindow.statusbar.addWidget(self.mainWindow.cancelButton)
+        self.mainWindow.statusbar.addWidget(self.mainWindow.progressIndicator)
+        self.mainWindow.cancelButton.show()
+        self.mainWindow.progressIndicator.show()
+        self.mainWindow.cancelButton.connect(self.mainWindow.cancelButton,QtCore.SIGNAL("clicked()"),self.on_cancelClicked)
+
+    def hideProgressBar(self):
+        self.mainWindow.statusbar.removeWidget(self.mainWindow.cancelButton)
+        self.mainWindow.statusbar.removeWidget(self.mainWindow.progressIndicator)
+        self.mainWindow.progressIndicator.reset()
+        self.mainWindow.progressIndicator.setValue(0)
 
     def getExport(self):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
