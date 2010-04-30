@@ -158,21 +158,13 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             windowTitleElements = self.windowTitle().split(' ')
             self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
             #progressDialog = Dialogues.ProgressStatus() #Dialogues.Progress("Reading data", 0, self.workspace)
-            self.statusbar.addWidget(self.cancelButton)
-            self.statusbar.addWidget(self.progressIndicator)
-            self.cancelButton.show()
-            self.progressIndicator.show()
-            self.cancelButton.connect(self.cancelButton,QtCore.SIGNAL("clicked()"),self.on_cancelClicked)
-            #progressDialog.connect(progressDialog, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
+            self.showProgressBar(self.on_cancelClicked)
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
                                                         self.progressIndicator.setCurrentAndMaximum,
                                                         True)
             campaign = Representations.Campaign(*self.reader.read())
-            self.statusbar.removeWidget(self.cancelButton)
-            self.statusbar.removeWidget(self.progressIndicator)
-            self.progressIndicator.reset()
-            self.progressIndicator.setValue(0)
+            self.hideProgressBar()
             if self.readerStopped:
                 self.readerStopped = False
                 return
@@ -305,6 +297,20 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 				"<h4>Wrowser - The WNS Result Browser</h4>"
 				"The Wrowser is a browsing and viewing utility "
 				"for results of the WNS simulator.")
+
+    def showProgressBar(self, callBack):
+        self.statusbar.addWidget(self.cancelButton)
+        self.statusbar.addWidget(self.progressIndicator)
+        self.cancelButton.show()
+        self.progressIndicator.show()
+        self.cancelButton.connect(self.cancelButton,QtCore.SIGNAL("clicked()"), callBack)
+
+    def hideProgressBar(self):
+        self.statusbar.removeWidget(self.cancelButton)
+        self.statusbar.removeWidget(self.progressIndicator)
+        self.progressIndicator.reset()
+        self.progressIndicator.setValue(0)
+
 
 class SimulationParameters(QtGui.QDockWidget):
 
@@ -647,13 +653,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.readerStopped = True
         self.campaigns.draw.stopAcquireGraphs()
 
-    def showProgressBar(self):
-        self.mainWindow.statusbar.addWidget(self.mainWindow.cancelButton)
-        self.mainWindow.statusbar.addWidget(self.mainWindow.progressIndicator)
-        self.mainWindow.cancelButton.show()
-        self.mainWindow.progressIndicator.show()
-        self.mainWindow.cancelButton.connect(self.mainWindow.cancelButton,QtCore.SIGNAL("clicked()"),self.on_cancelClicked)
-
     def acquireGraphs(self, scenarioDataAcquirer, graphClass = None): 
         campaign = self.campaigns.draw
         if graphClass is None:
@@ -666,13 +665,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
                                                             progressReset = self.mainWindow.progressIndicator.reset,
                                                             graphClass = probeselector.Graphs.AggregatedGraph)
         return graphsHelp, errorsHelp
-
-
-    def hideProgressBar(self):
-        self.mainWindow.statusbar.removeWidget(self.mainWindow.cancelButton)
-        self.mainWindow.statusbar.removeWidget(self.mainWindow.progressIndicator)
-        self.mainWindow.progressIndicator.reset()
-        self.mainWindow.progressIndicator.setValue(0)
 
     def getExport(self):
         print "export"
@@ -755,10 +747,10 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        self.showProgressBar()  
+        self.mainWindow.showProgressBar(self.on_cancelClicked)  
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
-        self.hideProgressBar()  
+        self.mainWindow.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -791,11 +783,11 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        self.showProgressBar()  
+        self.mainWindow.showProgressBar(self.on_cancelClicked)  
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
-        self.hideProgressBar()  
+        self.mainWindow.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -835,14 +827,14 @@ class XDFFigure(ProbeFigure, LineGraphs):
             parameterNames = list(campaign.getChangingParameterNames() - set([aggregationParameter]))
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.weightedXDF)
 
-            self.showProgressBar()  
+            self.mainWindow.showProgressBar(self.on_cancelClicked)  
 
             graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
 
             graphs += graphsHelp
             errors += errorsHelp
 
-            self.hideProgressBar()  
+            self.mainWindow.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
             return graphs
@@ -854,13 +846,13 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                             parameterNames = parameterNames)
-            self.showProgressBar()  
+            self.mainWindow.showProgressBar(self.on_cancelClicked)  
 
             graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer)
 
             graphs += graphsHelp
             errors += errorsHelp
-            self.hideProgressBar()  
+            self.mainWindow.hideProgressBar()  
 
         if self.readerStopped:
             self.readerStopped = False
@@ -914,11 +906,11 @@ class LREFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        self.showProgressBar()  
+        self.mainWindow.showProgressBar(self.on_cancelClicked)  
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
-        self.hideProgressBar()  
+        self.mainWindow.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -967,11 +959,11 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        self.showProgressBar()  
+        self.mainWindow.showProgressBar(self.on_cancelClicked)  
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
 
-        self.hideProgressBar()  
+        self.mainWindow.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -1004,11 +996,11 @@ class TableFigure(ProbeFigure, TableGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        self.showProgressBar()  
+        self.mainWindow.showProgressBar(self.on_cancelClicked)  
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.TableGraph)
 
-        self.hideProgressBar()  
+        self.mainWindow.hideProgressBar()  
         if self.readerStopped:
             self.readerStopped = False
 
@@ -1109,13 +1101,13 @@ class ParameterFigure(Figure, LineGraphs):
             showConfidenceLevel = self.parameterGraphControl.isShowConfidenceLevels()
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
 
-            self.showProgressBar()  
+            self.mainWindow.showProgressBar(self.on_cancelClicked)  
  
             graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
 
             graphs += graphsHelp
             errors += errorsHelp
-            self.hideProgressBar()  
+            self.mainWindow.hideProgressBar()  
  
         if self.readerStopped:
             self.readerStopped = False
@@ -1152,7 +1144,7 @@ class ParameterFigure(Figure, LineGraphs):
                 confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
 
-                self.showProgressBar()  
+                self.mainWindow.showProgressBar(self.on_cancelClicked)  
                 graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
 
             else:
@@ -1161,13 +1153,13 @@ class ParameterFigure(Figure, LineGraphs):
                 #progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
                 #progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
-                self.showProgressBar()  
+                self.mainWindow.showProgressBar(self.on_cancelClicked)  
                 graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer)
 
             graphs += graphsHelp
             errors += errorsHelp
 
-            self.hideProgressBar() 
+            self.mainWindow.hideProgressBar() 
             if self.readerStopped:
                 self.readerStopped = False
 
