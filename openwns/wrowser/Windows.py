@@ -67,14 +67,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                      self.workspace, QtCore.SLOT("setActiveWindow(QWidget *)"))
 
         self.cancelButton = QtGui.QPushButton("Cancel")
-        progressIndicator = QtGui.QProgressBar()
-        progressIndicator.setMaximum(100)
-        progressIndicator.setValue(33)
-        self.progressIndicator = Dialogues.ProgressStatus()
-        #self.statusbar.showMessage("Halllllllooooooooooooo")
-        #self.statusbar.addWidget(self.cancelButton)
-        #self.statusbar.addWidget(progressIndicator)
-        # currently disabled
+        self.progressText = QtGui.QLabel("")
+        self.progressIndicator = Dialogues.ProgressStatus(self.progressText)
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
@@ -301,15 +295,19 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     def showProgressBar(self, callBack):
         self.statusbar.addWidget(self.cancelButton)
         self.statusbar.addWidget(self.progressIndicator)
+        self.statusbar.addWidget(self.progressText)
         self.cancelButton.show()
         self.progressIndicator.show()
+        self.progressText.show()
         self.cancelButton.connect(self.cancelButton,QtCore.SIGNAL("clicked()"), callBack)
 
     def hideProgressBar(self):
         self.statusbar.removeWidget(self.cancelButton)
         self.statusbar.removeWidget(self.progressIndicator)
+        self.statusbar.removeWidget(self.progressText)
         self.progressIndicator.reset()
         self.progressIndicator.setValue(0)
+        self.progressText.clear()
 
 
 class SimulationParameters(QtGui.QDockWidget):
