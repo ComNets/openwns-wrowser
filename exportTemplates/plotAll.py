@@ -1,5 +1,5 @@
 import imp
-import wrowser.FigurePlotter
+import openwns.wrowser.FigurePlotter
 import os
 
 for fileName in os.listdir('.'):
