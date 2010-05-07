@@ -115,7 +115,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
 
             self.menuSetAllOpen(False)
-            self.actionView_Scenario.setEnabled(False)
             self.actionCloseDataSource.setEnabled(True)
 
     def updateScenarioView(self, fileToPlot, fillValue, includeContour):
@@ -172,6 +171,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.actionOpenCampaignDatabase.setEnabled(isEnabled)
             self.actionOpenDSV.setEnabled(isEnabled)
             self.actionOpenDirectory.setEnabled(isEnabled)
+            self.actionView_Scenario.setEnabled(isEnabled)
  
     def on_cancelClicked(self):
         self.readerStopped = True
@@ -223,7 +223,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.menuSetAllOpen(True)
         self.actionCloseDataSource.setEnabled(False)
         self.actionNewParameter.setEnabled(True)
-        self.actionView_Scenario.setEnabled(True)
         self.menuNew.setEnabled(False)
 
     @QtCore.pyqtSignature("")
@@ -565,6 +564,8 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
     def setInterfaceEnabled(self,isEnabled):
         self.setEnabled(isEnabled)
         self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        self.mainWindow.actionCloseDataSource.setEnabled(isEnabled)
+        self.mainWindow.actionView_Scenario.setEnabled(isEnabled)
         #self.draw.setEnabled(isEnabled)
         #self.printit.setEnabled(isEnabled)
         #self.export.setEnabled(isEnabled)
