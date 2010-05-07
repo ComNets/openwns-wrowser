@@ -173,18 +173,18 @@ class ProgressStatus(QtGui.QProgressBar):
 
     def setCurrentAndMaximum(self, current, maximum, additionalText = ""):
         import Time
-
+        
         self.setMaximum(maximum)
         self.setValue(current)
         labelText = self.labelText
         if len(additionalText) > 0:
-            labelText += "\n" + additionalText
+            additionalText = additionalText.replace('\n',' ')
+            labelText += " " + additionalText
         if maximum > 0 and float(current)/maximum >= 0.01:
             elapsed = datetime.datetime.now() - self.startTime
             total = elapsed * maximum / current
             remaining = total - elapsed
             labelText += " approx. " + Time.Delta(remaining).asString() + " left"
-        #self.setLabelText(labelText)
         if QtGui.QApplication.hasPendingEvents():
             QtGui.QApplication.instance().syncX()
             QtGui.QApplication.instance().processEvents()
@@ -194,7 +194,6 @@ class ProgressStatus(QtGui.QProgressBar):
 class Progress(QtGui.QProgressDialog):
     def __init__(self, labelText, minShow, *args):
         QtGui.QProgressDialog.__init__(self, *args)
-#        self.setCancelButton(None)
         self.setCancelButtonText("Cancel")
         self.labelText = labelText
         self.setLabelText(labelText)

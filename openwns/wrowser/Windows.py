@@ -114,9 +114,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
 
-            self.actionOpenCampaignDatabase.setEnabled(False)
-            self.actionOpenDSV.setEnabled(False)
-            self.actionOpenDirectory.setEnabled(False)
+            self.menuSetAllOpen(False)
             self.actionView_Scenario.setEnabled(False)
             self.actionCloseDataSource.setEnabled(True)
 
@@ -151,8 +149,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
             windowTitleElements = self.windowTitle().split(' ')
             self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
-            #progressDialog = Dialogues.ProgressStatus() #Dialogues.Progress("Reading data", 0, self.workspace)
             self.showProgressBar(self.on_cancelClicked)
+            self.menuSetAllOpen(False)
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
                                                         self.progressIndicator.setCurrentAndMaximum,
@@ -161,17 +159,20 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.hideProgressBar()
             if self.readerStopped:
                 self.readerStopped = False
+                self.menuSetAllOpen(True)
                 return
             self.campaigns.original = Interface.Facade(campaign)
 
             self.simulationParameters = SimulationParameters(self.campaigns, self)
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
             self.menuNew.setEnabled(True)
-            self.actionOpenCampaignDatabase.setEnabled(False)
-            self.actionOpenDSV.setEnabled(False)
-            self.actionOpenDirectory.setEnabled(False)
             self.actionCloseDataSource.setEnabled(True)
 
+    def menuSetAllOpen(self,isEnabled):
+            self.actionOpenCampaignDatabase.setEnabled(isEnabled)
+            self.actionOpenDSV.setEnabled(isEnabled)
+            self.actionOpenDirectory.setEnabled(isEnabled)
+ 
     def on_cancelClicked(self):
         self.readerStopped = True
         self.reader.stop()
@@ -197,9 +198,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 self.simulationParameters = SimulationParameters(self.campaigns, self)
                 self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
                 self.menuNew.setEnabled(True)
-                self.actionOpenCampaignDatabase.setEnabled(False)
-                self.actionOpenDSV.setEnabled(False)
-                self.actionOpenDirectory.setEnabled(False)
+                self.menuSetAllOpen(False)
                 self.actionCloseDataSource.setEnabled(True)
 
 
@@ -207,9 +206,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     def on_actionOpenDirectory_triggered(self):
         self.directoryNavigation = DirectoryNavigation(self.campaigns, os.getcwd(), self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
-        self.actionOpenCampaignDatabase.setEnabled(False)
-        self.actionOpenDSV.setEnabled(False)
-        self.actionOpenDirectory.setEnabled(False)
+        self.menuSetAllOpen(False)
         self.actionCloseDataSource.setEnabled(True)
 
     QtCore.pyqtSignature("")
@@ -223,9 +220,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         for window in self.workspace.windowList():
             window.close()
         self.campaigns = Observable()
-        self.actionOpenCampaignDatabase.setEnabled(True)
-        self.actionOpenDSV.setEnabled(True)
-        self.actionOpenDirectory.setEnabled(True)
+        self.menuSetAllOpen(True)
         self.actionCloseDataSource.setEnabled(False)
         self.actionNewParameter.setEnabled(True)
         self.actionView_Scenario.setEnabled(True)
@@ -566,6 +561,13 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.printer.setPageSize(QtGui.QPrinter.Letter)
         self.printer.setPrintProgram("lpr")            
         self.readerStopped = False
+
+    def setInterfaceEnabled(self,isEnabled):
+        self.setEnabled(isEnabled)
+        self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        #self.draw.setEnabled(isEnabled)
+        #self.printit.setEnabled(isEnabled)
+        #self.export.setEnabled(isEnabled)
  
     @staticmethod
     def cleanLayout(layout):
@@ -745,8 +747,10 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
         scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                         parameterNames = parameterNames)
 
-        self.mainWindow.showProgressBar(self.on_cancelClicked)  
+        self.mainWindow.showProgressBar(self.on_cancelClicked) 
+        self.setInterfaceEnabled(False) 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
+        self.setInterfaceEnabled(True) 
 
         self.mainWindow.hideProgressBar()  
         if self.readerStopped:
@@ -782,8 +786,10 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         self.mainWindow.showProgressBar(self.on_cancelClicked)  
+        self.setInterfaceEnabled(False) 
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
+        self.setInterfaceEnabled(True) 
 
         self.mainWindow.hideProgressBar()  
         if self.readerStopped:
@@ -826,8 +832,10 @@ class XDFFigure(ProbeFigure, LineGraphs):
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.weightedXDF)
 
             self.mainWindow.showProgressBar(self.on_cancelClicked)  
+            self.setInterfaceEnabled(False) 
 
             graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
+            self.setInterfaceEnabled(True) 
 
             graphs += graphsHelp
             errors += errorsHelp
@@ -845,8 +853,10 @@ class XDFFigure(ProbeFigure, LineGraphs):
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers = probeDataAcquirers,
                                                             parameterNames = parameterNames)
             self.mainWindow.showProgressBar(self.on_cancelClicked)  
+            self.setInterfaceEnabled(False) 
 
             graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer)
+            self.setInterfaceEnabled(True) 
 
             graphs += graphsHelp
             errors += errorsHelp
@@ -905,8 +915,10 @@ class LREFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         self.mainWindow.showProgressBar(self.on_cancelClicked)  
+        self.setInterfaceEnabled(False) 
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
+        self.setInterfaceEnabled(True) 
 
         self.mainWindow.hideProgressBar()  
         if self.readerStopped:
@@ -958,8 +970,10 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
                                                         parameterNames = parameterNames)
 
         self.mainWindow.showProgressBar(self.on_cancelClicked)  
+        self.setInterfaceEnabled(False) 
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer)
+        self.setInterfaceEnabled(True) 
 
         self.mainWindow.hideProgressBar()  
         if self.readerStopped:
@@ -995,8 +1009,10 @@ class TableFigure(ProbeFigure, TableGraphs):
                                                         parameterNames = parameterNames)
 
         self.mainWindow.showProgressBar(self.on_cancelClicked)  
+        self.setInterfaceEnabled(False) 
 
         graphs, errors = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.TableGraph)
+        self.setInterfaceEnabled(True) 
 
         self.mainWindow.hideProgressBar()  
         if self.readerStopped:
@@ -1100,8 +1116,10 @@ class ParameterFigure(Figure, LineGraphs):
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
 
             self.mainWindow.showProgressBar(self.on_cancelClicked)  
+            self.setInterfaceEnabled(False) 
  
             graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
+            self.setInterfaceEnabled(True) 
 
             graphs += graphsHelp
             errors += errorsHelp
@@ -1143,6 +1161,7 @@ class ParameterFigure(Figure, LineGraphs):
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.WeightedMeanWithConfidenceInterval(confidenceLevel))
 
                 self.mainWindow.showProgressBar(self.on_cancelClicked)  
+                self.setInterfaceEnabled(False) 
                 graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer, graphClass = probeselector.Graphs.AggregatedGraph)
 
             else:
@@ -1152,10 +1171,12 @@ class ParameterFigure(Figure, LineGraphs):
                 #progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
                 self.mainWindow.showProgressBar(self.on_cancelClicked)  
+                self.setInterfaceEnabled(False) 
                 graphsHelp, errorsHelp = self.acquireGraphs(scenarioDataAcquirer)
 
             graphs += graphsHelp
             errors += errorsHelp
+            self.setInterfaceEnabled(True) 
 
             self.mainWindow.hideProgressBar() 
             if self.readerStopped:
