@@ -20,5 +20,7 @@ setup(name='openWNS-Wrowser',
                 'openwns.wrowser.probeselector.dataacquisition',
                 'openwns.wrowser.scenario'],
       scripts=['bin/wrowser'],
+      data_files=[("exportTemplates",["readDBandPlot", "plotAll.py"])]
      )
 
+#package_data = {"openwns.wrowser.probeselector" : [      
