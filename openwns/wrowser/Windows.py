@@ -566,9 +566,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.mainWindow.simulationParameters.setEnabled(isEnabled)
         self.mainWindow.actionCloseDataSource.setEnabled(isEnabled)
         self.mainWindow.actionView_Scenario.setEnabled(isEnabled)
-        #self.draw.setEnabled(isEnabled)
-        #self.printit.setEnabled(isEnabled)
-        #self.export.setEnabled(isEnabled)
  
     @staticmethod
     def cleanLayout(layout):
@@ -672,12 +669,12 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
  
 class LineGraphs(Observing):
 
-    def __init__(self):
+    def __init__(self, mainWindow):
         self.graphDisplaySplitter = QtGui.QSplitter(self.graphDisplay)
         self.graphDisplaySplitter.setOrientation(QtCore.Qt.Vertical)
         self.graphDisplaySplitter.setObjectName("graphDisplaySplitter")
 
-        self.graph = Widgets.LineGraph(self.graphDisplaySplitter)
+        self.graph = Widgets.LineGraph(mainWindow, self.graphDisplaySplitter)
         self.graph.setObjectName("graph")
         self.observe(self.on_figureConfig_title_changed, self.graph.figureConfig, "title")
 
@@ -725,7 +722,7 @@ class LogEvalFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "LogEval Probe Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self)
+        LineGraphs.__init__(self, mainWindow)
         self.graph.figureConfig.title = "LogEval Probe Figure"
         self.probeGraphControl.aggregateframe.hide()
 
@@ -763,7 +760,7 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "TimeSeries Probe Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self)
+        LineGraphs.__init__(self, mainWindow)
         self.graph.figureConfig.title = "TimeSeries Probe Figure"
         self.probeGraphControl.aggregateframe.hide()
 
@@ -802,7 +799,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self)
+        LineGraphs.__init__(self, mainWindow)
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
         self.probeGraphControl.confidenceparameterframe.hide()
         self.campaignId = campaignId
@@ -880,7 +877,7 @@ class LREFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "(D)LRE Probe Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self)
+        LineGraphs.__init__(self, mainWindow)
         self.graph.figureConfig.title = "(D)LRE Probe Figure"
         self.probeGraphControl.aggregateframe.hide()
 
@@ -931,7 +928,7 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
 
     def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "BatchMeans Probe Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self)
+        LineGraphs.__init__(self, mainWindow)
         self.probeGraphControl.aggregateframe.hide()
         
         self.graph.figureConfig.title = "BatchMeans Probe Figure"
@@ -1024,7 +1021,7 @@ class TableFigure(ProbeFigure, TableGraphs):
 class ParameterFigure(Figure, LineGraphs):
     def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self)
+        LineGraphs.__init__(self, mainWindow)
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
         self.campaignId = campaignId

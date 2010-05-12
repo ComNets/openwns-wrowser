@@ -184,7 +184,10 @@ class ProgressStatus(QtGui.QProgressBar):
             elapsed = datetime.datetime.now() - self.startTime
             total = elapsed * maximum / current
             remaining = total - elapsed
-            labelText += " approx. " + Time.Delta(remaining).asString() + " left"
+            if len(labelText) > self.LabelLength
+                labelText = ".. approx. " + Time.Delta(remaining).asString() + " left"
+            else:
+                labelText += " approx. " + Time.Delta(remaining).asString() + " left"
         if QtGui.QApplication.hasPendingEvents():
             QtGui.QApplication.instance().syncX()
             QtGui.QApplication.instance().processEvents()
