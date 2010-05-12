@@ -204,13 +204,6 @@ class Sim:
             except OSError, e:
                 print >>sys.stdout, "openwns is now shutting down ... (Exception caught: ", e.strerror, ")"
 
-        for line in process.stdout:
-            sys.stdout.write(line)
-            sys.stdout.flush()
-        for line in process.stderr:
-            sys.stderr.write(line)
-            sys.stderr.flush()
-
         statusCode = process.returncode
         print >>sys.stdout, "Process exited with Status Code %d" % statusCode
 
