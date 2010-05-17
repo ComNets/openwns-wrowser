@@ -26,7 +26,7 @@
 #
 ###############################################################################
 
-from wrowser.simdb.Parameters import Parameters, Bool, Int, Float, String
+from openwns.wrowser.simdb.Parameters import Parameters, Bool, Int, Float, String
 
 ###################################
 # Simple parameter generation HowTo

@@ -9,6 +9,6 @@ for fileName in os.listdir('.'):
             module = imp.load_module('PlotParameters', file(fileName), '.', ('.py', 'r', imp.PY_SOURCE))
             #module.PlotParameters.color = False #parameter is modified for all plots
             print "going to plot the figure"
-            wrowser.FigurePlotter.loadCampaignAndPlotGraphs(module.PlotParameters)
+            openwns.wrowser.FigurePlotter.loadCampaignAndPlotGraphs(module.PlotParameters)
         except ImportError :
             print "this file does not contain the class 'PlotParameters'"

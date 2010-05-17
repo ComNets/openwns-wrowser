@@ -9,5 +9,5 @@
   outputFormats = [ 'png', 'pdf']
 
 import openwns.wrowser.FigurePlotter
-if __name__ == '__main__': wrowser.FigurePlotter.loadCampaignAndPlotGraphs(PlotParameters)
+if __name__ == '__main__': openwns.wrowser.FigurePlotter.loadCampaignAndPlotGraphs(PlotParameters)
 
