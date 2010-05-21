@@ -652,7 +652,9 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.campaigns.draw.stopAcquireGraphs()
 
     def acquireGraphs(self, scenarioDataAcquirer, graphClass = None): 
+        print "Figure acquireGraphs"
         campaign = self.campaigns.draw
+        campaign.setMainWindow(self.mainWindow)
         if graphClass is None:
            graphsHelp, errorsHelp = campaign.acquireGraphs(acquireScenarioData = scenarioDataAcquirer,
                                                             progressNotify = self.mainWindow.progressIndicator.setCurrentAndMaximum,
@@ -711,6 +713,7 @@ class ProbeFigure(Figure):
 
     def on_drawCampaign_changed(self, campaign):
         print "ProbeFigure drawCampaign changed"
+        selectedProbes = self.probeGraphControl.probeNames()
         selectionModel = self.probeGraphControl.probesView().selectionModel()
         self.probeGraphControl.probesView().clearSelection()
         self.probesModel.setCampaign(self.campaigns.draw)
@@ -1083,6 +1086,7 @@ class ParameterFigure(Figure, LineGraphs):
         self.parameterGraphControl.xProbeEntry.setCurrentIndex(selectedXProbeEntry)
 
     def getGraphs(self):
+        print "parameter plot - getGraphs"
         import probeselector.Graphs
 
         dataacquisition = probeselector.dataacquisition

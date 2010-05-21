@@ -378,6 +378,7 @@ class LineGraph(Graph, Observing):
 
     def setGraphs(self, graphs):
         self.figureConfig.graphs = graphs
+        print "graphs set"
 
     def setGrid(self, xmajor, xminor, ymajor, yminor):
         self.canvas.axes.get_xaxis().grid(xmajor, which="major")

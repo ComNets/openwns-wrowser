@@ -164,7 +164,7 @@ class ProgressStatus(QtGui.QProgressBar):
         QtGui.QProgressBar.__init__(self, *args)
         self.progressLabel = progressLabel
         self.labelText=""
-        self.labelLength=180
+        self.labelLength=80
         self.reset()
 
     def reset(self):
