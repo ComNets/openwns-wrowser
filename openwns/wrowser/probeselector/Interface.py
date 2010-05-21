@@ -304,7 +304,8 @@ class Facade:
         if callable(progressReset):
             progressReset()
         for index, scenario in enumerate(self.campaign.scenarios):
-            if self.stopped: 
+            if self.stopped:
+              print "interface - stop line 388" 
               self.stopped=False
               return [],errors
             if callable(progressNotify):

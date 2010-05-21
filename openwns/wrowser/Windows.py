@@ -1128,10 +1128,12 @@ class ParameterFigure(Figure, LineGraphs):
             self.mainWindow.hideProgressBar()  
  
         if self.readerStopped:
+            print "readerStoppedi line 1131"
             self.readerStopped = False
             return graphs
  
         if self.parameterGraphControl.isPlotNotAggregatedGraphs() or not self.parameterGraphControl.isAggregateParameter():
+            print "no aggregation"
             if self.parameterGraphControl.isXUseProbeEntry():
                 xProbeName = self.parameterGraphControl.xProbeNames()[0]
                 xProbeEntry = self.parameterGraphControl.xProbeEntryName()
