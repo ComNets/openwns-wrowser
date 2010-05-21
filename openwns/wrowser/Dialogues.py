@@ -164,6 +164,7 @@ class ProgressStatus(QtGui.QProgressBar):
         QtGui.QProgressBar.__init__(self, *args)
         self.progressLabel = progressLabel
         self.labelText=""
+        self.labelLength=180
         self.reset()
 
     def reset(self):
@@ -184,7 +185,7 @@ class ProgressStatus(QtGui.QProgressBar):
             elapsed = datetime.datetime.now() - self.startTime
             total = elapsed * maximum / current
             remaining = total - elapsed
-            if len(labelText) > self.LabelLength
+            if len(labelText) > self.labelLength:
                 labelText = ".. approx. " + Time.Delta(remaining).asString() + " left"
             else:
                 labelText += " approx. " + Time.Delta(remaining).asString() + " left"
