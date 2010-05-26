@@ -290,6 +290,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.statusbar.addWidget(self.cancelButton)
         self.statusbar.addWidget(self.progressIndicator)
         self.statusbar.addWidget(self.progressText)
+        self.cancelCallback = callBack
         self.cancelButton.show()
         self.progressIndicator.show()
         self.progressText.show()
@@ -302,6 +303,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.progressIndicator.reset()
         self.progressIndicator.setValue(0)
         self.progressText.clear()
+        self.cancelButton.disconnect(self.cancelButton,QtCore.SIGNAL("clicked()"), self.cancelCallback)
 
 
 class SimulationParameters(QtGui.QDockWidget):
@@ -652,7 +654,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         self.campaigns.draw.stopAcquireGraphs()
 
     def acquireGraphs(self, scenarioDataAcquirer, graphClass = None): 
-        print "Figure acquireGraphs"
         campaign = self.campaigns.draw
         campaign.setMainWindow(self.mainWindow)
         if graphClass is None:
@@ -712,7 +713,6 @@ class ProbeFigure(Figure):
         self.probeGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
 
     def on_drawCampaign_changed(self, campaign):
-        print "ProbeFigure drawCampaign changed"
         selectedProbes = self.probeGraphControl.probeNames()
         selectionModel = self.probeGraphControl.probesView().selectionModel()
         self.probeGraphControl.probesView().clearSelection()
@@ -1086,7 +1086,6 @@ class ParameterFigure(Figure, LineGraphs):
         self.parameterGraphControl.xProbeEntry.setCurrentIndex(selectedXProbeEntry)
 
     def getGraphs(self):
-        print "parameter plot - getGraphs"
         import probeselector.Graphs
 
         dataacquisition = probeselector.dataacquisition
@@ -1128,12 +1127,10 @@ class ParameterFigure(Figure, LineGraphs):
             self.mainWindow.hideProgressBar()  
  
         if self.readerStopped:
-            print "readerStoppedi line 1131"
             self.readerStopped = False
             return graphs
  
         if self.parameterGraphControl.isPlotNotAggregatedGraphs() or not self.parameterGraphControl.isAggregateParameter():
-            print "no aggregation"
             if self.parameterGraphControl.isXUseProbeEntry():
                 xProbeName = self.parameterGraphControl.xProbeNames()[0]
                 xProbeEntry = self.parameterGraphControl.xProbeEntryName()
@@ -1170,9 +1167,6 @@ class ParameterFigure(Figure, LineGraphs):
 
             else:
                 scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames)
-
-                #progressDialogue = Dialogues.Progress("Fetching graphs", 0, self.parentWidget())
-                #progressDialogue.connect(progressDialogue, QtCore.SIGNAL("canceled()"),self.on_cancelClicked)
 
                 self.mainWindow.showProgressBar(self.on_cancelClicked)  
                 self.setInterfaceEnabled(False) 
