@@ -183,8 +183,8 @@ class Sim:
 
         command = [os.path.join('.', 'openwns') + ' -y \'WNS.masterLogger.enabled=False; WNS.outputDir=\"%s\"\'' % self.outputPath]
         process = subprocess.Popen(args = command,
-                                   stdout = subprocess.PIPE,
-                                   stderr = subprocess.PIPE,
+                                   stdout = sys.stdout,
+                                   stderr = sys.stderr,
                                    close_fds = True,
                                    shell = True,
                                    cwd = self.simPath)
