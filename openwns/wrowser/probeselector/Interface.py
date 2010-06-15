@@ -295,7 +295,6 @@ class Facade:
         return filterExpression
 
     def acquireGraphs(self, acquireScenarioData, progressNotify = None, progressReset = None, graphClass = Graphs.Graph):
-        print "Interface - acquireGraphs"
         if len(self.campaign.scenarios) == 0:
             raise Errors.NoScenariosFound()
         graphs = Graphs.GraphInstantiator(graphClass)
@@ -305,7 +304,6 @@ class Facade:
             progressReset()
         for index, scenario in enumerate(self.campaign.scenarios):
             if self.stopped:
-              print "interface - stop line 388" 
               self.stopped=False
               return [],errors
             if callable(progressNotify):

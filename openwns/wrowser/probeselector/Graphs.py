@@ -84,8 +84,6 @@ class AggregatedGraph(Graph):
         numberOfPoints = map(lambda x: len(x), self.pointsDict.values())
         if min(numberOfPoints) != max(numberOfPoints):
             raise Errors.Aggregation()
-            print "Fehler bei der Aggregierung"
-        print "probeSelector-Graphs-AggregatedGraph-process"
         self.points = self.aggregationFunction(self)
         Graph.process(self)
 

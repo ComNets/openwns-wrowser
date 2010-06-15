@@ -50,10 +50,9 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, *args):
+    def __init__(self, currentDir, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
-
         self.campaigns = Observable()
         self.reader = None
         self.readerStopped = False
