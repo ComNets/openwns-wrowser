@@ -50,14 +50,14 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, currentDir, *args):
+    def __init__(self, calledFromDir, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
         self.reader = None
         self.readerStopped = False
         self.campaignId = None
-
+        self.calledFromDir = calledFromDir
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
 
@@ -203,7 +203,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionOpenDirectory_triggered(self):
-        self.directoryNavigation = DirectoryNavigation(self.campaigns, os.getcwd(), self)
+        self.directoryNavigation = DirectoryNavigation(self.campaigns, self.calledFromDir, self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
         self.menuSetAllOpen(False)
         self.actionCloseDataSource.setEnabled(True)
