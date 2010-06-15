@@ -28,6 +28,7 @@
 import Interface
 import openwns.wrowser.Tools as Tools
 import Errors
+from PyQt4 import QtGui
 
 class GraphInstantiator:
 
@@ -67,7 +68,7 @@ class Graph(Tools.Chameleon):
         self.axisLabels = ("", "")
         self.reversePoints = False
 
-    def process(self):
+    def process(self, mainWindow = None):
         if self.reversePoints:
             self.points.reverse()
         self.points.sort(key = lambda x: x[0])
@@ -80,12 +81,17 @@ class AggregatedGraph(Graph):
         self.pointsDict = dict()
         self.confidenceIntervalDict = dict()
 
-    def process(self):
+    def process(self, missingScenarios, mainWindow = None):
         numberOfPoints = map(lambda x: len(x), self.pointsDict.values())
+        missingScenariosLocal = False 
         if min(numberOfPoints) != max(numberOfPoints):
-            raise Errors.Aggregation()
+            if not missingScenarios:
+                QtGui.QMessageBox.warning(mainWindow, "Aggregation Problem", "The number of y values to aggregate is different for different x values!")
+            missingScenariosLocal=True
+        
         self.points = self.aggregationFunction(self)
         Graph.process(self)
+        return ( missingScenariosLocal or missingScenarios)
 
 
 class TableGraph(Graph):

@@ -316,13 +316,14 @@ class Facade:
         if graphClass == Graphs.Graph or graphClass == Graphs.AggregatedGraph:
             if callable(progressReset):
                 progressReset()
+            missingScenarios = False
             for index, graph in enumerate(graphsList):
                 if callable(progressNotify):
                     msg = "Processing and sorting graph points..."
                     msg += "\n" + str(graph.identity)
                     progressNotify(index, maxIndex, msg)
                 try:
-                    graph.process()
+                    missingScenarios = graph.process(missingScenarios)
                 except Exception, e:
                     QtGui.QMessageBox.information(self.mainWindow, "Error encountered", str(e))
                     return [],errors
