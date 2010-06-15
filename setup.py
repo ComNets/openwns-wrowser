@@ -22,6 +22,6 @@ setup(name='openWNS-Wrowser',
                 'openwns.wrowser.scenario',
 		'openwns.wrowser.scenario.templates',
 		'openwns.wrowser.playgroundPlugins.SimulationCampaign'],
-    scripts=['bin/wrowser'],
-     )
-
+      scripts=['bin/wrowser'],
+      data_files=[("exportTemplates",["readDBandPlot", "plotAll.py"])]
+      )

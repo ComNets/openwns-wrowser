@@ -28,6 +28,7 @@
 """This module contains the interface to the campaign data structure.
 """
 import operator
+from PyQt4 import QtCore, QtGui
 
 from openwns.wrowser.Tools import objectFilter, ObjectFilterError
 
@@ -302,7 +303,7 @@ class Facade:
         if callable(progressReset):
             progressReset()
         for index, scenario in enumerate(self.campaign.scenarios):
-            if self.stopped: 
+            if self.stopped:
               self.stopped=False
               return [],errors
             if callable(progressNotify):
@@ -315,12 +316,18 @@ class Facade:
         if graphClass == Graphs.Graph or graphClass == Graphs.AggregatedGraph:
             if callable(progressReset):
                 progressReset()
+            missingScenarios = False
             for index, graph in enumerate(graphsList):
                 if callable(progressNotify):
                     msg = "Processing and sorting graph points..."
                     msg += "\n" + str(graph.identity)
                     progressNotify(index, maxIndex, msg)
-                graph.process()
+                try:
+                    missingScenarios = graph.process(missingScenarios)
+                except Exception, e:
+                    QtGui.QMessageBox.information(self.mainWindow, "Error encountered", str(e))
+                    return [],errors
+                     
                 if self.stopped: 
                   self.stopped=False
                   return [],errors
@@ -395,6 +402,9 @@ class Facade:
     def stopAcquireGraphs(self):
         self.stopped = True
         
+    def setMainWindow(self, mainWindow):
+        self.mainWindow = mainWindow
+
     def getHistograms(self, probeNames, function, aggregationParameter = '', progressNotify = None, progressReset = None, plotNotAggregatedGraphs = False):
 
         funType = function

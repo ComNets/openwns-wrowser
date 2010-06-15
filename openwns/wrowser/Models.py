@@ -352,6 +352,10 @@ class ProbeEntries(QtCore.QAbstractListModel):
         for index, entry in enumerate(self.probeEntries):
             if entry == text:
                 return index
+        text = 'mean' 
+        for index, entry in enumerate(self.probeEntries):
+            if entry == text:
+                return index
         return 1000000001
 
     def changeProbes(self, probeNames):
@@ -386,7 +390,6 @@ class ProbeData(QtCore.QAbstractTableModel):
         self.probeName = probeName
         self.probeData = campaign.getAllProbeDataExtended(probeName)
         self.parameterNames = list(campaign.getParameterNames())
-        #self.valueNames = set()
         self.probeInfoNames = set()
         for data in self.probeData:
             self.probeInfoNames |= set(data[1].keys())
