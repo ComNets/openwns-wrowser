@@ -35,6 +35,7 @@ from Tools import URI, Observing
 import Models
 import Debug
 import time
+import tracing.model
 
 from ui.Dialogues_Preferences_ui import Ui_Dialogues_Preferences
 class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
@@ -102,6 +103,48 @@ class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
         setattr(cSandbox, 'sandboxPath', str(self.sandboxpath.text()))
         setattr(cSandbox, 'sandboxFlavour', str(self.sandboxflavour.currentText()))
         cSandbox.writeSandboxConf(owner)
+
+from ui.Dialogues_OpenCouchDatabase_ui import Ui_CouchDBDialog
+class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
+    def __init__(self, *args):
+        QtGui.QDialog.__init__(self, *args)
+        self.setupUi(self)
+
+        import desktopcouch.records.server
+        import couchdb.client
+        port = desktopcouch.find_port()
+        s = desktopcouch.records.server.OAuthCapableServer('http://localhost:%s/' % port)
+        for dbname in s:
+            self.listWidget.addItem(dbname)
+        self.connect(self.importButton, QtCore.SIGNAL("clicked()"), self.onImportClicked)
+
+    def onImportClicked(self):
+        fileDialogue = QtGui.QFileDialog(self, "Select a Probe to import", os.getcwd(), "Probe files (*.dat)")
+        fileDialogue.setAcceptMode(QtGui.QFileDialog.AcceptOpen)
+        fileDialogue.setFileMode(QtGui.QFileDialog.ExistingFile)
+        fileDialogue.setViewMode(QtGui.QFileDialog.Detail)
+        if fileDialogue.exec_() == QtGui.QDialog.Accepted:
+            fileName = fileDialogue.selectedFiles()[0]
+        else:
+            return
+
+        dbName = "unnamed"
+        r = QtGui.QInputDialog.getText(self, "Give a name for the new database", "Datbase name:", QtGui.QLineEdit.Normal, dbName)
+        if (r[1] and r[0] != ""):
+            dbName = r[0]
+
+        tracing.model.importFile(str(fileName), str(dbName))
+
+    def getDatabase(self):
+        i = self.listWidget.selectedItems()
+        if len(i)!=1:
+            return None
+        return i[0].text()
+
+    def contextMenuEvent(self, event):
+        index = self.listWidget.indexAt(event.pos());
+
+        print index.data()
 
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):

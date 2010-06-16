@@ -41,8 +41,20 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
 
 import scenario.plotterFactory
 import scenario.widgets
+
 import inspect
 import pprint
+
+try:
+    import desktopcouch.records
+    couchIsUsable = True
+except ImportError:
+    couchIsUsable = False
+
+if couchIsUsable:
+    import tracing.frameplotter
+    import tracing.model
+
 
 from ui.Windows_Main_ui import Ui_Windows_Main
 class Main(QtGui.QMainWindow, Ui_Windows_Main):
@@ -71,6 +83,9 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
 
+        global couchIsUsable
+        self.actionView_CouchDB_Trace.setEnabled(couchIsUsable)
+
     @QtCore.pyqtSignature("")
     def on_actionPreferences_triggered(self):
         import os
@@ -82,6 +97,42 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         preferencesDialogue.readFromConfig(filename, owner)
         if preferencesDialogue.exec_() == QtGui.QDialog.Accepted:
             preferencesDialogue.writeToConfig(filename, owner)
+
+    @QtCore.pyqtSignature("")
+    def on_actionView_CouchDB_Trace_triggered(self):
+        couchDbDialogue = Dialogues.OpenCouchDatabase(self.workspace)
+        self.workspace.addWindow(couchDbDialogue)
+        couchDbDialogue.showMaximized()
+        if couchDbDialogue.exec_() == QtGui.QDialog.Accepted:
+            couchId = couchDbDialogue.getDatabase()
+        else:
+            return
+
+        db = desktopcouch.records.server.CouchDatabase(str(couchId), create=False)
+        self.viewCouchDBCanvas = tracing.frameplotter.FramePlotter(db, self.workspace)
+        self.workspace.addWindow(self.viewCouchDBCanvas)
+        self.viewCouchDBCanvas.showMaximized()
+
+        self.model = tracing.model.TraceEntryTableModel(self)
+    
+        self.viewCouchDBTraceWidget = Widgets.ViewCouchDBTrace(self)
+        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.viewCouchDBTraceWidget)
+        self.viewCouchDBTraceWidget.internalWidget.tableView.setModel(self.model)
+
+        self.viewCouchDBNavigation = Widgets.TraceNavigation(self)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewCouchDBNavigation)
+
+        self.connect(self.viewCouchDBNavigation, QtCore.SIGNAL("radioFrameChanged(int)"), self.viewCouchDBCanvas.on_radioFrameChanged)
+        self.connect(self.viewCouchDBCanvas, QtCore.SIGNAL("itemPicked"), self.model.addItem)
+        self.connect(self.viewCouchDBTraceWidget.internalWidget.clearButton,
+                     QtCore.SIGNAL("clicked()"), self.model.clear)
+
+        self.actionOpenCampaignDatabase.setEnabled(False)
+        self.actionView_CouchDB_Trace.setEnabled(False)
+        self.actionOpenDSV.setEnabled(False)
+        self.actionOpenDirectory.setEnabled(False)
+        self.actionView_Scenario.setEnabled(False)
+        self.actionCloseDataSource.setEnabled(True)
 
     @QtCore.pyqtSignature("")
     def on_actionView_Scenario_triggered(self):
@@ -113,6 +164,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewScenarioWidget)
 
             self.actionOpenCampaignDatabase.setEnabled(False)
+            self.actionView_CouchDB_Trace.setEnabled(False)
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
             self.actionView_Scenario.setEnabled(False)
@@ -165,6 +217,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
             self.menuNew.setEnabled(True)
             self.actionOpenCampaignDatabase.setEnabled(False)
+            self.actionView_CouchDB_Trace.setEnabled(False)
             self.actionOpenDSV.setEnabled(False)
             self.actionOpenDirectory.setEnabled(False)
             self.actionCloseDataSource.setEnabled(True)
@@ -195,6 +248,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
                 self.menuNew.setEnabled(True)
                 self.actionOpenCampaignDatabase.setEnabled(False)
+                self.actionView_CouchDB_Trace.setEnabled(False)
                 self.actionOpenDSV.setEnabled(False)
                 self.actionOpenDirectory.setEnabled(False)
                 self.actionCloseDataSource.setEnabled(True)
@@ -205,6 +259,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.directoryNavigation = DirectoryNavigation(self.campaigns, os.getcwd(), self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
         self.actionOpenCampaignDatabase.setEnabled(False)
+        self.actionView_CouchDB_Trace.setEnabled(False)
         self.actionOpenDSV.setEnabled(False)
         self.actionOpenDirectory.setEnabled(False)
         self.actionCloseDataSource.setEnabled(True)
@@ -217,10 +272,19 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.directoryNavigation.close()
         if hasattr(self, "viewScenarioWidget"):
             self.viewScenarioWidget.close()
+        if hasattr(self, "viewCouchDBTraceWidget"):
+            self.viewCouchDBTraceWidget.close()
+        if hasattr(self, "viewCouchDBNavigation"):
+            self.viewCouchDBNavigation.close()
+
+        if hasattr(self, "model"):
+            del self.model
         for window in self.workspace.windowList():
             window.close()
         self.campaigns = Observable()
         self.actionOpenCampaignDatabase.setEnabled(True)
+        global couchIsUsable
+        self.actionView_CouchDB_Trace.setEnabled(couchIsUsable)
         self.actionOpenDSV.setEnabled(True)
         self.actionOpenDirectory.setEnabled(True)
         self.actionCloseDataSource.setEnabled(False)

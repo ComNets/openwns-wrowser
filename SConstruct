@@ -49,6 +49,7 @@ pyuic_src_files = ['ui/Windows_Main.ui',
 		   'ui/Dialogues_Preferences.ui',
                    'ui/Dialogues_ConfigureGraph.ui',
                    'ui/Dialogues_OpenDatabase.ui',
+		   'ui/Dialogues_OpenCouchDatabase.ui',
                    'ui/Dialogues_OpenCampaignDb.ui',
                    'ui/Dialogues_OpenDSV.ui',
                    'ui/Windows_SimulationParameters.ui',
@@ -59,7 +60,9 @@ pyuic_src_files = ['ui/Windows_Main.ui',
                    'ui/Widgets_TableGraph.ui',
                    'ui/Widgets_ProbeGraphControl.ui',
                    'ui/Widgets_ParameterGraphControl.ui',
-		   'ui/Widgets_ViewScenario.ui']
+		   'ui/Widgets_ViewScenario.ui',
+		   'ui/Widgets_ViewCouchDBTrace.ui',
+		   'ui/Widgets_TraceNavigation.ui']
 
 pyrcc_src_files = ['ui/wrowser.qrc',]
 

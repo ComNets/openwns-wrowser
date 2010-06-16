@@ -562,3 +562,74 @@ class TableGraph(QtGui.QWidget, Ui_Widgets_TableGraph, Observing):
 
 class Legend(QtGui.QListView):
     pass
+
+class TraceNavigation(QtGui.QDockWidget):
+
+    from openwns.wrowser.ui.Widgets_TraceNavigation_ui import Ui_Widgets_TraceNavigation
+    class TraceNavigationWidget(QtGui.QWidget, Ui_Widgets_TraceNavigation):
+        
+        def __init__(self, mainWindow, *args):
+            QtGui.QWidget.__init__(self, *args)
+            self.setupUi(self)
+
+    def __init__(self, parent, *args):
+        QtGui.QDockWidget.__init__(self, "Navigation", parent, *args)
+        self.internalWidget = self.__class__.TraceNavigationWidget(parent, self)
+        self.setWidget(self.internalWidget)
+
+        self.connect(self.internalWidget.next10, QtCore.SIGNAL("clicked()"), self.on_Next10Clicked)
+        self.connect(self.internalWidget.previous10, QtCore.SIGNAL("clicked()"), self.on_Previous10Clicked)
+
+        self.connect(self.internalWidget.radioframe, QtCore.SIGNAL("valueChanged(int)"), self.on_radioFrameChanged)
+        self.timer = None
+
+    @QtCore.pyqtSignature("")
+    def on_Next10Clicked(self):
+        rf = self.internalWidget.radioframe.value()
+        rf += 10
+        self.internalWidget.radioframe.setValue(rf)
+
+    @QtCore.pyqtSignature("")
+    def on_Previous10Clicked(self):
+        rf = self.internalWidget.radioframe.value()
+        rf -= 10
+
+        if rf < 0:
+            rf = 0
+
+        self.internalWidget.radioframe.setValue(rf)
+
+    @QtCore.pyqtSignature("int")
+    def on_radioFrameChanged(self, value):
+        if self.timer is None:
+            self.timer = QtCore.QTimer(self)
+            self.timer.setSingleShot(True)
+            self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.on_changeTimerExpired)
+            
+            self.timer.start(500)
+
+        else:
+            if self.timer.isActive():
+                self.timer.stop()
+
+            self.timer.start(500)
+
+    @QtCore.pyqtSignature("")
+    def on_changeTimerExpired(self):
+        print "Emitting radioFrameChanged"
+        self.emit(QtCore.SIGNAL("radioFrameChanged(int)"), self.internalWidget.radioframe.value())
+
+class ViewCouchDBTrace(QtGui.QDockWidget):
+
+    from openwns.wrowser.ui.Widgets_ViewCouchDBTrace_ui import Ui_Widgets_ViewCouchDBTrace
+    class ViewCouchDBTraceWidget(QtGui.QWidget, Ui_Widgets_ViewCouchDBTrace):
+        
+        def __init__(self, mainWindow, *args):
+            QtGui.QWidget.__init__(self, *args)
+            self.setupUi(self)
+
+    def __init__(self, parent, *args):
+        QtGui.QDockWidget.__init__(self, "View CouchDB Trace", parent, *args)
+        self.internalWidget = self.__class__.ViewCouchDBTraceWidget(parent, self)
+        self.setWidget(self.internalWidget)
+

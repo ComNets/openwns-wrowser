@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>Windows_Main</class>
- <widget class="QMainWindow" name="Windows_Main" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="Windows_Main">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,209 +10,206 @@
     <height>550</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Wrowser 0.9</string>
   </property>
-  <widget class="QWidget" name="centralwidget" >
-   <layout class="QVBoxLayout" >
-    <property name="spacing" >
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout">
+    <property name="spacing">
      <number>6</number>
     </property>
-    <property name="leftMargin" >
-     <number>9</number>
-    </property>
-    <property name="topMargin" >
-     <number>9</number>
-    </property>
-    <property name="rightMargin" >
-     <number>9</number>
-    </property>
-    <property name="bottomMargin" >
+    <property name="margin">
      <number>9</number>
     </property>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar" >
-   <property name="geometry" >
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionAboutWrowser" />
-    <addaction name="actionAboutQt" />
+    <addaction name="actionAboutWrowser"/>
+    <addaction name="actionAboutQt"/>
    </widget>
-   <widget class="QMenu" name="menuFigure" >
-    <property name="enabled" >
+   <widget class="QMenu" name="menuFigure">
+    <property name="enabled">
      <bool>true</bool>
     </property>
-    <property name="title" >
+    <property name="title">
      <string>Fi&amp;gure</string>
     </property>
-    <widget class="QMenu" name="menuNew" >
-     <property name="enabled" >
+    <widget class="QMenu" name="menuNew">
+     <property name="enabled">
       <bool>false</bool>
      </property>
-     <property name="title" >
+     <property name="title">
       <string>&amp;New</string>
      </property>
-     <addaction name="actionNewLogEval" />
-     <addaction name="actionNewTimeSeries" />
-     <addaction name="actionNewXDF" />
-     <addaction name="actionNewLRE" />
-     <addaction name="actionNewBatchMeans" />
-     <addaction name="actionNewTable" />
-     <addaction name="actionNewParameter" />
+     <addaction name="actionNewLogEval"/>
+     <addaction name="actionNewTimeSeries"/>
+     <addaction name="actionNewXDF"/>
+     <addaction name="actionNewLRE"/>
+     <addaction name="actionNewBatchMeans"/>
+     <addaction name="actionNewTable"/>
+     <addaction name="actionNewParameter"/>
     </widget>
-    <addaction name="menuNew" />
-    <addaction name="actionCloseFigure" />
-    <addaction name="actionConfigure" />
-    <addaction name="separator" />
+    <addaction name="menuNew"/>
+    <addaction name="actionCloseFigure"/>
+    <addaction name="actionConfigure"/>
+    <addaction name="separator"/>
    </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionOpenCampaignDatabase" />
-    <addaction name="actionOpenDSV" />
-    <addaction name="actionOpenDirectory" />
-    <addaction name="actionCloseDataSource" />
-    <addaction name="separator" />
-    <addaction name="actionView_Scenario" />
-    <addaction name="separator" />
-    <addaction name="actionRefresh" />
-    <addaction name="actionQuit" />
+    <addaction name="actionOpenCampaignDatabase"/>
+    <addaction name="actionOpenDSV"/>
+    <addaction name="actionOpenDirectory"/>
+    <addaction name="actionCloseDataSource"/>
+    <addaction name="separator"/>
+    <addaction name="actionView_Scenario"/>
+    <addaction name="actionView_CouchDB_Trace"/>
+    <addaction name="separator"/>
+    <addaction name="actionRefresh"/>
+    <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuExtra" >
-    <property name="title" >
+   <widget class="QMenu" name="menuExtra">
+    <property name="title">
      <string>Extra</string>
     </property>
-    <addaction name="actionPreferences" />
+    <addaction name="actionPreferences"/>
    </widget>
-   <addaction name="menuFile" />
-   <addaction name="menuFigure" />
-   <addaction name="menuExtra" />
-   <addaction name="menuHelp" />
+   <addaction name="menuFile"/>
+   <addaction name="menuFigure"/>
+   <addaction name="menuExtra"/>
+   <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
-  <action name="actionQuit" >
-   <property name="text" >
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionQuit">
+   <property name="text">
     <string>&amp;Quit</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionAboutQt" >
-   <property name="text" >
+  <action name="actionAboutQt">
+   <property name="text">
     <string>About Qt</string>
    </property>
   </action>
-  <action name="actionAboutWrowser" >
-   <property name="text" >
+  <action name="actionAboutWrowser">
+   <property name="text">
     <string>About Wrowser</string>
    </property>
   </action>
-  <action name="actionOpenDatabase" >
-   <property name="text" >
+  <action name="actionOpenDatabase">
+   <property name="text">
     <string>Open S&amp;QLObject Database</string>
    </property>
   </action>
-  <action name="actionOpenDSV" >
-   <property name="text" >
+  <action name="actionOpenDSV">
+   <property name="text">
     <string>Open DS&amp;V</string>
    </property>
-   <property name="iconText" >
+   <property name="iconText">
     <string>Open DSV</string>
    </property>
   </action>
-  <action name="actionOpenDirectory" >
-   <property name="text" >
+  <action name="actionOpenDirectory">
+   <property name="text">
     <string>Open &amp;Directory</string>
    </property>
   </action>
-  <action name="actionCloseFigure" >
-   <property name="text" >
+  <action name="actionCloseFigure">
+   <property name="text">
     <string>&amp;Close</string>
    </property>
   </action>
-  <action name="actionCloseDataSource" >
-   <property name="enabled" >
+  <action name="actionCloseDataSource">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Close</string>
    </property>
   </action>
-  <action name="actionNewLogEval" >
-   <property name="text" >
+  <action name="actionNewLogEval">
+   <property name="text">
     <string>LogEval</string>
    </property>
   </action>
-  <action name="actionNewTimeSeries" >
-   <property name="text" >
+  <action name="actionNewTimeSeries">
+   <property name="text">
     <string>TimeSeries</string>
    </property>
   </action>
-  <action name="actionNewLRE" >
-   <property name="text" >
+  <action name="actionNewLRE">
+   <property name="text">
     <string>(D)LRE</string>
    </property>
   </action>
-  <action name="actionNewBatchMeans" >
-   <property name="text" >
+  <action name="actionNewBatchMeans">
+   <property name="text">
     <string>BatchMeans</string>
    </property>
   </action>
-  <action name="actionNewTable" >
-   <property name="text" >
+  <action name="actionNewTable">
+   <property name="text">
     <string>Table</string>
    </property>
   </action>
-  <action name="actionNewXDF" >
-   <property name="text" >
+  <action name="actionNewXDF">
+   <property name="text">
     <string>PDF/CDF/CCDF</string>
    </property>
   </action>
-  <action name="actionNewParameter" >
-   <property name="text" >
+  <action name="actionNewParameter">
+   <property name="text">
     <string>Parameter</string>
    </property>
   </action>
-  <action name="actionConfigure" >
-   <property name="text" >
+  <action name="actionConfigure">
+   <property name="text">
     <string>C&amp;onfigure...</string>
    </property>
   </action>
-  <action name="actionOpenCampaignDatabase" >
-   <property name="text" >
+  <action name="actionOpenCampaignDatabase">
+   <property name="text">
     <string>Open &amp;Campaign Database</string>
    </property>
   </action>
-  <action name="actionRefresh" >
-   <property name="text" >
+  <action name="actionRefresh">
+   <property name="text">
     <string>&amp;Refresh</string>
    </property>
   </action>
-  <action name="actionView_Scenario" >
-   <property name="text" >
+  <action name="actionView_Scenario">
+   <property name="text">
     <string>View &amp;Scenario</string>
    </property>
   </action>
-  <action name="actionPreferences" >
-   <property name="text" >
+  <action name="actionPreferences">
+   <property name="text">
     <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionView_CouchDB_Trace">
+   <property name="text">
+    <string>View CouchDB Trace</string>
    </property>
   </action>
  </widget>
  <resources>
-  <include location="wrowser.qrc" />
+  <include location="wrowser.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -220,11 +218,11 @@
    <receiver>Windows_Main</receiver>
    <slot>close()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>216</x>
      <y>206</y>
     </hint>
