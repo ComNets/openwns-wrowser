@@ -23,7 +23,7 @@ class BS(openwns.node.Node):
                                                 "Mobility Component",
                                                 mobility)
         self.mobility.mobility.logger.enabled=False
-        self.sender = ofdmaphy.Station.Sender(self, name, [ofdmaphy.Transmitter.TransmitterDropIn()])
+        self.sender = ofdmaphy.Station.Sender(self, name, [ofdmaphy.Transmitter.TransmitterDropIn()], $centerfreq)
         self.sender.txPower = powerPerSubBand
 
 class MS(openwns.node.Node):
@@ -37,9 +37,15 @@ class MS(openwns.node.Node):
                                                 "Mobility Component",
                                                 mobility)
         self.mobility.mobility.logger.enabled=False
-        self.scanner = ofdmaphy.Station.Scanner(self, name, [ofdmaphy.Receiver.ReceiverDropIn()])
+        self.scanner = ofdmaphy.Station.Scanner(self, name, [ofdmaphy.Receiver.ReceiverDropIn()], $centerfreq)
         self.scanner.rxpProbeName = "Scanner_RxPwr"
         self.scanner.sinrProbeName = "Scanner_SINR"
+        self.scanner.pathlossProbeName = "Scanner_PL"
+        self.scanner.maxRxpProbeName = "Scanner_maxRxPwr"
+        self.scanner.maxSINRProbeName = "Scanner_maxSINR"
+        self.scanner.minPathlossProbeName = "Scanner_minPL"
+        self.scanner.maxThroughputProbeName = "Scanner_maxThrpt"
+        self.scanner.distanceProbeName = "Scanner_Distance"
 
 class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
 
@@ -49,6 +55,13 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         self.powerPerSubBand = powerPerSubBand
         self.rxpProbeName = "Scanner_RxPwr"
         self.sinrProbeName = "Scanner_SINR"
+        self.pathlossProbeName = "Scanner_PL"
+        self.maxRxpProbeName = "Scanner_maxRxPwr"
+        self.maxSINRProbeName = "Scanner_maxSINR"
+        self.minPathlossProbeName = "Scanner_minPL"
+        self.maxThroughputProbeName = "Scanner_maxThrpt"
+        self.distanceProbeName = "Scanner_Distance"
+
         self.numBS = 0
         self.xBins = xBins
         self.yBins = yBins
@@ -61,7 +74,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
 
         ofdmaPhyConfig = self.simulator.modules.ofdmaPhy
         ofdmaPhySystem = ofdmaphy.OFDMAPhy.OFDMASystem('OFDMA')
-        ofdmaPhySystem.Scenario = rise.Scenario.Scenario(0.0, 0.0)
+        ofdmaPhySystem.Scenario = rise.Scenario.Scenario()
         ofdmaPhyConfig.systems.append(ofdmaPhySystem)
         
     def getSimulator(self):

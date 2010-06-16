@@ -1,0 +1,43 @@
+# This is prepended to a config file to extract relevant information
+
+import pickle
+f = open("$filename", "w")
+
+inspectedNodes = []
+
+def hasMobility(node):
+    import rise.Mobility
+    for c in node.components:
+        if isinstance(c, rise.Mobility.Component):
+            return True
+    return False
+
+def getMobility(node):
+    import rise.Mobility
+    assert hasMobility(node), "No mobility found"
+
+    for c in node.components:
+        if isinstance(c, rise.Mobility.Component):
+            return c.mobility
+
+def getNodeType(node):
+        
+    classname = node.__class__.__name__
+
+    return classname
+
+
+for n in openwns.simulator.getSimulator().simulationModel.nodes:
+    if hasMobility(n):
+        inspectedNode = {}
+        inspectedNode["name"] = n.name
+        inspectedNode["hasMobility"] = True
+        inspectedNode["coords"] = {}
+        inspectedNode["coords"]["x"] = getMobility(n).coords.x
+        inspectedNode["coords"]["y"] = getMobility(n).coords.y
+        inspectedNode["coords"]["z"] = getMobility(n).coords.z
+        inspectedNode["nodeType"] = getNodeType(n)
+        inspectedNodes.append(inspectedNode)
+
+pickle.dump(inspectedNodes, f)
+f.close()
