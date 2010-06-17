@@ -110,13 +110,18 @@ class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
         QtGui.QDialog.__init__(self, *args)
         self.setupUi(self)
 
+        self._readDatabases()
+
+        self.connect(self.importButton, QtCore.SIGNAL("clicked()"), self.onImportClicked)
+
+    def _readDatabases(self):
         import desktopcouch.records.server
         import couchdb.client
         port = desktopcouch.find_port()
         s = desktopcouch.records.server.OAuthCapableServer('http://localhost:%s/' % port)
+        self.listWidget.clear()
         for dbname in s:
             self.listWidget.addItem(dbname)
-        self.connect(self.importButton, QtCore.SIGNAL("clicked()"), self.onImportClicked)
 
     def onImportClicked(self):
         fileDialogue = QtGui.QFileDialog(self, "Select a Probe to import", os.getcwd(), "Probe files (*.dat)")
@@ -135,6 +140,8 @@ class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
 
         tracing.model.importFile(str(fileName), str(dbName))
 
+        self._readDatabases()
+
     def getDatabase(self):
         i = self.listWidget.selectedItems()
         if len(i)!=1:
@@ -142,9 +149,24 @@ class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
         return i[0].text()
 
     def contextMenuEvent(self, event):
-        index = self.listWidget.indexAt(event.pos());
+        items = self.listWidget.selectedItems()
+        dbname = items[0].data(0).toString()
+        
+        menu = QtGui.QMenu(self)
+        deleteAction = menu.addAction("Delete")
+        action = menu.exec_(self.mapToGlobal(event.pos()))
 
-        print index.data()
+        if action == deleteAction:
+            msg = QtGui.QMessageBox()
+            msg.setText("<b>%s</b> will be permanently deleted!" % dbname)
+            msg.setInformativeText("Do your really want to delete?")
+            msg.setStandardButtons(QtGui.QMessageBox.Yes|QtGui.QMessageBox.Cancel)
+            msg.setDefaultButton(QtGui.QMessageBox.Cancel)
+            ret = msg.exec_()
+
+            if ret == QtGui.QMessageBox.Yes:
+                tracing.model.deleteDB(str(dbname))
+                self._readDatabases()
 
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
