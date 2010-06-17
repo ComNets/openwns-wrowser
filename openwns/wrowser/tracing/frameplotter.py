@@ -33,8 +33,11 @@ class FramePlotter(FigureCanvasQTAgg):
         FigureCanvasQTAgg.updateGeometry(self)
 
         self.db = db
-        self.data = self.db.execute_view("orderByStartTime", "orderByStartTime")
-        #print self.data
+        # Stale OK disables regeneration of index
+        # Just keep in mind that this application is read-only
+        # If you modify the db, you need to rebuild the index!!!
+        self.data = self.db.execute_view("orderByStartTime", "orderByStartTime", stale='ok')
+
         self.radioFrameDuration = 0.01
         self.subFrameDuration = 0.001
         self.tolerance = self.subFrameDuration / 14
@@ -77,7 +80,7 @@ class FramePlotter(FigureCanvasQTAgg):
 
         ax = self.figure.axes[0]
         ax.set_xlim(startTime + self.tolerance, stopTime - self.tolerance)
-        ax.set_ylim(-1, 10)
+        ax.set_ylim(-1, 51)
         ax.grid()
         ax.set_title("Radioframe starting at subframe %d" % self.startFrame)
         ax.set_xlabel("Time [s]")
