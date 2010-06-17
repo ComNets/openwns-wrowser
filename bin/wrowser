@@ -41,6 +41,8 @@ if "openwns" in os.listdir(searchPath):
     print "Prepending %s to sys.path" % searchPath
     sys.path.insert(0, searchPath)
 
+calledFromDir = os.path.abspath(os.path.curdir)
+
 os.chdir(searchPath)
 import openwns.wrowser.Windows
 
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     application.setWindowIcon(QtGui.QIcon(":/icons/icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
-    widget = openwns.wrowser.Windows.Main()
+    widget = openwns.wrowser.Windows.Main(calledFromDir)
     widget.show()
     sys.excepthook = wrowserExceptHook
     sys.exit(application.exec_())

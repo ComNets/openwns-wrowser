@@ -120,16 +120,17 @@ from ScenarioFrame to plot special scenarios"""
         shapes = { 0 : '^', 1 : 'o', 2 : 's', 3: 'x'}
 
         for n in self.inspector.getNodes():
-            if self.inspector.hasMobility(n):
-                pos = self.inspector.getMobility(n).coords
+            if n["hasMobility"]:
+                x = n["coords"]["x"]
+                y = n["coords"]["y"]
                 type = self.inspector.getNodeTypeId(n)
                 color = groupcolors[1]
-                axes.plot([pos.x], [pos.y], color+shapes[type])
+                axes.plot([x], [y], color+shapes[type])
 
                 import random
-                x=random.randint(-10,10)
-                y=random.randint(-10,10)
-                axes.text(pos.x + x, pos.y + y, n.name)
+                xr=random.randint(-10,10)
+                yr=random.randint(-10,10)
+                axes.text(x + xr, y + yr, n["name"])
 
         map = self.loadImage(fileToPlot, fillValue)
         if map is not None:

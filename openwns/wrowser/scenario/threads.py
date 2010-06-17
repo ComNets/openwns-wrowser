@@ -60,10 +60,12 @@ class SimulationThread(QtCore.QThread):
 
         bsPositions = []
         for n in self.parent.inspector.getNodes():
-            if self.parent.inspector.hasMobility(n):
+            if n["hasMobility"]:
                 if self.parent.inspector.getNodeTypeId(n) == 0:
-                    m = self.parent.inspector.getMobility(n)
-                    bsPositions.append(templates.datamodel.BSPosition(m.coords.x, m.coords.y, m.coords.z))
+                    x = n["coords"]["x"]
+                    y = n["coords"]["y"]
+                    z = n["coords"]["z"]
+                    bsPositions.append(templates.datamodel.BSPosition(x, y, z))
 
         content = {}
         content["powerPerSubBand"] = str(self.parent.powerPerSubBand.text())
@@ -71,6 +73,7 @@ class SimulationThread(QtCore.QThread):
         content["numYBins"] = int(self.parent.yBinsEdit.text())
         content["scenario"] = templates.datamodel.Scenario(*self.parent.inspector.getSize())
         content["baseStations"] = bsPositions
+        content["centerfreq"] = float(self.parent.centerfreq.text())
 
         t = Cheetah.Template.Template(file=templateFilename, searchList=[content])
 

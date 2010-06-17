@@ -26,6 +26,7 @@
 ###############################################################################
 
 import os
+import subprocess
 
 import openwns.wrowser.Configuration as Configuration
 
@@ -40,54 +41,46 @@ class ConfigInspector:
         c = Configuration.SandboxConfiguration()
         c.read()
 
-        self.config = {}
-        exec("import sys", self.config)
-        filepath = os.path.dirname(str(configurationFile))
-        exec("sys.path.append('%s')" % filepath, self.config)
-        exec("sys.path.insert(0,'%s/%s/lib/PyConfig')" % (c.sandboxPath, c.sandboxFlavour), self.config)
+        thisDir = os.path.dirname(__file__)
+        templateFilename = os.path.join(thisDir, 'templates', 'inspection.py.tmpl')
 
-        file = open(str(configurationFile), "r")
-        content = file.read()
-        file.close()
+        # Create configuration using the template system
+        import Cheetah.Template
+        import templates.datamodel
+        pckfilename = "__wrowser__viewscenario__inspect.pck"
+        content = {"filename":pckfilename}
+
+        t = Cheetah.Template.Template(file=templateFilename, searchList=[content])
+
+        f = open(str(configurationFile), "r")
+        content = f.read()
+        f.close()
+
+        filepath = os.path.dirname(configurationFile)
 
         os.chdir(filepath)
-        exec(content,self.config)
+
+        instrFilename = "__wrowser__viewscenario__config.py"
+        f = open(instrFilename, "w")
+        f.write(content)
+        f.write("\n")
+        f.write(t.respond())
+        f.close()
+
+        pypath = os.path.join(c.sandboxPath, c.sandboxFlavour, "lib", "PyConfig")
+
+        subprocess.call(['python', instrFilename], env = { "PYTHONPATH":pypath})
+
+        import pickle
+
+        f = open(pckfilename)
+        self.nodelist = pickle.load(f)
+        f.close()
+
         os.chdir(currentdir)
-
-        self.simulator = self.getSimulator()
-
-    def getSimulator(self):
-        import openwns.simulator
-        for k,v in self.config.items():
-            if isinstance(v, openwns.simulator.OpenWNS):
-                return v
-
-        raise SimulatorConfigNotFound
-
-    def getNodes(self):
-        sim = self.simulator
-        return sim.simulationModel.nodes
-
-    def hasMobility(self, node):
-        import rise.Mobility
-        for c in node.components:
-            if isinstance(c, rise.Mobility.Component):
-                return True
-        return False
-
-    def getMobility(self, node):
-        import rise.Mobility
-        assert self.hasMobility(node), "No mobility found"
-
-        for c in node.components:
-            if isinstance(c, rise.Mobility.Component):
-                return c.mobility
-
-    def getNodeType(self, node):
         
-        classname = node.__class__.__name__
-
-        return classname
+    def getNodes(self):
+        return self.nodelist
 
     def getNodeTypeId(self, node):
         """Returns the node type
@@ -97,7 +90,7 @@ class ConfigInspector:
         3 : Unknown
         """
 
-        classname = self.getNodeType(node)
+        classname = node["nodeType"]
 
         if classname in ['BS', 'BaseStation', 'Station']:
             return 0
@@ -117,19 +110,20 @@ class ConfigInspector:
         yMin = None
 
         for n in self.getNodes():
-            if self.hasMobility(n):
-                m = self.getMobility(n)
-                if xMax is None or xMax < m.coords.x:
-                    xMax = m.coords.x
+            if n["hasMobility"]:
+                x = n["coords"]["x"]
+                y = n["coords"]["y"]
+                if xMax is None or xMax < x:
+                    xMax = x
 
-                if xMin is None or xMin > m.coords.x:
-                    xMin = m.coords.x
+                if xMin is None or xMin > x:
+                    xMin = x
 
-                if yMax is None or yMax < m.coords.y:
-                    yMax = m.coords.y
+                if yMax is None or yMax < y:
+                    yMax = y
 
-                if yMin is None or yMin > m.coords.y:
-                    yMin = m.coords.y
+                if yMin is None or yMin > y:
+                    yMin = y
 
         width = xMax - xMin
         height = yMax - yMin

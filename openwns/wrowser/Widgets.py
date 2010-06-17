@@ -356,12 +356,13 @@ class Graph(QtGui.QWidget, Ui_Widgets_Graph):
 
 class LineGraph(Graph, Observing):
 
-    def __init__(self, *qwidgetArgs):
+    def __init__(self, mainWindow, *qwidgetArgs):
         Graph.__init__(self, *qwidgetArgs)
 
         self.lines = []
         self.labels = []
         self.legendModel = Models.Legend()
+        self.mainWindow = mainWindow
 
         self.figureConfig = Data.Figure()
         self.observe(self.on_figureConfig_grid_changed, self.figureConfig, "grid")
@@ -369,9 +370,11 @@ class LineGraph(Graph, Observing):
         self.observe(self.on_figureConfig_marker_changed, self.figureConfig, "marker")
         self.observe(self.on_figureConfig_legend_changed, self.figureConfig, "legend")
         self.observe(self.on_figureConfig_graphs_changed, self.figureConfig, "graphs")
+        self.plottingStopped = False
 
-        import Dialogues
-        self.progressDialogue = Dialogues.Progress("Plotting", 0, self)
+
+    def on_cancelClicked(self):
+        self.plottingStopped = True
 
     def setGraphs(self, graphs):
         self.figureConfig.graphs = graphs
@@ -418,7 +421,8 @@ class LineGraph(Graph, Observing):
         self.labels = []
 
         maxIndex = len(self.figureConfig.graphs) - 1
-        self.progressDialogue.reset()
+        self.mainWindow.showProgressBar(self.on_cancelClicked)
+        self.setInterfaceEnabled(False)
         xLabels = set()
         yLabels = set()
         for index, graph in enumerate(self.figureConfig.graphs):
@@ -427,8 +431,14 @@ class LineGraph(Graph, Observing):
             label = Facade.getGraphDescription(graph)
             xLabels.add(graph.axisLabels[0])
             yLabels.add(graph.axisLabels[1])
-            self.progressDialogue.setCurrentAndMaximum(index, maxIndex, "Preparing: " + label)
-           
+            self.mainWindow.progressIndicator.setCurrentAndMaximum(index, maxIndex, "Preparing: " + label)
+            if self.plottingStopped:
+                self.plottingStopped = False
+                self.canvas.axes.clear()
+                self.mainWindow.hideProgressBar()
+                self.setInterfaceEnabled(True)
+                return
+
             try:
                 style = csIter.next()
             except StopIteration:
@@ -452,6 +462,16 @@ class LineGraph(Graph, Observing):
         self.setScale(*(self.figureConfig.scale))
         if self.figureConfig.legend:
             self.setLegend(True)
+        self.plottingStopped = False
+        self.mainWindow.hideProgressBar()
+        self.setInterfaceEnabled(True)
+
+    def setInterfaceEnabled(self,isEnabled):
+        for window in self.mainWindow.workspace.windowList():
+            window.setEnabled(isEnabled)
+        self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        self.mainWindow.actionCloseDataSource.setEnabled(isEnabled)
+        self.mainWindow.actionView_Scenario.setEnabled(isEnabled)
 
     def on_figureConfig_title_changed(self, value):
         self.canvas.axes.set_title(value)

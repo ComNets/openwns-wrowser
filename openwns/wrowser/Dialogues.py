@@ -224,10 +224,45 @@ class OpenDSV(QtGui.QDialog, Ui_Dialogues_OpenDSV):
                       directoryColumn = str(self.directoryColumnEdit.text()),
                       subDirectory = str(self.subDirectoryEdit.text()))
 
+class ProgressStatus(QtGui.QProgressBar):
+    def __init__(self, progressLabel,  *args):
+        QtGui.QProgressBar.__init__(self, *args)
+        self.progressLabel = progressLabel
+        self.labelText=""
+        self.labelLength=80
+        self.reset()
+
+    def reset(self):
+        self.setMinimum(0)
+        self.startTime = datetime.datetime.now()
+        QtGui.QProgressBar.reset(self)
+
+    def setCurrentAndMaximum(self, current, maximum, additionalText = ""):
+        import Time
+        
+        self.setMaximum(maximum)
+        self.setValue(current)
+        labelText = self.labelText
+        if len(additionalText) > 0:
+            additionalText = additionalText.replace('\n',' ')
+            labelText += " " + additionalText
+        if maximum > 0 and float(current)/maximum >= 0.01:
+            elapsed = datetime.datetime.now() - self.startTime
+            total = elapsed * maximum / current
+            remaining = total - elapsed
+            if len(labelText) > self.labelLength:
+                labelText = ".. approx. " + Time.Delta(remaining).asString() + " left"
+            else:
+                labelText += " approx. " + Time.Delta(remaining).asString() + " left"
+        if QtGui.QApplication.hasPendingEvents():
+            QtGui.QApplication.instance().syncX()
+            QtGui.QApplication.instance().processEvents()
+            self.progressLabel.setText(labelText)
+        time.sleep(0.006)
+
 class Progress(QtGui.QProgressDialog):
     def __init__(self, labelText, minShow, *args):
         QtGui.QProgressDialog.__init__(self, *args)
-#        self.setCancelButton(None)
         self.setCancelButtonText("Cancel")
         self.labelText = labelText
         self.setLabelText(labelText)
