@@ -6,12 +6,16 @@ from PyQt4 import QtCore, QtGui
 class FramePlotter(FigureCanvasQTAgg):
 
     colors={}
-    colors["UT4"]="#aa0000"
-    colors["UT5"]="#00aa00"
-    colors["UT6"]="#0000aa"
-    colors["UT7"]="#aaaa00"
-    colors["BS2"]="#aaaaaa"
-    colors["BS3"]="#666666"
+    colors[0]="#aa0000"
+    colors[1]="#00aa00"
+    colors[2]="#0000aa"
+    colors[3]="#aa6000"
+    colors[4]="#aa0060"
+    colors[5]="#aaaa00"
+    colors[6]="#aa00aa"
+    colors[7]="#aaaaaa"
+    colors[8]="#606060"
+    colors[9]="#000000"
 
     """This class implements a QT Widget on which you can draw using the
     MATLAB(R)-style commands provided by matplotlib
@@ -57,7 +61,10 @@ class FramePlotter(FigureCanvasQTAgg):
 
         for entry in self.data[startTime:stopTime]:
             v = entry.value
-            theColor = FramePlotter.colors[v["Receiver"]["ID"]]
+            import re
+            m=re.match('\D*(\d*)', v["Transmission"]["ReceiverID"])
+            cindex=int(m.group(1)) % 10
+            theColor = FramePlotter.colors[cindex]
             duration = v["Transmission"]["Stop"] - v["Transmission"]["Start"]
 
             rect=matplotlib.patches.Rectangle((v["Transmission"]["Start"],

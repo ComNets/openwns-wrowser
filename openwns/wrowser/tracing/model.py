@@ -24,7 +24,7 @@ def importFile(filename, dbname):
     
     mapjs="""
 function(doc) {
-  if (doc.Transmission && doc.Receiver)
+  if (doc.Transmission)
   {
       emit(doc.Transmission.Start, doc);
   }
@@ -40,8 +40,6 @@ function(doc) {
         r["Transmission"] = entry["Transmission"]
         if entry.has_key("SINREst"):
             r["SINREst"] = entry["SINREst"]
-        if entry.has_key("Receiver"):
-            r["Receiver"] = entry["Receiver"]
         recordsToAdd.append(r)
 
     progress.setValue(5)
@@ -107,7 +105,7 @@ class TraceEntryTableModel(QtCore.QAbstractTableModel):
         i["Transmission.Start"] = item.value["Transmission"]["Start"]
         i["Transmission.Stop"] = item.value["Transmission"]["Stop"]
         i["Transmission.SC"] = item.value["Transmission"]["Subchannel"]
-        i["Receiver.ID"] = item.value["Receiver"]["ID"]
+        i["Receiver.ID"] = item.value["Transmission"]["ReceiverID"]
         i["_data"] = item
 
         self.theData.append(i)

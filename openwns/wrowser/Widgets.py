@@ -616,7 +616,6 @@ class TraceNavigation(QtGui.QDockWidget):
 
     @QtCore.pyqtSignature("")
     def on_changeTimerExpired(self):
-        print "Emitting radioFrameChanged"
         self.emit(QtCore.SIGNAL("radioFrameChanged(int)"), self.internalWidget.radioframe.value())
 
 class ViewCouchDBTrace(QtGui.QDockWidget):
