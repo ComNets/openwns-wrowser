@@ -46,9 +46,18 @@ import inspect
 import pprint
 
 try:
+    import gnomekeyring
     import desktopcouch.records
     couchIsUsable = True
 except ImportError:
+    couchIsUsable = False
+except gnomekeyring.IOError:
+    print "DesktopCouch is installed but not running. Try executing the command: "
+    print """
+    
+    dbus-send --session --dest=org.desktopcouch.CouchDB --print-reply --type=method_call / org.desktopcouch.CouchDB.getPort
+    
+    """
     couchIsUsable = False
 
 if couchIsUsable:

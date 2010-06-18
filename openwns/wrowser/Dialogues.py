@@ -35,7 +35,6 @@ from Tools import URI, Observing
 import Models
 import Debug
 import time
-import tracing.model
 
 from ui.Dialogues_Preferences_ui import Ui_Dialogues_Preferences
 class Preferences(QtGui.QDialog, Ui_Dialogues_Preferences):
@@ -108,6 +107,7 @@ from ui.Dialogues_OpenCouchDatabase_ui import Ui_CouchDBDialog
 class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
     def __init__(self, *args):
         QtGui.QDialog.__init__(self, *args)
+        import tracing.model
         self.setupUi(self)
 
         self._readDatabases()
