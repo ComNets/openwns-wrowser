@@ -509,3 +509,47 @@ class SelectItem(QtGui.QDialog):
             return QtGui.QDialog.Accepted
         else:
             return QtGui.QDialog.exec_(self)
+
+
+from ui.Dialogues_Warning_ui import Ui_Dialogues_Warning
+class Warning(QtGui.QDialog, Ui_Dialogues_Warning):
+    def __init__(self, parent, entryname, title, message, *args):
+        QtGui.QDialog.__init__(self, *args)
+        self.setupUi(self)
+
+        self.setWindowTitle(title)
+        self.label.setText(message)
+        self.entryname = entryname
+
+        import os
+        import os.path
+        self.owner = os.environ["USER"]
+
+        import Configuration
+        self.cSandbox = Configuration.SandboxConfiguration()
+        try:
+            self.cSandbox.read()
+        except Configuration.MissingConfigurationFile, e:
+            setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), False)
+            c.writeSandboxConf(filename, self.owner)
+        except (Configuration.BadConfigurationFile,
+                Configuration.MissingConfigurationSection,
+                Configuration.MissingConfigurationEntry), e:
+            setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), False)
+            self.cSandbox.writeSandboxConf(self.owner)
+
+        try:
+            self.disabled = self.cSandbox.parser.get('Warnings', 'hiddenwarnings_%s' % (self.entryname))
+        except:
+            self.disabled = "0"
+            setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), "0")
+            self.cSandbox.writeSandboxConf(self.owner)
+
+        self.exec_()
+
+    def exec_(self):
+        if self.disabled == "0":
+            r = QtGui.QDialog.exec_(self)
+            if self.checkBox.checkState() == QtCore.Qt.Checked:
+                setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), "1")
+                self.cSandbox.writeSandboxConf(self.owner)

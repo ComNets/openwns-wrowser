@@ -48,8 +48,13 @@ import pprint
 try:
     import desktopcouch.records
     couchIsUsable = True
+    couchHasUsableKeyring = True
 except ImportError:
     couchIsUsable = False
+    couchHasUsableKeyring = True
+except gnomekeyring.IOError:
+    couchIsUsable = False
+    couchHasUsableKeyring= False
 
 if couchIsUsable:
     import tracing.frameplotter
@@ -85,6 +90,19 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionRefresh.setVisible(False)
 
         global couchIsUsable
+        global couchHasUsableKeyring
+        if not couchIsUsable and not couchHasUsableKeyring:
+            Dialogues.Warning(self, "couchdbnotfound", "Missing CouchDB",
+                              "<h4>I cannot find a running CouchDB instance</h4>"
+                              "This usually happens if you execute wrowser on a remote machine."
+                              "The menu item will be disabled")
+
+        elif not couchIsUsable:
+            Dialogues.Warning(self, "couchdbnotinstalled", "No CouchDB installed",
+                              "<h4>I cannot find a an installation of desktopcouch</h4>"
+                              "The couchdb tracing view will only work with desktopcouch, which is preinstalled in Ubuntu Lucid Lynx."
+                              "The menu item will be disabled")
+
         self.actionView_CouchDB_Trace.setEnabled(couchIsUsable)
 
     @QtCore.pyqtSignature("")
