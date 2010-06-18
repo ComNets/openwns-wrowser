@@ -46,6 +46,7 @@ import inspect
 import pprint
 
 try:
+    import gnomekeyring
     import desktopcouch.records
     couchIsUsable = True
     couchHasUsableKeyring = True
