@@ -601,6 +601,9 @@ class TraceNavigation(QtGui.QDockWidget):
         self.connect(self.internalWidget.previous10, QtCore.SIGNAL("clicked()"), self.on_Previous10Clicked)
 
         self.connect(self.internalWidget.radioframe, QtCore.SIGNAL("valueChanged(int)"), self.on_radioFrameChanged)
+
+        self.connect(self.internalWidget.senders, QtCore.SIGNAL("itemSelectionChanged()"), self.on_selectionChanged)
+        self.connect(self.internalWidget.receivers, QtCore.SIGNAL("itemSelectionChanged()"), self.on_selectionChanged)
         self.timer = None
 
     @QtCore.pyqtSignature("")
@@ -637,6 +640,10 @@ class TraceNavigation(QtGui.QDockWidget):
     @QtCore.pyqtSignature("")
     def on_changeTimerExpired(self):
         self.emit(QtCore.SIGNAL("radioFrameChanged(int)"), self.internalWidget.radioframe.value())
+
+    @QtCore.pyqtSignature("")
+    def on_selectionChanged(self):
+        self.on_radioFrameChanged(self.internalWidget.radioframe.value())
 
 class ViewCouchDBTrace(QtGui.QDockWidget):
 

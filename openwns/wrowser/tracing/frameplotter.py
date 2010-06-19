@@ -36,7 +36,19 @@ class FramePlotter(FigureCanvasQTAgg):
         # Stale OK disables regeneration of index
         # Just keep in mind that this application is read-only
         # If you modify the db, you need to rebuild the index!!!
-        self.data = self.db.execute_view("orderByStartTime", "orderByStartTime", stale='ok')
+        self.data = self.db.execute_view("orderByStartTime", design_doc="wrowser")#, stale='ok')
+
+        self.sendersView = self.db.execute_view("senders", design_doc="wrowser", group=True)#, stale='ok')
+        self.receiversView = self.db.execute_view("receivers", design_doc="wrowser", group=True)#, stale='ok')
+
+        self.senders = []
+        self.receivers = []
+
+        for row in self.sendersView:
+            self.senders.append(row.key)
+
+        for row in self.receiversView:
+            self.receivers.append(row.key)
 
         self.radioFrameDuration = 0.01
         self.subFrameDuration = 0.001
@@ -45,7 +57,6 @@ class FramePlotter(FigureCanvasQTAgg):
         self.activeWindows = []
 
         self._makeConnects()
-        self.plotRadioFrame()
 
     def _makeConnects(self):
         self.figure.gca().get_figure().canvas.mpl_connect('pick_event', self.onPicked)
@@ -54,6 +65,7 @@ class FramePlotter(FigureCanvasQTAgg):
         self.emit(QtCore.SIGNAL("itemPicked"), event.artist.data)
 
     def on_radioFrameChanged(self, value):
+        self.figure.clear()
         self.startFrame = value
         self.plotRadioFrame()
         self.figure.canvas.draw()
@@ -62,10 +74,27 @@ class FramePlotter(FigureCanvasQTAgg):
         startTime = (self.subFrameDuration * self.startFrame) - self.tolerance
         stopTime = startTime + self.radioFrameDuration + 2 * self.tolerance
 
+        selectedSenders = self.getSelectedSenders()
+        selectedReceivers = self.getSelectedReceivers()
+
         for entry in self.data[startTime:stopTime]:
+            if len(selectedSenders) > 0:
+                # Only then we filter by sender
+                if not entry.value["Transmission"]["SenderID"] in selectedSenders:
+                    continue
+
+            if len(selectedReceivers) > 0:
+                # Only then we filter by sender
+                if not entry.value["Transmission"]["ReceiverID"] in selectedReceivers:
+                    continue
+
             v = entry.value
             import re
-            m=re.match('\D*(\d*)', v["Transmission"]["ReceiverID"])
+            if v["Transmission"]["SenderID"].startswith("BS"):
+                m=re.match('\D*(\d*)', v["Transmission"]["ReceiverID"])
+            else:
+                m=re.match('\D*(\d*)', v["Transmission"]["SenderID"])
+
             cindex=int(m.group(1)) % 10
             theColor = FramePlotter.colors[cindex]
             duration = v["Transmission"]["Stop"] - v["Transmission"]["Start"]
@@ -77,11 +106,34 @@ class FramePlotter(FigureCanvasQTAgg):
                                               facecolor=theColor, picker=True)
             rect.data=entry
             self.figure.gca().add_patch(rect)
+        
+        if len(self.figure.axes)>0:
+            ax = self.figure.axes[0]
+            ax.set_xlim(startTime + self.tolerance, stopTime - self.tolerance)
+            ax.set_ylim(-1, 51)
+            ax.grid()
+            ax.set_title("Radioframe starting at subframe %d" % self.startFrame)
+            ax.set_xlabel("Time [s]")
+            ax.set_ylabel("Subchannel")
 
-        ax = self.figure.axes[0]
-        ax.set_xlim(startTime + self.tolerance, stopTime - self.tolerance)
-        ax.set_ylim(-1, 51)
-        ax.grid()
-        ax.set_title("Radioframe starting at subframe %d" % self.startFrame)
-        ax.set_xlabel("Time [s]")
-        ax.set_ylabel("Subchannel")
+    def setSelectors(self, senderSelector, receiverSelector):
+        self.senderSelector = senderSelector
+        self.receiverSelector = receiverSelector
+
+    def getSelectedSenders(self):
+        selectedSenders = []
+        if self.senderSelector is not None:
+            items = self.senderSelector.selectedItems()
+            for it in items:
+                if it.isSelected():
+                    selectedSenders.append(str(it.data(0).toString()))
+        return selectedSenders
+
+    def getSelectedReceivers(self):
+        selectedReceivers = []
+        if self.receiverSelector is not None:
+            items = self.receiverSelector.selectedItems()
+            for it in items:
+                if it.isSelected():
+                    selectedReceivers.append(str(it.data(0).toString()))
+        return selectedReceivers

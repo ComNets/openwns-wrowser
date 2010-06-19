@@ -141,6 +141,14 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.viewCouchDBNavigation = Widgets.TraceNavigation(self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.viewCouchDBNavigation)
+        for sender in  self.viewCouchDBCanvas.senders:
+            self.viewCouchDBNavigation.internalWidget.senders.addItem(sender)
+
+        for receiver in  self.viewCouchDBCanvas.receivers:
+            self.viewCouchDBNavigation.internalWidget.receivers.addItem(receiver)
+
+        self.viewCouchDBCanvas.setSelectors(self.viewCouchDBNavigation.internalWidget.senders, self.viewCouchDBNavigation.internalWidget.receivers)
+        self.viewCouchDBCanvas.plotRadioFrame()
 
         self.connect(self.viewCouchDBNavigation, QtCore.SIGNAL("radioFrameChanged(int)"), self.viewCouchDBCanvas.on_radioFrameChanged)
         self.connect(self.viewCouchDBCanvas, QtCore.SIGNAL("itemPicked"), self.model.addItem)

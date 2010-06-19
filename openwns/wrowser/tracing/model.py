@@ -22,17 +22,41 @@ def importFile(filename, dbname):
 
     db = desktopcouch.records.server.CouchDatabase(dbname, create=True)
     
-    mapjs="""
+    db.add_view("orderByStartTime",
+"""
 function(doc) {
   if (doc.Transmission)
   {
       emit(doc.Transmission.Start, doc);
   }
 }
-"""
-    reducejs=""
+""", "", "wrowser")
 
-    db.add_view("orderByStartTime", mapjs, reducejs)
+    db.add_view("senders",
+"""
+function(doc) {
+  emit(doc.Transmission.SenderID, null);
+}
+""", 
+"""
+function(keys, values) {
+   return true;
+}
+""",
+"wrowser")
+
+    db.add_view("receivers",
+"""
+function(doc) {
+  emit(doc.Transmission.ReceiverID, null);
+}
+""", 
+"""
+function(keys, values) {
+   return true;
+}
+""",
+"wrowser")
 
     recordsToAdd = []
     for entry in parsed:
@@ -62,7 +86,11 @@ class TraceEntryTableModel(QtCore.QAbstractTableModel):
         self.headerNames.append("Transmission.Start")
         self.headerNames.append("Transmission.Stop")
         self.headerNames.append("Transmission.SC")
+        self.headerNames.append("Source.ID")
+        self.headerNames.append("Destination.ID")
         self.headerNames.append("Receiver.ID")
+        self.headerNames.append("Sender.ID")
+        self.headerNames.append("SINR")
         self.theData=[]
 
     def rowCount(self, parent = QtCore.QModelIndex()):
@@ -106,6 +134,10 @@ class TraceEntryTableModel(QtCore.QAbstractTableModel):
         i["Transmission.Stop"] = item.value["Transmission"]["Stop"]
         i["Transmission.SC"] = item.value["Transmission"]["Subchannel"]
         i["Receiver.ID"] = item.value["Transmission"]["ReceiverID"]
+        i["Sender.ID"] = item.value["Transmission"]["SenderID"]
+        i["Source.ID"] = item.value["Transmission"]["SourceID"]
+        i["Destination.ID"] = item.value["Transmission"]["DestinationID"]
+        i["SINR"] = str(float(item.value["Transmission"]["RxPower"]) - float(item.value["Transmission"]["InterferencePower"]))
         i["_data"] = item
 
         self.theData.append(i)
