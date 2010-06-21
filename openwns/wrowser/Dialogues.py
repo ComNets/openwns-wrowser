@@ -124,6 +124,7 @@ class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
             self.listWidget.addItem(dbname)
 
     def onImportClicked(self):
+        import tracing.model
         fileDialogue = QtGui.QFileDialog(self, "Select a Probe to import", os.getcwd(), "Probe files (*.dat)")
         fileDialogue.setAcceptMode(QtGui.QFileDialog.AcceptOpen)
         fileDialogue.setFileMode(QtGui.QFileDialog.ExistingFile)
