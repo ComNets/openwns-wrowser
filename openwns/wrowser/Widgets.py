@@ -604,6 +604,8 @@ class TraceNavigation(QtGui.QDockWidget):
 
         self.connect(self.internalWidget.senders, QtCore.SIGNAL("itemSelectionChanged()"), self.on_selectionChanged)
         self.connect(self.internalWidget.receivers, QtCore.SIGNAL("itemSelectionChanged()"), self.on_selectionChanged)
+        self.connect(self.internalWidget.applyFilterButton, QtCore.SIGNAL("clicked()"), self.on_selectionChanged)
+        self.connect(self.internalWidget.applyFilterCheckbox, QtCore.SIGNAL("stateChanged(int)"), self.on_selectionChanged)
         self.timer = None
 
     @QtCore.pyqtSignature("")

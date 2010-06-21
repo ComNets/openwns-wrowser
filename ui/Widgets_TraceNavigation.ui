@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>266</width>
-    <height>344</height>
+    <width>350</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,6 +77,48 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="applyFilterCheckbox">
+       <property name="text">
+        <string>Additional filter code</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="applyFilterButton">
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPlainTextEdit" name="customFilter">
+     <property name="font">
+      <font>
+       <family>Courier 10 Pitch</family>
+       <underline>false</underline>
+      </font>
+     </property>
+     <property name="plainText">
+      <string>def filter(key, value):
+   # Return True if data is to be included
+
+   # Look in the console output to see fields
+   # print value
+
+   # Check before accessing helps
+   #if value.has_key(&quot;Transmission&quot;):
+      #if value[&quot;Transmission&quot;].has_key(&quot;ReceiverID&quot;):
+          #return value[&quot;Transmission&quot;][&quot;ReceiverID&quot;] == &quot;UT2&quot;
+   #return False
+   return True</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
