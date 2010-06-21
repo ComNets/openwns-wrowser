@@ -150,6 +150,7 @@ class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
         return i[0].text()
 
     def contextMenuEvent(self, event):
+        import tracing.model
         items = self.listWidget.selectedItems()
         dbname = items[0].data(0).toString()
         

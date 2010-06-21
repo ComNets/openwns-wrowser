@@ -3,22 +3,27 @@ import json
 import desktopcouch
 
 def importFile(filename, dbname):
-    progress = QtGui.QProgressDialog("Importing data", "Stop", 0 ,6)
+    progress = QtGui.QProgressDialog("Importing data", "Stop", 0 ,3)
     progress.setWindowModality(QtCore.Qt.WindowModal)
     progress.setCancelButton(None)
     progress.setMinimumDuration(0)
 
     progress.setValue(1)
-    progress.setValue(2)
     f = open(filename)
     c = f.read()
     f.close()
 
-    progress.setValue(3)
+    progress.setValue(2)
 
     parsed = json.loads(c)["content"]
 
-    progress.setValue(4)
+    progress.setValue(3)
+
+    
+    progress = QtGui.QProgressDialog("Writing %d entries to database" % len(parsed), "Stop", 0, int(len(parsed)/500) +1)
+    progress.setWindowModality(QtCore.Qt.WindowModal)
+    progress.setCancelButton(None)
+    progress.setMinimumDuration(0)
 
     db = desktopcouch.records.server.CouchDatabase(dbname, create=True)
     
@@ -58,17 +63,27 @@ function(keys, values) {
 """,
 "wrowser")
 
+
+
+    i = 1
     recordsToAdd = []
     for entry in parsed:
         r = desktopcouch.records.record.Record(record_type="http://openwns.org/couchdb/phytrace")
         r["Transmission"] = entry["Transmission"]
         if entry.has_key("SINREst"):
             r["SINREst"] = entry["SINREst"]
+        if entry.has_key("SchedulingTimeSlot"):
+            r["SchedulingTimeSlot"] = entry["SchedulingTimeSlot"]
         recordsToAdd.append(r)
+        if len(recordsToAdd) > 500:
+            db.put_records_batch(recordsToAdd)
+            recordsToAdd = []
+            progress.setValue(i)
+            i = i + 1
 
-    progress.setValue(5)
+    progress.setValue(i+1)
     db.put_records_batch(recordsToAdd)
-    progress.setValue(6)
+
 
 def deleteDB(dbname):
     import desktopcouch.records.server
@@ -83,14 +98,20 @@ class TraceEntryTableModel(QtCore.QAbstractTableModel):
     def __init__(self, parent = None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self.headerNames = []
+        self.headerNames.append("Source.ID")
+        self.headerNames.append("Destination.ID")
+        self.headerNames.append("SINR")
+        self.headerNames.append("TS.HARQ.NDI")
+        self.headerNames.append("TS.HARQ.Process")
+        self.headerNames.append("TS.HARQ.TID")
+        self.headerNames.append("TS.HARQ.RetryCounter")
         self.headerNames.append("Transmission.Start")
         self.headerNames.append("Transmission.Stop")
         self.headerNames.append("Transmission.SC")
-        self.headerNames.append("Source.ID")
-        self.headerNames.append("Destination.ID")
         self.headerNames.append("Receiver.ID")
         self.headerNames.append("Sender.ID")
-        self.headerNames.append("SINR")
+
+
         self.theData=[]
 
     def rowCount(self, parent = QtCore.QModelIndex()):
@@ -138,6 +159,19 @@ class TraceEntryTableModel(QtCore.QAbstractTableModel):
         i["Source.ID"] = item.value["Transmission"]["SourceID"]
         i["Destination.ID"] = item.value["Transmission"]["DestinationID"]
         i["SINR"] = str(float(item.value["Transmission"]["RxPower"]) - float(item.value["Transmission"]["InterferencePower"]))
+
+        if item.value.has_key("SchedulingTimeSlot"):
+            if item.value["SchedulingTimeSlot"]["HARQ"]["enabled"]:
+                i["TS.HARQ.NDI"] = str(item.value["SchedulingTimeSlot"]["HARQ"]["NDI"])
+                i["TS.HARQ.Process"] = str(item.value["SchedulingTimeSlot"]["HARQ"]["ProcessID"])
+                i["TS.HARQ.TID"] = str(item.value["SchedulingTimeSlot"]["HARQ"]["TransportBlockID"])
+                i["TS.HARQ.RetryCounter"] = str(item.value["SchedulingTimeSlot"]["HARQ"]["RetryCounter"])
+        else:
+                i["TS.HARQ.NDI"] = ""
+                i["TS.HARQ.Process"] = ""
+                i["TS.HARQ.TID"] = ""
+                i["TS.HARQ.RetryCounter"] = ""
+
         i["_data"] = item
 
         self.theData.append(i)
