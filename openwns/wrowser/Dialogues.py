@@ -107,7 +107,7 @@ from ui.Dialogues_OpenCouchDatabase_ui import Ui_CouchDBDialog
 class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
     def __init__(self, *args):
         QtGui.QDialog.__init__(self, *args)
-        import tracing.model
+
         self.setupUi(self)
 
         self._readDatabases()

@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>189</width>
-    <height>79</height>
+    <width>266</width>
+    <height>344</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
@@ -41,6 +41,38 @@
       <widget class="QPushButton" name="previous10">
        <property name="text">
         <string>-10</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Sender</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Receiver</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QListWidget" name="receivers">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QListWidget" name="senders">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
        </property>
       </widget>
      </item>
