@@ -530,12 +530,12 @@ class Warning(QtGui.QDialog, Ui_Dialogues_Warning):
         try:
             self.cSandbox.read()
         except Configuration.MissingConfigurationFile, e:
-            setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), False)
+            setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), "0")
             c.writeSandboxConf(filename, self.owner)
         except (Configuration.BadConfigurationFile,
                 Configuration.MissingConfigurationSection,
                 Configuration.MissingConfigurationEntry), e:
-            setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), False)
+            setattr(self.cSandbox, 'hiddenwarnings_%s' % (self.entryname), "0")
             self.cSandbox.writeSandboxConf(self.owner)
 
         try:

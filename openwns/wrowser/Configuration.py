@@ -105,9 +105,14 @@ class SandboxConfiguration(object):
 
         if 'Warnings' not in self.parser.sections():
             self.parser.add_section('Warnings')
-
-        self.parser.set('Sandbox', 'path', getattr(self, 'sandboxPath'))
-        self.parser.set('Sandbox', 'flavour', getattr(self, 'sandboxFlavour'))
+            
+        if hasattr(self, 'sandboxPath'):
+            self.parser.set('Sandbox', 'path', getattr(self, 'sandboxPath'))
+            self.parser.set('Sandbox', 'flavour', getattr(self, 'sandboxFlavour'))
+        else:
+            self.parser.set('Sandbox', 'path', "")
+            self.parser.set('Sandbox', 'flavour', "dbg")
+          
 
         for k,v in self.__dict__.items():
             if k.startswith("hiddenwarnings_"):
