@@ -597,6 +597,18 @@ class TraceNavigation(QtGui.QDockWidget):
         self.internalWidget = self.__class__.TraceNavigationWidget(parent, self)
         self.setWidget(self.internalWidget)
 
+        import tracing.model
+        self.snippetModel = tracing.model.CodeSnippetModel(self)
+        #self.snippetModel = QtGui.QStringListModel(["Hahn", "Leee"], self)
+        combo = self.internalWidget.snippetCombo
+
+        self.connect(combo.model(), QtCore.SIGNAL("dataChanged(const QModelIndex&, const QModelIndex&)"), self.on_SnippetDataChanged)
+        self.connect(combo, QtCore.SIGNAL("currentIndexChanged(int)"), self.on_SnippetSelectionChanged)
+
+        combo.setModel(self.snippetModel)
+
+        combo.setCurrentIndex(combo.count())
+
         self.connect(self.internalWidget.next10, QtCore.SIGNAL("clicked()"), self.on_Next10Clicked)
         self.connect(self.internalWidget.previous10, QtCore.SIGNAL("clicked()"), self.on_Previous10Clicked)
 
@@ -606,8 +618,47 @@ class TraceNavigation(QtGui.QDockWidget):
         self.connect(self.internalWidget.receivers, QtCore.SIGNAL("itemSelectionChanged()"), self.on_selectionChanged)
         self.connect(self.internalWidget.applyFilterButton, QtCore.SIGNAL("clicked()"), self.on_selectionChanged)
         self.connect(self.internalWidget.applyFilterCheckbox, QtCore.SIGNAL("stateChanged(int)"), self.on_selectionChanged)
+        self.connect(self.internalWidget.removeFilterButton, QtCore.SIGNAL("clicked()"), self.on_removeFilter)
+        self.connect(self.internalWidget.applyFilterButton, QtCore.SIGNAL("clicked()"), self.on_saveFilter)
+        self.connect(self.internalWidget.applyFilterCheckbox, QtCore.SIGNAL("stateChanged(int)"), self.on_saveFilter)
+
         self.timer = None
 
+    @QtCore.pyqtSignature("const QModelIndex&, const QModelIndex&")
+    def on_SnippetDataChanged(self, start, stop):
+        combo = self.internalWidget.snippetCombo
+        code = self.internalWidget.customFilter
+
+        i = combo.currentIndex()
+        i = combo.model().index(i,1)
+        t = combo.model().data(i, QtCore.Qt.DisplayRole)
+        code.setPlainText(t.toString())
+
+    def on_SnippetSelectionChanged(self, pos):
+        combo = self.internalWidget.snippetCombo
+        code = self.internalWidget.customFilter
+
+        i = combo.model().index(pos,1)
+        t = combo.model().data(i, QtCore.Qt.DisplayRole)
+        code.setPlainText(t.toString())
+        
+    def on_saveFilter(self):
+        combo = self.internalWidget.snippetCombo
+        code = self.internalWidget.customFilter
+
+        i = combo.currentIndex()
+        i = combo.model().index(i,1)
+        t = combo.model().setData(i, QtCore.QVariant(code.toPlainText()))
+    
+    def on_removeFilter(self):
+        combo = self.internalWidget.snippetCombo
+        code = self.internalWidget.customFilter
+
+        i = combo.currentIndex()
+
+        if i > -1:
+            i = combo.model().remove(i)
+        
     @QtCore.pyqtSignature("")
     def on_Next10Clicked(self):
         rf = self.internalWidget.radioframe.value()
