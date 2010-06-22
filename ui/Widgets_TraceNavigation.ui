@@ -22,28 +22,57 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Radioframe</string>
+        <string>Start Frame</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="next10">
+      <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>+10</string>
+        <string>No Frames</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QSpinBox" name="radioframe">
+     <item row="1" column="1">
+      <widget class="QSpinBox" name="stepSize">
+       <property name="toolTip">
+        <string>Show number of radio frames</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
        <property name="maximum">
         <number>999999</number>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="previous10">
+     <item row="1" column="2">
+      <widget class="QPushButton" name="previous">
+       <property name="toolTip">
+        <string>go back number of radioframes</string>
+       </property>
        <property name="text">
-        <string>-10</string>
+        <string>&lt;&lt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="next">
+       <property name="toolTip">
+        <string>forward number of radioframes</string>
+       </property>
+       <property name="text">
+        <string>&gt;&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QSpinBox" name="radioframe">
+       <property name="toolTip">
+        <string>Start at radioframe</string>
+       </property>
+       <property name="maximum">
+        <number>999999</number>
        </property>
       </widget>
      </item>

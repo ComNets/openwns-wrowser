@@ -315,11 +315,10 @@ def filter(key, value):
         self.beginInsertRows(QtCore.QModelIndex(), row, row+count)
 
         for i in xrange(count):
-            print "Inserting %d" % i
             self.snippets.insert(row+i, ["", "def filter(key, value):\n   return True"])
 
         self.endInsertRows()
-
+        self.emit(QtCore.SIGNAL("modelReset()"))
         return True
 
     def remove(self, rowindex):

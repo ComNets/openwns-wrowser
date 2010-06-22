@@ -609,10 +609,11 @@ class TraceNavigation(QtGui.QDockWidget):
 
         combo.setCurrentIndex(combo.count())
 
-        self.connect(self.internalWidget.next10, QtCore.SIGNAL("clicked()"), self.on_Next10Clicked)
-        self.connect(self.internalWidget.previous10, QtCore.SIGNAL("clicked()"), self.on_Previous10Clicked)
+        self.connect(self.internalWidget.next, QtCore.SIGNAL("clicked()"), self.on_NextClicked)
+        self.connect(self.internalWidget.previous, QtCore.SIGNAL("clicked()"), self.on_PreviousClicked)
 
         self.connect(self.internalWidget.radioframe, QtCore.SIGNAL("valueChanged(int)"), self.on_radioFrameChanged)
+        self.connect(self.internalWidget.stepSize, QtCore.SIGNAL("valueChanged(int)"), self.on_stepSizeChanged)
 
         self.connect(self.internalWidget.senders, QtCore.SIGNAL("itemSelectionChanged()"), self.on_selectionChanged)
         self.connect(self.internalWidget.receivers, QtCore.SIGNAL("itemSelectionChanged()"), self.on_selectionChanged)
@@ -660,15 +661,15 @@ class TraceNavigation(QtGui.QDockWidget):
             i = combo.model().remove(i)
         
     @QtCore.pyqtSignature("")
-    def on_Next10Clicked(self):
+    def on_NextClicked(self):
         rf = self.internalWidget.radioframe.value()
-        rf += 10
+        rf += 10 * self.internalWidget.stepSize.value()
         self.internalWidget.radioframe.setValue(rf)
 
     @QtCore.pyqtSignature("")
-    def on_Previous10Clicked(self):
+    def on_PreviousClicked(self):
         rf = self.internalWidget.radioframe.value()
-        rf -= 10
+        rf -= 10 * self.internalWidget.stepSize.value()
 
         if rf < 0:
             rf = 0
@@ -690,9 +691,24 @@ class TraceNavigation(QtGui.QDockWidget):
 
             self.timer.start(500)
 
+    @QtCore.pyqtSignature("int")
+    def on_stepSizeChanged(self, value):
+        if self.timer is None:
+            self.timer = QtCore.QTimer(self)
+            self.timer.setSingleShot(True)
+            self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.on_changeTimerExpired)
+            
+            self.timer.start(500)
+
+        else:
+            if self.timer.isActive():
+                self.timer.stop()
+
+            self.timer.start(500)
+
     @QtCore.pyqtSignature("")
     def on_changeTimerExpired(self):
-        self.emit(QtCore.SIGNAL("radioFrameChanged(int)"), self.internalWidget.radioframe.value())
+        self.emit(QtCore.SIGNAL("radioFrameChanged(int, int)"), self.internalWidget.radioframe.value(), self.internalWidget.stepSize.value())
 
     @QtCore.pyqtSignature("")
     def on_selectionChanged(self):
