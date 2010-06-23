@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
+    <width>360</width>
     <height>580</height>
    </rect>
   </property>
@@ -96,6 +96,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QListWidget" name="receivers">
+       <property name="toolTip">
+        <string>filter by receiver, multiple selections possible</string>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::MultiSelection</enum>
        </property>
@@ -103,6 +106,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QListWidget" name="senders">
+       <property name="toolTip">
+        <string>filter by sender, multiple selections possible</string>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::MultiSelection</enum>
        </property>
@@ -165,26 +171,36 @@
     </layout>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="customFilter">
+    <widget class="QTextEdit" name="customFilter">
      <property name="font">
       <font>
        <family>Courier 10 Pitch</family>
        <underline>false</underline>
       </font>
      </property>
-     <property name="plainText">
-      <string>def filter(key, value):
-   # Return True if data is to be included
-
-   # Look in the console output to see fields
-   # print value
-
-   # Check before accessing helps
-   #if value.has_key(&quot;Transmission&quot;):
-      #if value[&quot;Transmission&quot;].has_key(&quot;ReceiverID&quot;):
-          #return value[&quot;Transmission&quot;][&quot;ReceiverID&quot;] == &quot;UT2&quot;
-   #return False
-   return True</string>
+     <property name="toolTip">
+      <string>Python code of filter</string>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Courier 10 Pitch'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;def filter(key, value):&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   # Return True if data is to be included&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   # Look in the console output to see fields&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   # print value&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   # Check before accessing helps&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   #if value.has_key(&amp;quot;Transmission&amp;quot;):&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;      #if value[&amp;quot;Transmission&amp;quot;].has_key(&amp;quot;ReceiverID&amp;quot;):&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;          #return value[&amp;quot;Transmission&amp;quot;][&amp;quot;ReceiverID&amp;quot;] == &amp;quot;UT2&amp;quot;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   #return False&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   return True&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="acceptRichText">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
