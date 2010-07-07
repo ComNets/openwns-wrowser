@@ -84,6 +84,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.connect(self.windowMapper, QtCore.SIGNAL("mapped(QWidget *)"),
                      self.workspace, QtCore.SLOT("setActiveWindow(QWidget *)"))
 
+        self.statusbar.setMinimumHeight(self.statusbar.height())
         self.cancelButton = QtGui.QPushButton("Cancel")
         self.progressText = QtGui.QLabel("")
         self.progressIndicator = Dialogues.ProgressStatus(self.progressText)
