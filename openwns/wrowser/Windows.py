@@ -68,7 +68,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, calledFromDir, *args):
+    def __init__(self, calledFromDir, directoryMode, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
@@ -76,6 +76,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.readerStopped = False
         self.campaignId = None
         self.calledFromDir = calledFromDir
+        self.directoryMode = directoryMode
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
 
@@ -89,6 +90,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
+        if directoryMode:
+            self.on_actionOpenDirectory_triggered()
 
         global couchIsUsable
         global couchHasUsableKeyring

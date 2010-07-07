@@ -31,6 +31,24 @@ import os
 import traceback
 
 from PyQt4 import QtGui
+import optparse
+
+usage = 'usage: %prog [options]'
+parser = optparse.OptionParser(usage)
+
+parser.add_option('-d','--directorymode',
+                  action = "store_true", dest = 'directoryMode',
+                  help = 'open wrowser in directorymode', default=False)
+
+
+options, args = parser.parse_args()
+if len(args):
+    print sys.stderr, 'Invalid argument(s): ' + str(args)
+    parser.print_help()
+    sys.exit(1)
+
+if options.directoryMode:
+    print "wrowser is started in directory mode"
 
 # Path to this script
 p = sys.path[0]
@@ -65,7 +83,7 @@ if __name__ == "__main__":
     application.setWindowIcon(QtGui.QIcon(":/icons/icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
-    widget = openwns.wrowser.Windows.Main(calledFromDir)
+    widget = openwns.wrowser.Windows.Main(calledFromDir, options.directoryMode)
     widget.show()
     sys.excepthook = wrowserExceptHook
     sys.exit(application.exec_())

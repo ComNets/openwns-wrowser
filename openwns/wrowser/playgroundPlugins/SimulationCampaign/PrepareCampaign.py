@@ -42,8 +42,6 @@ except ImportError:
 
 __config = conf.Configuration()
 __config.read()
-db.Database.connectConf(__config)
-
 
 def __getDirectoryProposal(directory):
     files = os.listdir(directory)
@@ -89,6 +87,7 @@ def createNewSubCampaign(directory):
 
     campaignTitle = raw_input('Please enter a name for the campaign: ')
     campaignDescription = raw_input('Please enter a short description of the campaign: ')
+    db.Database.connectConf(__config)
     cursor = db.Database.getCursor()
     cursor.execute('INSERT INTO campaigns (title, description) VALUES (\'%s\', \'%s\')' % (campaignTitle, campaignDescription))
     cursor.execute('SELECT currval(\'administration.campaigns_id_seq\')')
