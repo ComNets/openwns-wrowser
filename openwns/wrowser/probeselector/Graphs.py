@@ -81,12 +81,13 @@ class AggregatedGraph(Graph):
         self.pointsDict = dict()
         self.confidenceIntervalDict = dict()
 
-    def process(self, missingScenarios, mainWindow = None):
+    def process(self, missingScenarios, mainWindow = None, gui = True):
         numberOfPoints = map(lambda x: len(x), self.pointsDict.values())
         missingScenariosLocal = False 
         if min(numberOfPoints) != max(numberOfPoints):
             if not missingScenarios:
-                QtGui.QMessageBox.warning(mainWindow, "Aggregation Problem", "The number of y values to aggregate is different for different x values!")
+                if gui:
+                    QtGui.QMessageBox.warning(mainWindow, "Aggregation Problem", "The number of y values to aggregate is different for different x values!")
             missingScenariosLocal=True
         
         self.points = self.aggregationFunction(self)

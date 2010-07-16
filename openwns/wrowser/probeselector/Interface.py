@@ -323,7 +323,7 @@ class Facade:
                     msg += "\n" + str(graph.identity)
                     progressNotify(index, maxIndex, msg)
                 try:
-                    missingScenarios = graph.process(missingScenarios)
+                    missingScenarios = graph.process(missingScenarios, gui=False)
                 except Exception, e:
                     QtGui.QMessageBox.information(self.mainWindow, "Error encountered", str(e))
                     return [],errors
