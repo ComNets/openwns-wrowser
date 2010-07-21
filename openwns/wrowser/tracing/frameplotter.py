@@ -44,6 +44,7 @@ class FramePlotter(FigureCanvasQTAgg):
         self.subFrameDuration = 0.001
         self.tolerance = self.subFrameDuration / 14
         self.startFrame = 0
+        self.numFrames = 1
         self.activeWindows = []
 
         self._makeConnects()
@@ -54,15 +55,16 @@ class FramePlotter(FigureCanvasQTAgg):
     def onPicked(self, event):
         self.emit(QtCore.SIGNAL("itemPicked"), event.artist.data)
 
-    def on_radioFrameChanged(self, value):
+    def on_radioFrameChanged(self, start, numFrames):
         self.figure.clear()
-        self.startFrame = value
+        self.startFrame = start
+        self.numFrames = numFrames
         self.plotRadioFrame()
         self.figure.canvas.draw()
 
     def plotRadioFrame(self):
         startTime = (self.subFrameDuration * self.startFrame) - self.tolerance
-        stopTime = startTime + self.radioFrameDuration + 2 * self.tolerance
+        stopTime = startTime + self.radioFrameDuration * self.numFrames + 2 * self.tolerance
 
         selectedSenders = self.getSelectedSenders()
         selectedReceivers = self.getSelectedReceivers()

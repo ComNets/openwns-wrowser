@@ -191,3 +191,146 @@ class TraceEntryTableModel(QtCore.QAbstractTableModel):
 
         self.theData = sorted(self.theData, key=lambda i:i[key], reverse=reverse)
         self.reset()
+
+class CodeSnippetModel(QtCore.QAbstractItemModel):
+
+    def __init__(self, parent=None):
+        QtCore.QAbstractItemModel.__init__(self, parent)
+
+        import os
+
+        self.dir = os.path.join(os.environ['HOME'], '.wns', 'traceFilters')
+
+        if not os.path.exists(self.dir):
+            os.mkdir(self.dir)
+
+        self.snippets = []
+
+        self.load()
+
+        if len(self.snippets) == 0:
+
+            self.snippets.append(["Example", """
+def filter(key, value):
+   # The function named filter will be called from wrowser
+   # do not rename it or change the number of mandatory parameters
+   # Return True if you want to include this element in the frame viewer
+   # Return False otherwise
+
+   # Look in the console output to see fields
+   print key
+   print value
+
+   # Check if element exists before accessing it
+   if value.has_key("Transmission"):
+      if value["Transmission"].has_key("SenderID"):
+          return value["Transmission"]["SenderID"] == "BS2"
+   return False
+"""])
+            self.save()
+
+    def load(self):
+        import os
+        oldpath = os.getcwd()
+        os.chdir(self.dir)
+        import glob
+        files = glob.glob("*.py")
+        for filename in files:
+            key = filename.rstrip("y")
+            key = key.rstrip("p")
+            key = key.rstrip(".")
+
+            f = open(filename)
+            c = f.read()
+            f.close()
+            self.snippets.append([key, c])
+
+        os.chdir(oldpath)
+
+    def save(self):
+        import os
+        oldpath = os.getcwd()
+        os.chdir(self.dir)
+
+        for (k,v) in self.snippets:
+            f = open(k+".py","w")
+            f.write(v)
+            f.close()
+
+        os.chdir(oldpath)
+
+    def delete(self, key):
+        import os
+        oldpath = os.getcwd()
+        os.chdir(self.dir)
+
+        os.remove(str(key)+".py")
+
+        os.chdir(oldpath)
+        
+        
+        
+    def rowCount(self, parent = QtCore.QModelIndex()):
+        if parent.isValid():
+            return 0
+        else:
+            return len(self.snippets)
+
+    def columnCount(self, parent = QtCore.QModelIndex()):
+        if parent.isValid():
+            return 0
+        else:
+            return 2
+
+    def data(self, index, role = QtCore.Qt.DisplayRole):
+        if not index.isValid() or index.row() >= self.rowCount():
+            return QtCore.QVariant()
+
+        if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            return QtCore.QVariant(self.snippets[index.row()][index.column()])
+
+        return QtCore.QVariant()
+
+    def index(self, row, column, parent = QtCore.QModelIndex()):
+        return self.createIndex(row, column, 0)
+
+    def parent(self, index):
+        return QtCore.QModelIndex()
+
+    def setData(self, index, data, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            self.snippets[index.row()][index.column()] = data.toString()
+            self.save()
+            self.emit(QtCore.SIGNAL("dataChanged(const QModelIndex&,const QModelIndex&)"), index, index)
+            return True
+        return False
+
+    def flags(self, index):
+        if not index.isValid():
+            return QtCore.Qt.ItemIsEnabled
+
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+
+    def insertRows(self, row, count, parent):
+        self.beginInsertRows(QtCore.QModelIndex(), row, row+count)
+
+        for i in xrange(count):
+            self.snippets.insert(row+i, ["", "def filter(key, value):\n   return True"])
+
+        self.endInsertRows()
+        self.emit(QtCore.SIGNAL("modelReset()"))
+        return True
+
+    def remove(self, rowindex):
+
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText("Remove %s" % self.snippets[rowindex][0])
+        msgBox.setInformativeText("This will permanently delete the filter. Make sure you have a copy.")
+        msgBox.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel);
+        msgBox.setDefaultButton(QtGui.QMessageBox.Cancel);
+        ret = msgBox.exec_();
+        
+        if ret == QtGui.QMessageBox.Ok:
+            e = self.snippets.pop(rowindex)
+            self.delete(e[0])
+            self.emit(QtCore.SIGNAL("modelReset()"))

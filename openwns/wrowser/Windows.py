@@ -154,7 +154,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.viewCouchDBCanvas.plotRadioFrame()
 
-        self.connect(self.viewCouchDBNavigation, QtCore.SIGNAL("radioFrameChanged(int)"), self.viewCouchDBCanvas.on_radioFrameChanged)
+        self.connect(self.viewCouchDBNavigation, QtCore.SIGNAL("radioFrameChanged(int, int)"), self.viewCouchDBCanvas.on_radioFrameChanged)
 
         self.connect(self.viewCouchDBCanvas, QtCore.SIGNAL("itemPicked"), self.model.addItem)
         self.connect(self.viewCouchDBTraceWidget.internalWidget.clearButton,
