@@ -139,6 +139,7 @@ def loadCampaignAndPlotGraphs(PlotParameters):
 
     if PlotParameters.showTitle :
         title(PlotParameters.figureTitle)
+    PlotParameters.postFunction()
     if PlotParameters.legend:
         legend(prop = font, loc=PlotParameters.legendPosition) # (0.9, 0.01))
     print 'Plotting: ',PlotParameters.fileName
