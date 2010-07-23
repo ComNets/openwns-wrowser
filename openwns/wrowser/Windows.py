@@ -76,6 +76,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.readerStopped = False
         self.campaignId = None
         self.calledFromDir = calledFromDir
+        self.exportDir= calledFromDir
         self.directoryMode = directoryMode
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
@@ -724,11 +725,12 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         formatDialogue = Dialogues.SelectItem("Export Format", "Select format", Exporters.directory.keys(), self, Dialogues.SelectItem.RadioButtons)
         if formatDialogue.exec_() == QtGui.QDialog.Accepted:
             format = formatDialogue.selectedText()
-            fileDialogue = QtGui.QFileDialog(self, "Export to " + format + " file", os.getcwd(), "Files (*.*)")
+            fileDialogue = QtGui.QFileDialog(self, "Export to " + format + " file", self.mainWindow.exportDir, "Files (*.*)")
             fileDialogue.setAcceptMode(QtGui.QFileDialog.AcceptSave)
             fileDialogue.setFileMode(QtGui.QFileDialog.AnyFile)
             if fileDialogue.exec_() == QtGui.QDialog.Accepted:
                 filename = str(fileDialogue.selectedFiles()[0])
+                self.mainWindow.exportDir=os.path.dirname(filename)
                 progressDialogue = Dialogues.Progress("Exporting to " + filename, 0)
                 Exporters.directory[format].export(filename, export , progressDialogue.setCurrentAndMaximum, progressDialogue.reset) 
 
