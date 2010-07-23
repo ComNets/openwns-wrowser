@@ -68,7 +68,7 @@ class Graph(Tools.Chameleon):
         self.axisLabels = ("", "")
         self.reversePoints = False
 
-    def process(self, mainWindow = None):
+    def process(self, mainWindow = None, gui = True):
         if self.reversePoints:
             self.points.reverse()
         self.points.sort(key = lambda x: x[0])

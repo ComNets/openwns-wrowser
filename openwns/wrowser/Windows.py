@@ -668,7 +668,10 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
     def setInterfaceEnabled(self,isEnabled):
         self.setEnabled(isEnabled)
-        self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        try :
+            self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        except:
+            pass
         self.mainWindow.actionCloseDataSource.setEnabled(isEnabled)
         self.mainWindow.actionView_Scenario.setEnabled(isEnabled)
  
