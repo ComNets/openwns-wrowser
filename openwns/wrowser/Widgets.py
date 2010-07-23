@@ -469,7 +469,10 @@ class LineGraph(Graph, Observing):
     def setInterfaceEnabled(self,isEnabled):
         for window in self.mainWindow.workspace.windowList():
             window.setEnabled(isEnabled)
-        self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        try:
+            self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        except:
+            pass
         self.mainWindow.actionCloseDataSource.setEnabled(isEnabled)
         self.mainWindow.actionView_Scenario.setEnabled(isEnabled)
 

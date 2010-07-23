@@ -245,6 +245,7 @@ class ProgressStatus(QtGui.QProgressBar):
         self.setMaximum(maximum)
         self.setValue(current)
         labelText = self.labelText
+        timeDelta = ""
         if len(additionalText) > 0:
             additionalText = additionalText.replace('\n',' ')
             labelText += " " + additionalText
@@ -252,13 +253,14 @@ class ProgressStatus(QtGui.QProgressBar):
             elapsed = datetime.datetime.now() - self.startTime
             total = elapsed * maximum / current
             remaining = total - elapsed
-            if len(labelText) > self.labelLength:
-                labelText = ".. approx. " + Time.Delta(remaining).asString() + " left"
-            else:
-                labelText += " approx. " + Time.Delta(remaining).asString() + " left"
+            timeDelta = ".. approx. " + Time.Delta(remaining).asString() + " left"
         if QtGui.QApplication.hasPendingEvents():
             QtGui.QApplication.instance().syncX()
             QtGui.QApplication.instance().processEvents()
+            if len(labelText) > self.labelLength:
+                labelText = timeDelta
+            else:
+                labelText += timeDelta 
             self.progressLabel.setText(labelText)
         time.sleep(0.006)
 

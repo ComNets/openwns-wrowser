@@ -68,7 +68,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, calledFromDir, *args):
+    def __init__(self, calledFromDir, directoryMode, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
@@ -76,6 +76,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.readerStopped = False
         self.campaignId = None
         self.calledFromDir = calledFromDir
+        self.exportDir= calledFromDir
+        self.directoryMode = directoryMode
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
 
@@ -83,12 +85,15 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.connect(self.windowMapper, QtCore.SIGNAL("mapped(QWidget *)"),
                      self.workspace, QtCore.SLOT("setActiveWindow(QWidget *)"))
 
+        self.statusbar.setMinimumHeight(self.statusbar.height())
         self.cancelButton = QtGui.QPushButton("Cancel")
         self.progressText = QtGui.QLabel("")
         self.progressIndicator = Dialogues.ProgressStatus(self.progressText)
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
+        if directoryMode:
+            self.on_actionOpenDirectory_triggered()
 
         global couchIsUsable
         global couchHasUsableKeyring
@@ -664,7 +669,10 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
     def setInterfaceEnabled(self,isEnabled):
         self.setEnabled(isEnabled)
-        self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        try :
+            self.mainWindow.simulationParameters.setEnabled(isEnabled)
+        except:
+            pass
         self.mainWindow.actionCloseDataSource.setEnabled(isEnabled)
         self.mainWindow.actionView_Scenario.setEnabled(isEnabled)
  
@@ -717,11 +725,12 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
         formatDialogue = Dialogues.SelectItem("Export Format", "Select format", Exporters.directory.keys(), self, Dialogues.SelectItem.RadioButtons)
         if formatDialogue.exec_() == QtGui.QDialog.Accepted:
             format = formatDialogue.selectedText()
-            fileDialogue = QtGui.QFileDialog(self, "Export to " + format + " file", os.getcwd(), "Files (*.*)")
+            fileDialogue = QtGui.QFileDialog(self, "Export to " + format + " file", self.mainWindow.exportDir, "Files (*.*)")
             fileDialogue.setAcceptMode(QtGui.QFileDialog.AcceptSave)
             fileDialogue.setFileMode(QtGui.QFileDialog.AnyFile)
             if fileDialogue.exec_() == QtGui.QDialog.Accepted:
                 filename = str(fileDialogue.selectedFiles()[0])
+                self.mainWindow.exportDir=os.path.dirname(filename)
                 progressDialogue = Dialogues.Progress("Exporting to " + filename, 0)
                 Exporters.directory[format].export(filename, export , progressDialogue.setCurrentAndMaximum, progressDialogue.reset) 
 
