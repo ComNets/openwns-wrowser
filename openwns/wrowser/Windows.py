@@ -261,6 +261,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionOpenCampaignDatabase.setEnabled(isEnabled)
         self.actionOpenDSV.setEnabled(isEnabled)
         self.actionOpenDirectory.setEnabled(isEnabled)
+        self.actionOpenPythonCampaign.setEnabled(isEnabled)
         self.actionView_Scenario.setEnabled(isEnabled)
         self.actionView_CouchDB_Trace.setEnabled(isEnabled and couchIsUsable)
 
@@ -303,6 +304,29 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.menuSetAllOpen(False)
 
         self.actionCloseDataSource.setEnabled(True)
+
+    @QtCore.pyqtSignature("")
+    def on_actionOpenPythonCampaign_triggered(self):
+        from probeselector import PythonCampaignReader, Representations, Interface
+
+        dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
+                                                         os.getcwd(),
+                                                         QtGui.QFileDialog.ShowDirsOnly
+                                                         | QtGui.QFileDialog.DontResolveSymlinks))
+        if dir == '':
+            return
+        campaign =  Representations.Campaign(*PythonCampaignReader.PythonCampaignCampaignReader(dir).read())
+        self.campaigns.original = Interface.Facade(campaign)
+
+        self.simulationParameters = SimulationParameters(self.campaigns, self)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
+        self.menuNew.setEnabled(True)
+
+        self.menuSetAllOpen(False)
+
+        self.actionCloseDataSource.setEnabled(True)
+
+
 
     QtCore.pyqtSignature("")
     def on_actionCloseDataSource_triggered(self):
