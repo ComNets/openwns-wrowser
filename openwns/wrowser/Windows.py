@@ -944,7 +944,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
     @staticmethod
     def getProbeTypes():
         import Probe
-        return [Probe.PDFProbe]
+        return [Probe.PDFProbeBase]
 
     def getGraphs(self):
         dataacquisition = probeselector.dataacquisition
