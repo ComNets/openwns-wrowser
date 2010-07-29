@@ -62,6 +62,7 @@ class PythExport:
         set_path = """#!/usr/bin/python
 import sys
 import os
+from pylab import *
 sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
 
         def createPlotAll(newlocation):
