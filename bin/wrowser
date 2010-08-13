@@ -29,7 +29,6 @@
 import sys
 import os
 import traceback
-
 from PyQt4 import QtGui
 import optparse
 
@@ -63,6 +62,12 @@ calledFromDir = os.path.abspath(os.path.curdir)
 
 os.chdir(searchPath)
 import openwns.wrowser.Windows
+def getBzrRevision():
+    import subprocess
+    process = subprocess.Popen("bzr version-info | egrep -o 'revno: [0-9]*'", shell=True, stdout=subprocess.PIPE)
+    revision = process.communicate()[0].rstrip('\n').rpartition(' ')[-1]
+    return revision
+ 
 
 def wrowserExceptHook(eType, eValue, eTraceback):
     message = "".join(traceback.format_exception(eType, eValue, eTraceback))
@@ -77,6 +82,7 @@ def wrowserExceptHook(eType, eValue, eTraceback):
         pass
 
 if __name__ == "__main__":
+    print "Wrowser revision: ",getBzrRevision()
     application = QtGui.QApplication(sys.argv)
     application.setQuitOnLastWindowClosed(True)
     application.setApplicationName("Wrowser")

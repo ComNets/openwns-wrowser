@@ -232,6 +232,7 @@ class ProgressStatus(QtGui.QProgressBar):
         self.progressLabel = progressLabel
         self.labelText=""
         self.labelLength=80
+        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed))
         self.reset()
 
     def reset(self):
