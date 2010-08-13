@@ -363,7 +363,7 @@ class ConfigureGraph(QtGui.QDialog, Ui_Dialogues_ConfigureGraph):
             self.colorbarCheckBox.setCheckState(QtCore.Qt.Unchecked)
 
         self.colormapComboBox.setCurrentIndex(self.colormapComboBox.findText(self.figure.colormap))
-
+        self.tabWidget.setCurrentIndex(0)
 
     @QtCore.pyqtSignature("")
     def on_buttonBox_accepted(self):
