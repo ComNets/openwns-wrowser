@@ -356,7 +356,7 @@ class ProbeEntries(QtCore.QAbstractListModel):
         for index, entry in enumerate(self.probeEntries):
             if entry == text:
                 return index
-        return 1000000001
+        return 0
 
     def changeProbes(self, probeNames):
         self.probeNames = probeNames
