@@ -539,6 +539,7 @@ class DirectoryNavigation(QtGui.QDockWidget,Observing):
             self.directoryView.setColumnHidden(1, True)
             self.directoryView.setColumnHidden(2, True)
             self.directoryView.setColumnHidden(3, True)
+            self.xdfOpened = False
 
         @QtCore.pyqtSignature("const QString&")
         def on_rootEdit_textEdited(self, text):
@@ -571,6 +572,9 @@ class DirectoryNavigation(QtGui.QDockWidget,Observing):
             self.scanInfoLabel.setText(str(len(self.campaigns.draw.getScenarios())) + " directories with probes.")
             self.mainWindow.menuNew.setEnabled(True)
             self.mainWindow.actionNewParameter.setEnabled(False)
+            if not self.xdfOpened:
+                self.mainWindow.on_actionNewXDF_triggered()
+            self.xdfOpened = True
 
     def closeEvent(self, event):
         self.mainWindow.on_actionCloseDataSource_triggered()
