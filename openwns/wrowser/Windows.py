@@ -89,6 +89,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.cancelButton = QtGui.QPushButton("Cancel")
         self.progressText = QtGui.QLabel("")
         self.progressIndicator = Dialogues.ProgressStatus(self.progressText)
+        self.progressIndicator.setMinimumWidth(100)
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
