@@ -116,7 +116,6 @@ sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
         pw.write("yLabel",export.graphs[0].axisLabels[1])
         if typ == 'Param':
             pw.write("confidenceLevel",export.confidenceLevel)
-            pw.write("yLabel",export.graphs[0].axisLabels[1])
             pw.write("parameterName",export.paramName)
             pw.write("probeEntry",export.probeEntry)
             pw.write("useXProbe",export.useXProbe)
