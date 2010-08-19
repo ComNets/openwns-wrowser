@@ -188,7 +188,11 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         for column in xrange(self.campaignsModel.columnCount()):
             self.campaigns.resizeColumnToContents(column)
-        self.connect(self.campaigns, QtCore.SIGNAL("doubleClicked(QModelIndex)"), self.buttonBox, QtCore.SIGNAL("accepted()")) 
+        self.connect(self.campaigns, QtCore.SIGNAL("doubleClicked(QModelIndex)"), self.campaignSelected)
+    
+    def campaignSelected(self, index):
+        if index.column()==1:
+            self.buttonBox.emit(QtCore.SIGNAL("accepted()"))
 
     def getCampaign(self):
         return self.campaignsModel.getCampaign(self.campaigns.selectedIndexes()[0])
