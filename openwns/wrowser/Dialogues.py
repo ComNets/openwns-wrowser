@@ -191,8 +191,13 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
         self.connect(self.campaigns, QtCore.SIGNAL("doubleClicked(QModelIndex)"), self.campaignSelected)
     
     def campaignSelected(self, index):
-        if index.column()==1:
-            self.buttonBox.emit(QtCore.SIGNAL("accepted()"))
+        try:
+           self.campaigns.selectedIndexes()[0] 
+           if index.column()>0:
+                self.buttonBox.emit(QtCore.SIGNAL("accepted()"))
+        except IndexError:
+            pass
+
 
     def getCampaign(self):
         return self.campaignsModel.getCampaign(self.campaigns.selectedIndexes()[0])
