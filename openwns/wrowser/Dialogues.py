@@ -180,7 +180,6 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         self.campaignsModel = Models.CampaignDb(Campaigns.getCampaignsDict())
         self.campaigns.setModel(self.campaignsModel)
-
         user = os.getenv("USER")
         userIndex = self.campaignsModel.getUserRow(user)
         if userIndex != -1 :
@@ -189,6 +188,7 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         for column in xrange(self.campaignsModel.columnCount()):
             self.campaigns.resizeColumnToContents(column)
+        self.connect(self.campaigns, QtCore.SIGNAL("doubleClicked(QModelIndex)"), self.buttonBox, QtCore.SIGNAL("accepted()")) 
 
     def getCampaign(self):
         return self.campaignsModel.getCampaign(self.campaigns.selectedIndexes()[0])
