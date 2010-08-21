@@ -73,7 +73,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         riseConfig = self.simulator.modules.rise
 
         ofdmaPhyConfig = self.simulator.modules.ofdmaPhy
-        ofdmaPhySystem = ofdmaphy.OFDMAPhy.OFDMASystem('OFDMA')
+        ofdmaPhySystem = ofdmaphy.OFDMAPhy.OFDMASystem('ofdma')
         ofdmaPhySystem.Scenario = rise.Scenario.Scenario()
         ofdmaPhyConfig.systems.append(ofdmaPhySystem)
         
@@ -126,7 +126,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         table = Table(axis1 = 'rise.scenario.mobility.x', minValue1 = self.scenarioSize[0], maxValue1 = self.scenarioSize[2], resolution1 = self.xBins,
                       axis2 = 'rise.scenario.mobility.y', minValue2 = self.scenarioSize[1], maxValue2 = self.scenarioSize[3], resolution2 = self.yBins,
                       values = ['mean', 'max', 'trials'],
-                      formats = ['MatlabReadable']
+                      formats = ['Plain']
                       )
 
         node = openwns.evaluation.createSourceNode(self.simulator, self.rxpProbeName)
