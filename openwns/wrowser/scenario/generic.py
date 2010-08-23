@@ -26,6 +26,7 @@
 ###############################################################################
 
 import math
+import numpy
 from pylab import *
 
 try:
@@ -77,11 +78,11 @@ class GenericPlotter:
 
         try:
             filename = baseFilename + what
-            trialFilename = baseFilename + '_trials.m'
+            trialFilename = baseFilename + '_trials.dat'
             print "Loading %s" % filename
-            map_raw = load(filename, comments='%')
+            map_raw = numpy.loadtxt(filename, comments='%')
             print "Loading %s" % trialFilename
-            trials_raw = load(trialFilename, comments='%')
+            trials_raw = numpy.loadtxt(trialFilename, comments='%')
         except IOError:
             return None
 
@@ -118,7 +119,7 @@ from ScenarioFrame to plot special scenarios"""
         groupcolors = { 1 : 'b', 2:'r', 3:'g', 4:'y', 5:'m', 6:'c' }
 
         shapes = { 0 : '^', 1 : 'o', 2 : 's', 3: 'x'}
-
+        
         for n in self.inspector.getNodes():
             if n["hasMobility"]:
                 x = n["coords"]["x"]
