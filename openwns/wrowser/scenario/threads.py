@@ -69,8 +69,8 @@ class SimulationThread(QtCore.QThread):
 
         content = {}
         content["powerPerSubBand"] = str(self.parent.powerPerSubBand.text())
-        content["numXBins"] = int(self.parent.xBinsEdit.text())
-        content["numYBins"] = int(self.parent.yBinsEdit.text())
+        content["numXRes"] = int(self.parent.xBinsEdit.text())
+        content["numYRes"] = int(self.parent.yBinsEdit.text())
         content["scenario"] = templates.datamodel.Scenario(*self.parent.inspector.getSize())
         content["baseStations"] = bsPositions
         content["centerfreq"] = float(self.parent.centerfreq.text())
