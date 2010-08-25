@@ -154,10 +154,12 @@ class Probe(object):
 
 
 # Moments probe specific part
-class MomentsProbe(Probe):
-    fileNameSig = "_Moments.dat"
-
+class MomentsProbeBase:
     probeType = "Moments"
+
+
+class MomentsProbe(Probe, MomentsProbeBase):
+    fileNameSig = "_Moments.dat"
 
     def __init__(self, filename):
         super(MomentsProbe, self).__init__("Moments", filename)
@@ -181,13 +183,15 @@ class PDFHistogramEntry(object):
         self.pdf = float(listOfValues[3])
 
 
-class PDFProbe(Probe):
+class PDFProbeBase:
+    probeType = "PDF"
+
+
+class PDFProbe(Probe, PDFProbeBase):
 
     fileNameSig = "_PDF.dat"
     valueNames = ["P01","P05","P50","P95","P99","minX", "maxX", "numberOfBins", "underflows", "overflows"] + Probe.valueNames
     histogram = None
-
-    probeType = "PDF"
 
     def __init__(self, filename):
         super(PDFProbe, self).__init__("PDF", filename)
@@ -247,7 +251,11 @@ class PDFProbe(Probe):
     pureHistogram = property(__getPureHistogram)
 
 
-class TimeSeriesProbe(object):
+class TimeSeriesProbeBase:
+    probeType = "TimeSeries"
+
+
+class TimeSeriesProbe(object, TimeSeriesProbeBase):
     fileNameSig = "_TimeSeries.dat"
     valueNames = []
 
@@ -255,8 +263,6 @@ class TimeSeriesProbe(object):
     filenameWithoutDir = None
     name = None
     entries = None
-
-    probeType = "TimeSeries"
 
     def __init__(self, filename):
         self.filename = filename

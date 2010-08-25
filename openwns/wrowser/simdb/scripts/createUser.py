@@ -48,8 +48,8 @@ if searchPath is not None:
 
 import openwns.wrowser.simdb.Database as db
 
-hostname = 'localhost'
-dbName = 'simdb'
+hostname = 'postgres'
+dbName = 'simdbtest'
 password = 'foobar'
 
 userName = getpass.getuser()

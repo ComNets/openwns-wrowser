@@ -325,7 +325,7 @@ class Facade:
                 try:
                     missingScenarios = graph.process(missingScenarios, gui=False)
                 except Exception, e:
-                    QtGui.QMessageBox.information(self.mainWindow, "Holy Shit! Error encountered", str(e))
+                    QtGui.QMessageBox.information(self.mainWindow, "Error encountered", str(e))
                     return [],errors
                      
                 if self.stopped: 
