@@ -113,7 +113,10 @@ class Facade:
         assert(type(parameterName) == type(str()))
         valueSet = set()
         for scenario in self.campaign.scenarios:
-            valueSet |= set([scenario.parameters[parameterName]])
+            try:
+                valueSet |= set([scenario.parameters[parameterName]])
+            except KeyError:
+                valueSet |= set(["NA"])
         return valueSet
 
     def isNumericParameter(self, parameterName):
@@ -140,7 +143,10 @@ class Facade:
         assert(operator.isSequenceType(parameterNames))
         values = []
         for parameterName in parameterNames:
-            values.append(scenario.parameters[parameterName])
+            try:
+                values.append(scenario.parameters[parameterName])
+            except KeyError:
+                values.append("NA")
         return values
 
     def getNotChangingParameterNames(self):
@@ -153,6 +159,9 @@ class Facade:
             return set()
         notChangingParameterNames = set(self.campaign.parameterNames)
         initialValues = self.campaign.scenarios[0].parameters
+        for sc in self.campaign.scenarios[1:] :
+            if len(sc.parameters)>len(initialValues):
+                initialValues=sc.parameters
         for scenario in self.campaign.scenarios[1:]:
             # todo: refactor: do not iterate over already marked parameters
             for parameterName in self.campaign.parameterNames:
