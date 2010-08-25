@@ -172,16 +172,13 @@ class PythonCampaignCampaignReader:
             if os.path.isdir(filePath):
                 try:
                     paramsFileName = os.path.join(filePath, self.parametersFileName)
-                    print paramsFileName
                     if os.path.exists(paramsFileName):
                         try:
                             globals = {}
                             parameters = {}
                             execfile(paramsFileName, globals, parameters)
-                            print parameters
                         except Exception:
                             raise NoScenarioDir(filePath)
-                        print parameters
 
                         scenarioList.append(Representations.Scenario(PythonCampaignScenario(filePath,
                                                                                             self.resultsFileName,
@@ -190,7 +187,6 @@ class PythonCampaignCampaignReader:
                                                                     parameters))
 
                         for paramName, paramValue in parameters.iteritems():
-                            print parameters, paramName, paramValue
                             if paramValue not in parametersDict[paramName]:
                                 parametersDict[paramName].append(paramValue)
                 except NoScenarioDir:
