@@ -82,7 +82,7 @@ def wrowserExceptHook(eType, eValue, eTraceback):
         pass
 
 if __name__ == "__main__":
-    print "Wrowser revision: ",getBzrRevision()
+    #print "Wrowser revision: ",getBzrRevision()
     application = QtGui.QApplication(sys.argv)
     application.setQuitOnLastWindowClosed(True)
     application.setApplicationName("Wrowser")
