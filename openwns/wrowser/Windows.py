@@ -68,7 +68,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, calledFromDir, directoryMode, *args):
+    def __init__(self, calledFromDir, directoryMode, bzrInfo, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
@@ -78,6 +78,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
         self.directoryMode = directoryMode
+        self.bzrInfo = bzrInfo
+
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
 
@@ -413,7 +415,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 				"About Wrowser",
 				"<h4>Wrowser - The WNS Result Browser</h4>"
 				"The Wrowser is a browsing and viewing utility "
-				"for results of the WNS simulator.")
+				"for results of the WNS simulator.<br>"+self.bzrInfo.replace("\n","<br>"))
 
     def showProgressBar(self, callBack):
         self.statusbar.addWidget(self.cancelButton)

@@ -162,11 +162,15 @@ class Facade:
         for sc in self.campaign.scenarios[1:] :
             if len(sc.parameters)>len(initialValues):
                 initialValues=sc.parameters
+                self.campaign.parameterNames=initialValues.keys()
         for scenario in self.campaign.scenarios[1:]:
             # todo: refactor: do not iterate over already marked parameters
             for parameterName in self.campaign.parameterNames:
-                if scenario.parameters[parameterName] != initialValues[parameterName]:
-                    notChangingParameterNames -= set([parameterName])
+                try:                    
+                    if scenario.parameters[parameterName] != initialValues[parameterName]:
+                        notChangingParameterNames -= set([parameterName])
+                except KeyError:
+                    pass
         return notChangingParameterNames
 
     def getChangingParameterNames(self):
