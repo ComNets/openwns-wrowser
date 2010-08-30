@@ -115,7 +115,7 @@ def loadCampaignAndPlotGraphs(PlotParameters):
             if PlotParameters.confidence :
                 for i in range(len(X)):
                     e = graph.confidenceIntervalDict[X[i]]
-                    errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e , fmt=style)
+                    errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i]*PlotParameters.scaleFactorY+PlotParameters.moveY, yerr=e , fmt=style)
         except: None
         i+=1
     for additional in PlotParameters.additional_plots :
@@ -139,6 +139,7 @@ def loadCampaignAndPlotGraphs(PlotParameters):
 
     if PlotParameters.showTitle :
         title(PlotParameters.figureTitle)
+    PlotParameters.postFunction()
     if PlotParameters.legend:
         legend(prop = font, loc=PlotParameters.legendPosition) # (0.9, 0.01))
     print 'Plotting: ',PlotParameters.fileName

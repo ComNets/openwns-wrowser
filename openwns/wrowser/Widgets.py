@@ -52,6 +52,8 @@ class FigureCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width = 5, height = 4, dpi = 100):
         from matplotlib.figure import Figure
+        import matplotlib.pylab as p
+        p.rcParams['axes.formatter.limits']=[-3,3]
 
         self.fig = Figure(figsize = (width, height),
                           dpi = dpi)
@@ -411,7 +413,6 @@ class LineGraph(Graph, Observing):
         from probeselector.Interface import Facade
 
         self.canvas.axes.clear()
-
         lineColours = list("bgrcmyk")
         lineStyles = ["-", "--", "-.", ":"]
         coloursStyles = [colour + style for style in lineStyles for colour in lineColours]
@@ -429,6 +430,7 @@ class LineGraph(Graph, Observing):
             x = [point[0] for point in graph.points]
             y = [point[1] for point in graph.points]
             label = Facade.getGraphDescription(graph)
+
             xLabels.add(graph.axisLabels[0])
             yLabels.add(graph.axisLabels[1])
             self.mainWindow.progressIndicator.setCurrentAndMaximum(index, maxIndex, "Preparing: " + label)

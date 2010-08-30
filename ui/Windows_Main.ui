@@ -73,6 +73,7 @@
     <addaction name="actionOpenCampaignDatabase"/>
     <addaction name="actionOpenDSV"/>
     <addaction name="actionOpenDirectory"/>
+    <addaction name="actionOpenPythonCampaign"/>
     <addaction name="actionCloseDataSource"/>
     <addaction name="separator"/>
     <addaction name="actionView_Scenario"/>
@@ -129,6 +130,11 @@
    </property>
    <property name="iconText">
     <string>Open DSV</string>
+   </property>
+  </action>
+  <action name="actionOpenPythonCampaign">
+   <property name="text">
+    <string>Open &amp;Python Campaign</string>
    </property>
   </action>
   <action name="actionOpenDirectory">

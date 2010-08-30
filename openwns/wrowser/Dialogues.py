@@ -180,7 +180,6 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         self.campaignsModel = Models.CampaignDb(Campaigns.getCampaignsDict())
         self.campaigns.setModel(self.campaignsModel)
-
         user = os.getenv("USER")
         userIndex = self.campaignsModel.getUserRow(user)
         if userIndex != -1 :
@@ -189,6 +188,12 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         for column in xrange(self.campaignsModel.columnCount()):
             self.campaigns.resizeColumnToContents(column)
+        self.connect(self.campaigns, QtCore.SIGNAL("doubleClicked(QModelIndex)"), self.campaignSelected)
+    
+    def campaignSelected(self, index):
+           if index.column()>0 and len(self.campaigns.selectedIndexes())>0:
+                self.buttonBox.emit(QtCore.SIGNAL("accepted()"))
+
 
     def getCampaign(self):
         return self.campaignsModel.getCampaign(self.campaigns.selectedIndexes()[0])
@@ -232,6 +237,7 @@ class ProgressStatus(QtGui.QProgressBar):
         self.progressLabel = progressLabel
         self.labelText=""
         self.labelLength=80
+        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed))
         self.reset()
 
     def reset(self):
@@ -362,7 +368,7 @@ class ConfigureGraph(QtGui.QDialog, Ui_Dialogues_ConfigureGraph):
             self.colorbarCheckBox.setCheckState(QtCore.Qt.Unchecked)
 
         self.colormapComboBox.setCurrentIndex(self.colormapComboBox.findText(self.figure.colormap))
-
+        self.tabWidget.setCurrentIndex(0)
 
     @QtCore.pyqtSignature("")
     def on_buttonBox_accepted(self):

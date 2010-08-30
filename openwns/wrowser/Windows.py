@@ -78,6 +78,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
         self.directoryMode = directoryMode
+
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
 
@@ -89,6 +90,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.cancelButton = QtGui.QPushButton("Cancel")
         self.progressText = QtGui.QLabel("")
         self.progressIndicator = Dialogues.ProgressStatus(self.progressText)
+        self.progressIndicator.setMinimumWidth(100)
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
@@ -261,6 +263,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionOpenCampaignDatabase.setEnabled(isEnabled)
         self.actionOpenDSV.setEnabled(isEnabled)
         self.actionOpenDirectory.setEnabled(isEnabled)
+        self.actionOpenPythonCampaign.setEnabled(isEnabled)
         self.actionView_Scenario.setEnabled(isEnabled)
         self.actionView_CouchDB_Trace.setEnabled(isEnabled and couchIsUsable)
 
@@ -303,6 +306,29 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.menuSetAllOpen(False)
 
         self.actionCloseDataSource.setEnabled(True)
+
+    @QtCore.pyqtSignature("")
+    def on_actionOpenPythonCampaign_triggered(self):
+        from probeselector import PythonCampaignReader, Representations, Interface
+
+        dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
+                                                         os.getcwd(),
+                                                         QtGui.QFileDialog.ShowDirsOnly
+                                                         | QtGui.QFileDialog.DontResolveSymlinks))
+        if dir == '':
+            return
+        campaign =  Representations.Campaign(*PythonCampaignReader.PythonCampaignCampaignReader(dir).read())
+        self.campaigns.original = Interface.Facade(campaign)
+
+        self.simulationParameters = SimulationParameters(self.campaigns, self)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
+        self.menuNew.setEnabled(True)
+
+        self.menuSetAllOpen(False)
+
+        self.actionCloseDataSource.setEnabled(True)
+
+
 
     QtCore.pyqtSignature("")
     def on_actionCloseDataSource_triggered(self):
@@ -538,6 +564,7 @@ class DirectoryNavigation(QtGui.QDockWidget,Observing):
             self.directoryView.setColumnHidden(1, True)
             self.directoryView.setColumnHidden(2, True)
             self.directoryView.setColumnHidden(3, True)
+            self.xdfOpened = False
 
         @QtCore.pyqtSignature("const QString&")
         def on_rootEdit_textEdited(self, text):
@@ -570,6 +597,9 @@ class DirectoryNavigation(QtGui.QDockWidget,Observing):
             self.scanInfoLabel.setText(str(len(self.campaigns.draw.getScenarios())) + " directories with probes.")
             self.mainWindow.menuNew.setEnabled(True)
             self.mainWindow.actionNewParameter.setEnabled(False)
+            if not self.xdfOpened:
+                self.mainWindow.on_actionNewXDF_triggered()
+            self.xdfOpened = True
 
     def closeEvent(self, event):
         self.mainWindow.on_actionCloseDataSource_triggered()
@@ -920,7 +950,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
     @staticmethod
     def getProbeTypes():
         import Probe
-        return [Probe.PDFProbe]
+        return [Probe.PDFProbeBase]
 
     def getGraphs(self):
         dataacquisition = probeselector.dataacquisition
