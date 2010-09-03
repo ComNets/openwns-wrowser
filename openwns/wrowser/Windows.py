@@ -260,6 +260,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
             self.menuNew.setEnabled(True)
 
+            self.actionRefresh.setVisible(True)
             self.actionCloseDataSource.setEnabled(True)
 
     def menuSetAllOpen(self,isEnabled):
@@ -308,6 +309,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
 
         self.menuSetAllOpen(False)
+        self.actionRefresh.setVisible(True)
 
         self.actionCloseDataSource.setEnabled(True)
 
@@ -329,7 +331,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.menuNew.setEnabled(True)
 
         self.menuSetAllOpen(False)
-
+        self.actionRefresh.setVisible(True)
         self.actionCloseDataSource.setEnabled(True)
 
 
@@ -357,6 +359,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.actionCloseDataSource.setEnabled(False)
         self.actionNewParameter.setEnabled(True)
+        self.actionRefresh.setVisible(False)
         self.menuNew.setEnabled(False)
 
     @QtCore.pyqtSignature("")
@@ -364,7 +367,15 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         from probeselector import Representations, Interface
 
         if self.reader != None:
-            self.campaigns.original = Interface.Facade(Representations.Campaign(*self.reader.read()))
+            self.showProgressBar(self.on_cancelClicked)
+            self.menuSetAllOpen(False)
+            campaign = Representations.Campaign(*self.reader.read())
+            self.hideProgressBar()
+            if self.readerStopped:
+                self.readerStopped = False
+                self.menuSetAllOpen(True)
+                return
+            self.campaigns.original = Interface.Facade(campaign)
 
     @QtCore.pyqtSignature("")
     def on_actionNewLogEval_triggered(self):
