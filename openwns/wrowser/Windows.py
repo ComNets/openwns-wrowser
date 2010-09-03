@@ -323,7 +323,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                                                          | QtGui.QFileDialog.DontResolveSymlinks))
         if dir == '':
             return
-        campaign =  Representations.Campaign(*PythonCampaignReader.PythonCampaignCampaignReader(dir).read())
+        self.reader = PythonCampaignReader.PythonCampaignCampaignReader(dir)
+        campaign =  Representations.Campaign(*self.reader.read())
         self.campaigns.original = Interface.Facade(campaign)
 
         self.simulationParameters = SimulationParameters(self.campaigns, self)
@@ -334,10 +335,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionRefresh.setVisible(True)
         self.actionCloseDataSource.setEnabled(True)
 
-
-
-    QtCore.pyqtSignature("")
-    def on_actionCloseDataSource_triggered(self):
+    def closeDock(self):
         if hasattr(self, "simulationParameters"):
             self.simulationParameters.close()
         if hasattr(self, "directoryNavigation"):
@@ -348,6 +346,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.viewCouchDBTraceWidget.close()
         if hasattr(self, "viewCouchDBNavigation"):
             self.viewCouchDBNavigation.close()
+
+    QtCore.pyqtSignature("")
+    def on_actionCloseDataSource_triggered(self):
+        self.closeDock()
 
         if hasattr(self, "model"):
             del self.model
@@ -367,6 +369,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         from probeselector import Representations, Interface
 
         if self.reader != None:
+            self.closeDock()
             self.showProgressBar(self.on_cancelClicked)
             self.menuSetAllOpen(False)
             campaign = Representations.Campaign(*self.reader.read())
@@ -376,7 +379,12 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 self.menuSetAllOpen(True)
                 return
             self.campaigns.original = Interface.Facade(campaign)
-
+            self.simulationParameters = SimulationParameters(self.campaigns, self)
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
+            self.menuNew.setEnabled(True)
+            self.actionCloseDataSource.setEnabled(True)
+            self.actionRefresh.setVisible(True)
+ 
     @QtCore.pyqtSignature("")
     def on_actionNewLogEval_triggered(self):
         figureWindow = LogEvalFigure(self.campaigns, self.menuFigure, self, self.workspace)
