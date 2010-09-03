@@ -36,8 +36,12 @@ usage = 'usage: %prog [options]'
 parser = optparse.OptionParser(usage)
 
 parser.add_option('-d','--directorymode',
-                  action = "store_true", dest = 'directoryMode',
+                  action = "store_const", dest = 'startMode', const=1,
                   help = 'open wrowser in directorymode', default=False)
+
+parser.add_option('-p','--pythoncampaign',
+                  action = "store_const",  dest = 'startMode', const=2,
+                  help = 'open python campaign in wrowser', default=False)
 
 
 options, args = parser.parse_args()
@@ -46,8 +50,10 @@ if len(args):
     parser.print_help()
     sys.exit(1)
 
-if options.directoryMode:
+if options.startMode == 1:
     print "wrowser is started in directory mode"
+if options.startMode == 2:
+    print "wrowser is started in python campaign mode"
 
 # Path to this script
 p = sys.path[0]
@@ -62,17 +68,9 @@ calledFromDir = os.path.abspath(os.path.curdir)
 
 os.chdir(searchPath)
 import openwns.wrowser.Windows
-def getBzrRevision():
-    import subprocess
-    process = subprocess.Popen("bzr version-info | egrep -o 'revno: [0-9]*'", shell=True, stdout=subprocess.PIPE)
-    revision = process.communicate()[0].rstrip('\n').rpartition(' ')[-1]
-    return revision
  
 def getBzrInfo():
-    import subprocess
-    process = subprocess.Popen("bzr version-info lp:openwns-wrowser | egrep '^date|revno'", shell=True, stdout=subprocess.PIPE)
-    info = process.communicate()[0]
-    return info
+    return ""
 
 def wrowserExceptHook(eType, eValue, eTraceback):
     message = "".join(traceback.format_exception(eType, eValue, eTraceback))
@@ -81,8 +79,11 @@ def wrowserExceptHook(eType, eValue, eTraceback):
     if response == 0:
         sys.exit(255)
     elif response == 1:
-        import pdb
-        pdb.set_trace()
+        '''Set a tracepoint in the Python debugger that works with Qt'''
+        from PyQt4.QtCore import pyqtRemoveInputHook
+        from pdb import set_trace
+        pyqtRemoveInputHook()
+        set_trace()
     else:
         pass
 
@@ -95,7 +96,7 @@ if __name__ == "__main__":
     application.setWindowIcon(QtGui.QIcon(":/icons/icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
-    widget = openwns.wrowser.Windows.Main(calledFromDir, options.directoryMode,bzrInfo)
+    widget = openwns.wrowser.Windows.Main(calledFromDir, options.startMode,bzrInfo)
     widget.show()
     sys.excepthook = wrowserExceptHook
     sys.exit(application.exec_())

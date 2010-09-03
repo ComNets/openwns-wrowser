@@ -68,7 +68,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, calledFromDir, directoryMode, bzrInfo, *args):
+    def __init__(self, calledFromDir, startMode, bzrInfo, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
@@ -77,7 +77,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.campaignId = None
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
-        self.directoryMode = directoryMode
+        self.directoryMode = (startMode==1)
+        self.pythonCampaignMode = (startMode==2)
         self.bzrInfo = bzrInfo
 
         self.workspace = QtGui.QWorkspace(self)
@@ -95,8 +96,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
-        if directoryMode:
+        if self.directoryMode:
             self.on_actionOpenDirectory_triggered()
+        elif self.pythonCampaignMode:
+            self.on_actionOpenPythonCampaign_triggered()
 
         global couchIsUsable
         global couchHasUsableKeyring
@@ -313,7 +316,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         from probeselector import PythonCampaignReader, Representations, Interface
 
         dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
-                                                         os.getcwd(),
+                                                         self.calledFromDir,
                                                          QtGui.QFileDialog.ShowDirsOnly
                                                          | QtGui.QFileDialog.DontResolveSymlinks))
         if dir == '':

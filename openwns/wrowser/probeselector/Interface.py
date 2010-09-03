@@ -149,6 +149,14 @@ class Facade:
                 values.append("NA")
         return values
 
+    def getInitialValues(self):
+        result=dict()        
+        for scenario in self.campaign.scenarios :
+            for param in scenario.parameters:
+                result[param]=scenario.parameters[param]
+        print "result:",result
+        return result
+            
     def getNotChangingParameterNames(self):
         """Return the names of the parameters that do not vary.
 
@@ -158,6 +166,7 @@ class Facade:
         if len(self.campaign.scenarios) == 0:
             return set()
         notChangingParameterNames = set(self.campaign.parameterNames)
+        initialValues=self.getInitialValues()
         initialValues = self.campaign.scenarios[0].parameters
         for sc in self.campaign.scenarios[1:] :
             if len(sc.parameters)>len(initialValues):
