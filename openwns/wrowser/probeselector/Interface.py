@@ -126,7 +126,7 @@ class Facade:
         numericTypes = [type(bool()), type(int()), type(long()), type(float())]
         result = True
         for value in self.getValuesOfParameter(parameterName):
-            if type(value) not in numericTypes:
+            if type(value) not in numericTypes and value!="NA":
                 result = False
         return result
 

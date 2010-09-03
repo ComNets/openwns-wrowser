@@ -808,7 +808,17 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
     @QtCore.pyqtSignature("bool")
     def on_draw_clicked(self, checked):
-        self.graph.setGraphs(self.getGraphs())
+        debugMode = True #TODO: later this should be global, debug messages should only be printed in debugMode
+        if not debugMode:
+            try:
+                self.graph.setGraphs(self.getGraphs())
+            except:
+                print "in debug mode the wrowser would have thrown an exception, check on_draw_clicked in Windows.py"
+                self.mainWindow.hideProgressBar() 
+                self.setInterfaceEnabled(True)
+        else:
+            self.graph.setGraphs(self.getGraphs())
+
 
     def on_cancelClicked(self):
         self.readerStopped = True
