@@ -1,5 +1,5 @@
-import wrowser.simdb.Database as db
-import wrowser.Configuration
+import openwns.wrowser.simdb.Database as db
+import openwns.wrowser.Configuration
 
 class Campaign:
 
@@ -12,7 +12,7 @@ class Campaign:
 
 def getCampaigns():
 
-    config = wrowser.Configuration.Configuration()
+    config = openwns.wrowser.Configuration.Configuration()
     config.read()
 
     db.Database.connectConf(config)
