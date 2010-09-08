@@ -84,13 +84,16 @@ class AggregatedGraph(Graph):
     def process(self, missingScenarios, mainWindow = None, gui = True):
         numberOfPoints = map(lambda x: len(x), self.pointsDict.values())
         missingScenariosLocal = False 
-        if min(numberOfPoints) != max(numberOfPoints):
+
+        if len(numberOfPoints) > 0 and (min(numberOfPoints) != max(numberOfPoints)):
             if not missingScenarios:
                 if gui:
                     QtGui.QMessageBox.warning(mainWindow, "Aggregation Problem", "The number of y values to aggregate is different for different x values!")
             missingScenariosLocal=True
-        
-        self.points = self.aggregationFunction(self)
+
+        if self.aggregationFunction is not None:
+            self.points = self.aggregationFunction(self)
+
         Graph.process(self)
         return ( missingScenariosLocal or missingScenarios)
 

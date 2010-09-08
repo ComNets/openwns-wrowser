@@ -123,6 +123,7 @@ class TableParser:
             for xv in self.xvalues:
                 valueArray[lineNo].append( self.valueMap[(xv,yv)] )
             lineNo +=1
+
         return valueArray
 
     def getXValues(self):

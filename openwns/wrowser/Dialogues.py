@@ -180,6 +180,7 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
         self.campaignsModel = Models.CampaignDb(Campaigns.getCampaignsDict())
         self.campaigns.setModel(self.campaignsModel)
+
         user = os.getenv("USER")
         userIndex = self.campaignsModel.getUserRow(user)
         if userIndex != -1 :
@@ -368,6 +369,7 @@ class ConfigureGraph(QtGui.QDialog, Ui_Dialogues_ConfigureGraph):
             self.colorbarCheckBox.setCheckState(QtCore.Qt.Unchecked)
 
         self.colormapComboBox.setCurrentIndex(self.colormapComboBox.findText(self.figure.colormap))
+
         self.tabWidget.setCurrentIndex(0)
 
     @QtCore.pyqtSignature("")

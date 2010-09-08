@@ -41,6 +41,8 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
 
 import scenario.plotterFactory
 import scenario.widgets
+import inspect
+import pprint
 
 import inspect
 import pprint
@@ -73,8 +75,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.setupUi(self)
         self.campaigns = Observable()
         self.reader = None
+
         self.readerStopped = False
         self.campaignId = None
+
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
         self.directoryMode = directoryMode
@@ -236,10 +240,12 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.campaignId = campaignId
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
+
             windowTitleElements = self.windowTitle().split(' ')
             self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
             self.showProgressBar(self.on_cancelClicked)
             self.menuSetAllOpen(False)
+
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
                                                         self.progressIndicator.setCurrentAndMaximum,
@@ -255,7 +261,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.simulationParameters = SimulationParameters(self.campaigns, self)
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
             self.menuNew.setEnabled(True)
-
             self.actionCloseDataSource.setEnabled(True)
 
     def menuSetAllOpen(self,isEnabled):
@@ -292,7 +297,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 self.simulationParameters = SimulationParameters(self.campaigns, self)
                 self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
                 self.menuNew.setEnabled(True)
-
                 self.menuSetAllOpen(False)
 
                 self.actionCloseDataSource.setEnabled(True)
@@ -327,8 +331,6 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.menuSetAllOpen(False)
 
         self.actionCloseDataSource.setEnabled(True)
-
-
 
     QtCore.pyqtSignature("")
     def on_actionCloseDataSource_triggered(self):
@@ -376,6 +378,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
+
         figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
@@ -400,7 +403,9 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
+
         figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
+
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -941,6 +946,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
     def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
+
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
         self.probeGraphControl.confidenceparameterframe.hide()
         self.campaignId = campaignId
@@ -1070,6 +1076,7 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
     def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "BatchMeans Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
+
         self.probeGraphControl.aggregateframe.hide()
         
         self.graph.figureConfig.title = "BatchMeans Probe Figure"
@@ -1160,9 +1167,11 @@ class TableFigure(ProbeFigure, TableGraphs):
         return graphs
 
 class ParameterFigure(Figure, LineGraphs):
+
     def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
+
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
         self.campaignId = campaignId
@@ -1197,6 +1206,7 @@ class ParameterFigure(Figure, LineGraphs):
     def on_drawCampaign_changed(self, campaign):
         Debug.printCall(self, campaign)
         self.simulationParametersModel.setCampaign(self.campaigns.draw,True)
+
         selectedXProbes = self.parameterGraphControl.xProbeNames()
         selectedYProbes = self.parameterGraphControl.yProbeNames()
         selectionModelX = self.parameterGraphControl.xProbesView().selectionModel()
@@ -1253,6 +1263,7 @@ class ParameterFigure(Figure, LineGraphs):
             confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
             showConfidenceLevel = self.parameterGraphControl.isShowConfidenceLevels()
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
+
 
             self.mainWindow.showProgressBar(self.on_cancelClicked)  
             self.setInterfaceEnabled(False) 
