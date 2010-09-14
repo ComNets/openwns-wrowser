@@ -64,6 +64,12 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
                                   dest = "static", default = False,
                                   action = "store_true",
                                   help = "build static executable")
+                                  
+        self.optParser.add_option("", "--arch32",
+                                  dest = "arch32", default = False,
+                                  action = "store_true",
+                                  help = "build 32bit executable")                                  
+                                  
         self.numberOfArgs = 1
 
 
@@ -154,8 +160,13 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
     def installWNS(self, absSandboxDir):
         commonArgs = ["--sandboxDir="+absSandboxDir, '--scons="preparingcampaign=1"']
         installCommand = InstallCommand()
+
+        arch32String = " "
+        if self.options.arch32:
+            arch32String = " --arch32 "
+
         # install fresh version
-        print "running ./playground.py install --flavour=dbg -f " + self.options.configFile
+        print "running ./playground.py install --flavour=dbg" + arch32string + "-f " + self.options.configFile
         installCommand.startup(commonArgs + ["--flavour=dbg"])
         installCommand.run()
 
@@ -163,13 +174,13 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         if self.options.static:
             staticString = " --static "
 
-        print "running ./playground.py install --flavour=opt" + staticString + "-f " + self.options.configFile
+        print "running ./playground.py install --flavour=opt" + staticString + arch32String + "-f " + self.options.configFile
         installCommand.startup(commonArgs + ["--flavour=opt"])
         installCommand.options.static = self.options.static
         installCommand.run()
 
         if self.options.addProfOpt:
-            print "running ./playground.py install --flavour=profOpt" + staticString + "-f " + self.options.configFile
+            print "running ./playground.py install --flavour=profOpt" + staticString + arch32String + "-f " + self.options.configFile
             installCommand.startup(commonArgs + ["--flavour=profOpt"])
             installCommand.options.static = self.options.static
             installCommand.run()
