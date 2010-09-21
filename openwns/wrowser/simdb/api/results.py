@@ -30,7 +30,8 @@ def getCCDFs(name, campaign, forScenarios=None, agg=None):
 
 def _getPDF(what, name, campaign, forScenarios, agg):
     if forScenarios is None:
-        forScenarios = getScenariosForCampaign(campaign)
+        import scenarios
+        forScenarios = scenarios.getScenariosForCampaign(campaign)
 
     if agg is None:
 
