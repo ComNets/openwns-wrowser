@@ -245,7 +245,7 @@ def requeueCrashedScenarios(arg = 'unused'):
     for scenarioId in scenarioIds:
         # remove results from previous simulation runs
         openwns.wrowser.simdb.ProbeDB.removeAllProbesFromDB(scenarioId = scenarioId)
-        __submitJob(scenario)
+        __submitJob(scenarioId)
 
 def __deleteJob(scenarioId):
     cursor = db.Database.getCursor()

@@ -49,11 +49,11 @@ def __getDirectoryProposal(directory):
     ids = []
 #    print filteredFiles
     for f in filteredFiles:
-        print f
+        #print f
         if f == '':
             f = 1
         try:
-            print ids
+            #print ids
             ids.append(int(f))
         except ValueError:
             pass
@@ -64,20 +64,28 @@ def __getDirectoryProposal(directory):
     return proposedDirectory
 
 
-def createNewSubCampaign(directory):
-    proposedDirectory = __getDirectoryProposal(directory)
-    while True:
-        subCampaign = raw_input('Please enter the name of the directory the simulations shall be stored in [%s]: ' % proposedDirectory)
-        if subCampaign == '':
-            subCampaign = proposedDirectory
+def createNewSubCampaign(directory, proposedDirectory = None):
+    if(proposedDirectory is None):
+        proposedDirectory = __getDirectoryProposal(directory)
+        while True:
+            subCampaign = raw_input('Please enter the name of the directory the simulations shall be stored in [%s]: ' % proposedDirectory)
+            if subCampaign == '':
+                subCampaign = proposedDirectory
 
+            subCampaignDir = os.path.join(directory, subCampaign)
+
+            if os.path.exists(subCampaignDir):
+                print 'Path already exists. Please use a different name'
+            else:
+                break
+    else:
+        subCampaign = proposedDirectory
         subCampaignDir = os.path.join(directory, subCampaign)
 #        print subCampaignDir
 
         if os.path.exists(subCampaignDir):
-            print 'Path already exists. Please use a different name'
-        else:
-            break
+            print 'Path %s already exists. Please use a different name' % subCampaignDir
+            return
 
     os.mkdir(subCampaignDir)
     shutil.copy(os.path.join(os.path.dirname(__file__), 'simcontrol.py'), subCampaignDir)
@@ -85,8 +93,17 @@ def createNewSubCampaign(directory):
     shutil.copy(os.path.join(os.path.dirname(__file__), 'campaignConfiguration.py'), subCampaignDir)
     os.system("chmod u+x " + os.path.join(subCampaignDir, 'campaignConfiguration.py'))
 
-    campaignTitle = raw_input('Please enter a name for the campaign: ')
-    campaignDescription = raw_input('Please enter a short description of the campaign: ')
+    proposedTitle = directory.rsplit('/')[-1] + '_' + subCampaign
+    proposedDescription = subCampaignDir
+
+    campaignTitle = raw_input('Please enter a name for the campaign [%s]: ' % proposedTitle)
+    if campaignTitle == '':
+        campaignTitle = proposedTitle
+
+    campaignDescription = raw_input('Please enter a short description of the campaign [%s]: ' % proposedDescription)
+    if campaignDescription == '':
+        campaignDescription = proposedDescription
+
     db.Database.connectConf(__config)
     cursor = db.Database.getCursor()
     cursor.execute('INSERT INTO campaigns (title, description) VALUES (\'%s\', \'%s\')' % (campaignTitle, campaignDescription))
