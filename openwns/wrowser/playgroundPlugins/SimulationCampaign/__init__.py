@@ -178,6 +178,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         if (not self.options.noTouch):
             PrepareCampaign.updateSubCampaigns(directory)
             shutil.copy(os.path.join(os.path.dirname(__file__),"sim.py"), directory)
+            os.system("chmod u+x " + os.path.join(os.path.dirname(__file__),"sim.py"))
 
         logFileHandle.write("Simulation campaign directory successfully set up.\n\n")
         logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
