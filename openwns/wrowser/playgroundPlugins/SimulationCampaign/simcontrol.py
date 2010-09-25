@@ -159,7 +159,7 @@ def __submitJob(scenarioId):
     command = os.path.abspath(os.path.join('..', 'sim.py')) + ' -p ' + os.path.abspath(os.getcwd()) + ' -i ' + simId
     if options.skipNullTrials == True:
         command += ' -n'
-    process = subprocess.Popen(['qsub -q %s -N job%s -l s_cpu=%i:%i:00 -l h_cpu=%i:%i:00 -o %s -e %s -m a -M %s@comnets.rwth-aachen.de -v PYTHONPATH=%s %s' % (options.queue,
+    process = subprocess.Popen(['qsub -q %s -N job%s -l s_cpu=%i:%i:00 -l h_cpu=%i:%i:00 -o %s -e %s -m a -M %s@comnets.rwth-aachen.de -v %s' % (options.queue,
                                                                                                                                              simId,
                                                                                                                                              options.cpuTime,
                                                                                                                                              options.cpuMinutes,
@@ -168,7 +168,6 @@ def __submitJob(scenarioId):
                                                                                                                                              os.path.join(simPath, 'stdout'),
                                                                                                                                              os.path.join(simPath, 'stderr'),
                                                                                                                                              pwd.getpwuid(os.getuid())[0],
-                                                                                                                                             os.environ['PYTHONPATH'],
                                                                                                                                              command)],
                          stdout = subprocess.PIPE,
                          stderr = subprocess.STDOUT,
