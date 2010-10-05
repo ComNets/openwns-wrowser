@@ -70,10 +70,11 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, calledFromDir, directoryMode, *args):
+    def __init__(self, calledFromDir, directory, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
+        self.showMaximized()
         self.reader = None
 
         self.readerStopped = False
@@ -81,7 +82,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
-        self.directoryMode = directoryMode
+        self.directory = directory
 
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
@@ -98,8 +99,15 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
-        if directoryMode:
-            self.on_actionOpenDirectory_triggered()
+        if directory is not None:
+            self.directoryNavigation = DirectoryNavigation(self.campaigns, directory, self)
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
+
+            self.menuSetAllOpen(False)
+
+            self.actionCloseDataSource.setEnabled(True)
+
+            self.directoryNavigation.widget().on_scanButton_clicked(True)
 
         global couchIsUsable
         global couchHasUsableKeyring
@@ -591,7 +599,9 @@ class DirectoryNavigation(QtGui.QDockWidget,Observing):
         def on_scanButton_clicked(self, checked):
             from probeselector import DirectoryReaders, Representations, Interface
             dirIndex = self.directoryView.selectionModel().currentIndex()
-            self.rootEdit.setText(self.directoryModel.filePath(dirIndex))
+            if dirIndex.isValid():
+                self.rootEdit.setText(self.directoryModel.filePath(dirIndex))
+
             self.directoryView.setRootIndex(self.directoryModel.index(self.rootEdit.text()))
             directory = str(self.rootEdit.text())
             progressDialogue = Dialogues.Progress("Reading data", 0, self)
