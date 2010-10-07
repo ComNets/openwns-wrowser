@@ -44,10 +44,7 @@ class Scenario:
 
         def acquire(probe = None):
             scenarioParameterValues = openwns.wrowser.probeselector.Interface.Facade.getScenarioParameterValues(scenario, self.parameterNames)
-            print "scenarioParameterValues",scenarioParameterValues
-            print "ParameterNames",self.parameterNames
             graphParameters = dict(zip(self.parameterNames, scenarioParameterValues))
-            print "graphParameters",graphParameters
             if probe == None:
                 probeName = None
             else:

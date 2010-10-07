@@ -153,7 +153,8 @@ class Facade:
         result=dict()        
         for scenario in self.campaign.scenarios :
             for param in scenario.parameters:
-                result[param]=scenario.parameters[param]
+                if not result.has_key(param):
+                    result[param]=scenario.parameters[param]
         return result
             
     def getNotChangingParameterNames(self):
@@ -166,6 +167,7 @@ class Facade:
             return set()
         notChangingParameterNames = set(self.campaign.parameterNames)
         initialValues=self.getInitialValues()
+        self.campaign.parameterNames=initialValues.keys() 
         for scenario in self.campaign.scenarios[1:]:
             # todo: refactor: do not iterate over already marked parameters
             for parameterName in self.campaign.parameterNames:
