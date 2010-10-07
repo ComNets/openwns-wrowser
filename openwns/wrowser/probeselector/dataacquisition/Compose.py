@@ -47,6 +47,8 @@ class XY:
             x = self.acquireXData(scenario, probe)
         except Errors.ProbeNotFoundInSimulation, e:
             errors.append(e)
+        except KeyError:
+            pass
         else:
             try:
                 y = self.acquireYData(scenario, probe)
@@ -63,7 +65,8 @@ class ParameterValue:
         self.label = parameterName
 
     def __call__(self, scenario, probe):
-        return scenario.parameters[self.parameterName]
+        val =  scenario.parameters[self.parameterName]
+        return val
 
 class ProbeEntry:
     def __init__(self, entryName):
