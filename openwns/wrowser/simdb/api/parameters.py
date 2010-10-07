@@ -26,18 +26,23 @@ def getParameterSet(campaign, scenario):
 
     for l in p:
         paramname = str(l[0])
+        typename = l[1].rstrip()
 
-        if l[1] == "type_bool":
+        if typename == "type_bool":
+            #print "Adding bool parameter %s:%s" % (paramname, l[2])
             ps.params[paramname] = bool(l[2])
 
-        if l[1] == "type_integer":
+        if typename == "type_integer":
+            #print "Adding int parameter %s:%s" % (paramname, l[3])
             ps.params[paramname] = int(l[3])
 
-        if l[1] == "type_float":
+        if typename == "type_float":
+            #print "Adding float parameter %s:%s" % (paramname, l[4])
             ps.params[paramname] = float(l[4])
 
-        if l[1] == "type_string":
-            ps.params[paramname] = float(l[5])
+        if typename == "type_string":
+            #print "Adding string parameter %s:%s" % (paramname, l[5])
+            ps.params[paramname] = str(l[5])
 
     return ps
     
