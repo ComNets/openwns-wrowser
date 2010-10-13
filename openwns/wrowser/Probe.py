@@ -565,6 +565,11 @@ class TableProbe:
                     '_min.dat',
                     '_trials.dat',
                     '_var.dat',
+                    '_mean.m',
+                    '_max.m',
+                    '_min.m',
+                    '_trials.m',
+                    '_var.m'
                     ] # there are more than these, but these are the most commonly used ones.
     valueNames = ["minimum", "maximum"]
 
@@ -601,7 +606,11 @@ class TableProbe:
     def readProbes(dirname):
         result = {}
         for suffix in TableProbe.fileNameSigs:
-            result.update(Probe.readProbes(suffix, TableProbe, dirname))
+            #print "Calling result.update(Probe.readProbes(%s, TableProbe, %s))" % (suffix, dirname)
+            try:
+                result.update(Probe.readProbes(suffix, TableProbe, dirname))
+            except TableParser.WrongDimensions:
+                continue
         return result
     readProbes = staticmethod(readProbes)
 

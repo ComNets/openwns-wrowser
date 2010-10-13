@@ -36,9 +36,16 @@ import openwns.wrowser.Configuration as config
 
 class Type(object):
 
-    def __init__(self, variableType, sqlParameterType, default = None, parameterRange = None):
+    def __init__(self, variableType, sqlParameterType, default = None, parameterRange = None, minimum = None):
+
+        self.__minimum = None
+
         if default is not None:
             self.__default = variableType(default)
+            if minimum is not None:
+                self.__minimum = minimum
+            else:
+                self.__minimum = 0.0
         else:
             self.__default = None
 
@@ -76,6 +83,9 @@ class Type(object):
     def getDefault(self):
         return self.__default
 
+    def getMinimum(self):
+        return self.__minimum
+
 
     def getValue(self):
 #        print 'getValue ', self.__value
@@ -98,15 +108,15 @@ class Bool(Type):
 
 class Int(Type):
 
-    def __init__(self, default = None, parameterRange = None):
-        super(Int, self).__init__(int, 'type_integer', default, parameterRange)
+    def __init__(self, default = None, parameterRange = None, minimum = None):
+        super(Int, self).__init__(int, 'type_integer', default, parameterRange, minimum)
 
 
 
 class Float(Type):
 
-    def __init__(self, default = None, parameterRange = None):
-        super(Float, self).__init__(float, 'type_float', default, parameterRange)
+    def __init__(self, default = None, parameterRange = None, minimum = None):
+        super(Float, self).__init__(float, 'type_float', default, parameterRange, minimum)
 
 
 
@@ -373,11 +383,20 @@ class AutoSimulationParameters(Parameters):
                     lowerBound = min(inputColumn)/2
                     upperBound = max(inputColumn)*2
 
+                    # determine lb before ub to cancel out failed,
+                    # low-input simulations -> the ub is always at
+                    # least as high as the lb
                     for(scenarioId, input, output) in results:
                         if(cmpFunction(input, output) > 1-maxError):
                             lowerBound = max(lowerBound, input)
-                        else:
+                            lbScenarioId = scenarioId
+
+                    for(scenarioId, input, output) in results:
+                        if(cmpFunction(input, output) <= 1-maxError) and (input > lowerBound):
                             upperBound = min(upperBound, input)
+                            ubScenarioId = scenarioId
+
+                    assert(lowerBound <= upperBound)
 
                     if(len(results) > maxNumSimulations):
                         print "Reached maximum number of simulations (%d) for the scenario with parameters" % (maxNumSimulations)
@@ -387,20 +406,20 @@ class AutoSimulationParameters(Parameters):
                         finalResults[-1]['result'] = (upperBound+lowerBound)/2.0
                         finalResults[-1]['scenarioId'] = scenarioId
                         stats['finished'] += 1
-                    elif(lowerBound == 0):
+                    elif(lowerBound <= self.parameterSet[self.__inputVariableName].getMinimum()):
                         finalResults.append(self.__getCurrentParameters())
                         finalResults[-1]['result'] = lowerBound
                         finalResults[-1]['scenarioId'] = scenarioId
                         stats['finished'] += 1
                         if debug:
-                            print lowerBound, "...", upperBound, "--> No result found, stop!"
+                            print lowerBound, "...", upperBound, "--> Minimum %.2f reached, stop!" % self.parameterSet[self.__inputVariableName].getMinimum()
                     elif(float(upperBound-lowerBound)/float(lowerBound) < exactness):
                         finalResults.append(self.__getCurrentParameters())
                         finalResults[-1]['result'] = (upperBound+lowerBound)/2.0
-                        finalResults[-1]['scenarioId'] = scenarioId
+                        finalResults[-1]['scenarioId'] = lbScenarioId
                         stats['finished'] += 1
                         if debug:
-                            print lowerBound, "...", upperBound, "--> Exactness <", exactness, ", stop!"
+                            print "%.2f ... %.2f (exactness %.2f < %.2f), finished " % (lowerBound, upperBound, (float(upperBound-lowerBound)/float(lowerBound)), exactness)
                     else:
                         new = 0
                         if(lowerBound == max(inputColumn)):
@@ -414,7 +433,7 @@ class AutoSimulationParameters(Parameters):
                         if(createSimulations):
                             self.write()
                         if debug:
-                            print lowerBound, "...", upperBound, "--> newValue", new
+                            print "%.2f ... %.2f (exactness %.2f) --> new value %.2f" % (lowerBound, upperBound, (float(upperBound-lowerBound)/float(lowerBound)), new)
                 else:
                     self.__setInput(self.parameterSet[self.__inputVariableName].getDefault())
                     if(createSimulations):
@@ -432,9 +451,13 @@ class AutoSimulationParameters(Parameters):
                         for(scenarioId, input, output) in results:
                             if(cmpFunction(input, output) > 1-maxError):
                                 lowerBound = max(lowerBound, input)
-                            else:
+                        for(scenarioId, input, output) in results:
+                            if(cmpFunction(input, output) <= 1-maxError) and (input > lowerBound):
                                 upperBound = min(upperBound, input)
-                        print lowerBound, "...", upperBound," waiting for output"
+
+                        assert(lowerBound <= upperBound)
+
+                        print "%.2f ... %.2f (exactness %.2f), waiting for output" % (lowerBound, upperBound, (float(upperBound-lowerBound)/float(lowerBound)))
                     else:
                         print "waiting for output"
 
@@ -477,7 +500,7 @@ class AutoSimulationParameters(Parameters):
         for scenarioId in ids:
             self.__cursor.execute('SELECT state, current_job_id FROM scenarios WHERE campaign_id = %d AND id = %d' % (self.__campaignId, scenarioId))
             results = self.__cursor.fetchall()
-            if(results[0][0] != 'Finished'):
+            if(results[0][0] != 'Finished' and results[0][0] != 'Aborted'):
                 unfinishedId = results[0][1]
 
         if(unfinishedId > -1):

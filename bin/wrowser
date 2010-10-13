@@ -35,14 +35,11 @@ import optparse
 usage = 'usage: %prog [options]'
 parser = optparse.OptionParser(usage)
 
-parser.add_option('-d','--directorymode',
-                  action = "store_const", dest = 'startMode', const=1,
-                  help = 'open wrowser in directorymode', default=False)
+parser.add_option('-d','--directory', dest = 'directory',
+                  help = 'open wrowser in directory mode', metavar="DIR")
 
-parser.add_option('-p','--pythoncampaign',
-                  action = "store_const",  dest = 'startMode', const=2,
-                  help = 'open python campaign in wrowser', default=False)
-
+parser.add_option('-p','--python-campaign', dest = 'pythonDirectory',
+                  help = 'open wrowser in python campaign mode', metavar="DIR")
 
 options, args = parser.parse_args()
 if len(args):
@@ -50,10 +47,13 @@ if len(args):
     parser.print_help()
     sys.exit(1)
 
-if options.startMode == 1:
-    print "wrowser is started in directory mode"
-if options.startMode == 2:
-    print "wrowser is started in python campaign mode"
+if options.directory is not None:
+    options.directory = os.path.abspath(options.directory)
+    print "wrowser is started in directory mode (%s)" % (options.directory)
+
+if options.pythonDirectory is not None:
+    options.pythonDirectory = os.path.abspath(options.pythonDirectory)
+    print "wrowser is started in python campaign mode (%s)" % (options.pythonDirectory)
 
 # Path to this script
 p = sys.path[0]
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     application.setWindowIcon(QtGui.QIcon(":/icons/icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
-    widget = openwns.wrowser.Windows.Main(calledFromDir, options.startMode,bzrInfo)
+    widget = openwns.wrowser.Windows.Main(calledFromDir, options.directory, options.pythonDirectory ,bzrInfo)
     widget.show()
     sys.excepthook = wrowserExceptHook
     sys.exit(application.exec_())

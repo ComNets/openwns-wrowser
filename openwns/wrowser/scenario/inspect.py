@@ -128,8 +128,8 @@ class ConfigInspector:
         width = xMax - xMin
         height = yMax - yMin
 
-        dw = width * 0.3
-        dh = height * 0.3
+        dw = width * 0.05
+        dh = height * 0.05
 
         if dw < 50:
             dw = 50

@@ -38,7 +38,7 @@
          </property>
          <widget class="QWidget" name="winner" >
           <attribute name="title" >
-           <string>LTE</string>
+           <string>OFDMA</string>
           </attribute>
           <layout class="QVBoxLayout" >
            <item>
@@ -48,7 +48,7 @@
                <item>
                 <widget class="QLabel" name="tileWidthLabel" >
                  <property name="text" >
-                  <string>Bins</string>
+                  <string>Resolution</string>
                  </property>
                 </widget>
                </item>
@@ -82,10 +82,10 @@
                  <item>
                   <widget class="QLineEdit" name="xBinsEdit" >
                    <property name="toolTip" >
-                    <string>The x-axis will be devided in x bins, i.e. the resulting table probe has x rows in x direction.</string>
+                    <string>The x-axis will have this resolution in meters.</string>
                    </property>
                    <property name="text" >
-                    <string>100</string>
+                    <string>1</string>
                    </property>
                    <property name="maxLength" >
                     <number>32766</number>
@@ -105,13 +105,13 @@
                  <item>
                   <widget class="QLineEdit" name="yBinsEdit" >
                    <property name="toolTip" >
-                    <string>The y-axis will be devided in y bins, i.e. the resulting table probe has y rows in y direction.</string>
+                    <string>The y-axis will have this resolution in meters.</string>
                    </property>
                    <property name="layoutDirection" >
                     <enum>Qt::RightToLeft</enum>
                    </property>
                    <property name="text" >
-                    <string>100</string>
+                    <string>1</string>
                    </property>
                   </widget>
                  </item>
@@ -147,7 +147,7 @@
                <item>
                 <widget class="QLabel" name="label_10" >
                  <property name="text" >
-                  <string>int</string>
+                  <string>m</string>
                  </property>
                 </widget>
                </item>

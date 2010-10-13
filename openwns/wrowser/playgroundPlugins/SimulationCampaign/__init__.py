@@ -51,6 +51,14 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
 """
         wnsbase.playground.plugins.Command.Command.__init__(self, "preparecampaign", rationale, usage)
 
+        self.optParser.add_option("-u", "--updateSandbox",
+                                  dest = "updateSandbox", default = False, action = "store_true",
+                                  help = "Update the sandbox of an existing campaign")
+
+        self.optParser.add_option("-c", "--createSubCampaign",
+                                  type = "string", dest = "createSubCampaign", metavar = "NAME",
+                                  help = "Create a new sub-campaign in an existing campaign")
+
         self.optParser.add_option("-f", "--configFile",
                                   type="string", dest = "configFile", metavar = "FILE", default = "config/projects.py",
                                   help = "choose a configuration file (e.g., --configFile=config/projects.py)")
@@ -64,6 +72,17 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
                                   dest = "static", default = False,
                                   action = "store_true",
                                   help = "build static executable")
+
+        self.optParser.add_option("", "--arch32",
+                                  dest = "arch32", default = False,
+                                  action = "store_true",
+                                  help = "build 32bit executable")
+
+        self.optParser.add_option("", "--noTouch",
+                                  dest = "noTouch", default = False,
+                                  action = "store_true",
+                                  help = "Do not touch existing sim.py/simcontrol.py, only useful for creating a new sub-campaign")
+
         self.numberOfArgs = 1
 
 
@@ -79,6 +98,10 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         simulations should be placed here.
         """
 
+        if self.options.updateSandbox and self.options.createSubCampaign is not None:
+            print "ERROR! The options updateSandbox and createSubCampaign are mutually exclusive. Please use one after the other\n"
+            return
+
         print "Preparing simulation campaign. Please wait..."
 
         # copy simcontrol.py and sim.py to $OPENWNSROOT/bin
@@ -91,7 +114,7 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
 
         directory = "".join(self.args)
         # Import playground stuff
-        projects = core.getProjects()
+        ###projects = core.getProjects()
 
         absSandboxDir = os.path.abspath(os.path.join(directory, "sandbox"))
         campaignName = os.path.basename(os.path.abspath(directory))
@@ -99,11 +122,22 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
 
         updating = False
 
+        if (self.options.updateSandbox or self.options.createSubCampaign is not None) and (not os.path.exists(directory)) and (not os.path.exists(logFile)):
+            print "ERROR! The directory %s either does not exist or it is not a openWNS campaign directory " % directory
+            print "Updating / creation of a new subcampaign is not possible."
+            return
+
         if os.path.exists(directory):
             if os.path.exists(logFile):
                 print "Found simulation campaign in directory %s." % directory
-                answer = raw_input("Shall I try to (U)pdate the sandbox or do you want to (C)reate a new sub campaign? Type \'e\' to exit (u/c/e) [e]: ")
-                answer = answer.lower()
+                if self.options.updateSandbox:
+                    answer = "u"
+                elif self.options.createSubCampaign is not None:
+                    answer = "c"
+                else:
+                    answer = raw_input("Shall I try to (U)pdate the sandbox or do you want to (C)reate a new sub campaign? Type \'e\' to exit (u/c/e) [e]: ")
+                    answer = answer.lower()
+
                 if answer == "u":
                     if os.path.exists(absSandboxDir):
                         os.system("chmod -R u+w " + absSandboxDir)
@@ -113,7 +147,10 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
                     logFileHandle = file(logFile, 'a')
                     updating = True
                 elif answer == "c":
-                    PrepareCampaign.createNewSubCampaign(directory)
+                    if self.options.createSubCampaign != "":
+                        PrepareCampaign.createNewSubCampaign(directory, self.options.createSubCampaign)
+                    else:
+                        PrepareCampaign.createNewSubCampaign(directory)
                     sys.exit(0)
                 else:
                     sys.exit(0)
@@ -138,9 +175,10 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
 
         self.installWNS(absSandboxDir)
 
-        PrepareCampaign.updateSubCampaigns(directory)
-        shutil.copy(os.path.join(os.path.dirname(__file__),"sim.py"), directory)
-        os.system("chmod u+x " + os.path.join(directory, "sim.py"))
+        if (not self.options.noTouch):
+            PrepareCampaign.updateSubCampaigns(directory)
+            shutil.copy(os.path.join(os.path.dirname(__file__),"sim.py"), directory)
+            os.system("chmod u+x " + os.path.join(directory, "sim.py"))
 
         logFileHandle.write("Simulation campaign directory successfully set up.\n\n")
         logFileHandle.write("---END---" + datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S') + "---\n")
@@ -154,22 +192,29 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
     def installWNS(self, absSandboxDir):
         commonArgs = ["--sandboxDir="+absSandboxDir, '--scons="preparingcampaign=1"']
         installCommand = InstallCommand()
+
+        arch32String = " "
+        if self.options.arch32:
+            arch32String = " --arch32 "
+
         # install fresh version
-        print "running ./playground.py install --flavour=dbg -f " + self.options.configFile
+        print "running ./playground.py install --flavour=dbg" + arch32String + "-f " + self.options.configFile
         installCommand.startup(commonArgs + ["--flavour=dbg"])
+
         installCommand.run()
 
         staticString = " "
         if self.options.static:
             staticString = " --static "
 
-        print "running ./playground.py install --flavour=opt" + staticString + "-f " + self.options.configFile
+        print "running ./playground.py install --flavour=opt" + staticString + arch32String + "-f " + self.options.configFile
         installCommand.startup(commonArgs + ["--flavour=opt"])
+
         installCommand.options.static = self.options.static
         installCommand.run()
 
         if self.options.addProfOpt:
-            print "running ./playground.py install --flavour=profOpt" + staticString + "-f " + self.options.configFile
+            print "running ./playground.py install --flavour=profOpt" + staticString + arch32String + "-f " + self.options.configFile
             installCommand.startup(commonArgs + ["--flavour=profOpt"])
             installCommand.options.static = self.options.static
             installCommand.run()

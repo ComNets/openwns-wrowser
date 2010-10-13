@@ -114,7 +114,6 @@ class PythonCampaignScenario:
                     raise NoScenarioDir(self.directoryName)
 
             for key, value in results.iteritems():
-#                print key, value
                 probesDict[key] = Representations.Probe(Probe(key, MomentsPythonCampaign, MomentsPythonCampaign(value, key)))
 
             globals = {}
@@ -127,7 +126,6 @@ class PythonCampaignScenario:
                     raise NoScenarioDir(self.directoryName)
 
             for key, value in pdfs.iteritems():
-#                print key, value
                 probesDict[key] = Representations.Probe(Probe(key, PDFPythonCampaign, PDFPythonCampaign(value, key)))
 
 
@@ -141,7 +139,6 @@ class PythonCampaignScenario:
                     raise NoScenarioDir(self.directoryName)
 
             for key, value in timeSeries.iteritems():
-#                print key, value
                 probesDict[key] = Representations.Probe(Probe(key, TimeSeriesPythonCampaign, TimeSeriesPythonCampaign(value, key)))
             self.__probesDict = probesDict
 

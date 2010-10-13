@@ -65,8 +65,7 @@ class ParameterValue:
         self.label = parameterName
 
     def __call__(self, scenario, probe):
-        val =  scenario.parameters[self.parameterName]
-        return val
+        return scenario.parameters[self.parameterName]
 
 class ProbeEntry:
     def __init__(self, entryName):

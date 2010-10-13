@@ -49,7 +49,7 @@ class MS(openwns.node.Node):
 
 class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
 
-    def __init__(self, maxSimTime, scenarioSize, xBins, yBins, powerPerSubBand):
+    def __init__(self, maxSimTime, scenarioSize, xRes, yRes, powerPerSubBand):
         self.maxSimTime = maxSimTime
         self.scenarioSize = scenarioSize
         self.powerPerSubBand = powerPerSubBand
@@ -63,8 +63,8 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         self.distanceProbeName = "Scanner_Distance"
 
         self.numBS = 0
-        self.xBins = xBins
-        self.yBins = yBins
+        self.xRes = xRes
+        self.yRes = yRes
 
         self.simulator = openwns.Simulator(simulationModel = openwns.node.NodeSimulationModel())
         self.simulator.maxSimTime = maxSimTime
@@ -73,7 +73,7 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         riseConfig = self.simulator.modules.rise
 
         ofdmaPhyConfig = self.simulator.modules.ofdmaPhy
-        ofdmaPhySystem = ofdmaphy.OFDMAPhy.OFDMASystem('OFDMA')
+        ofdmaPhySystem = ofdmaphy.OFDMAPhy.OFDMASystem('ofdma')
         ofdmaPhySystem.Scenario = rise.Scenario.Scenario()
         ofdmaPhyConfig.systems.append(ofdmaPhySystem)
         
@@ -123,10 +123,10 @@ class ScannerScenarioBuilder(rise.scenario.ScenarioBuilder.IScenarioBuilder):
         # Create a table generator for the evaluation
         width = self.scenarioSize[2] - self.scenarioSize[0]
         height = self.scenarioSize[3] - self.scenarioSize[1]
-        table = Table(axis1 = 'rise.scenario.mobility.x', minValue1 = self.scenarioSize[0], maxValue1 = self.scenarioSize[2], resolution1 = self.xBins,
-                      axis2 = 'rise.scenario.mobility.y', minValue2 = self.scenarioSize[1], maxValue2 = self.scenarioSize[3], resolution2 = self.yBins,
+        table = Table(axis1 = 'rise.scenario.mobility.x', minValue1 = self.scenarioSize[0], maxValue1 = self.scenarioSize[2], resolution1 = int((self.scenarioSize[2] - self.scenarioSize[0]) / self.xRes),
+                      axis2 = 'rise.scenario.mobility.y', minValue2 = self.scenarioSize[1], maxValue2 = self.scenarioSize[3], resolution2 = int((self.scenarioSize[3] - self.scenarioSize[1]) / self.yRes),
                       values = ['mean', 'max', 'trials'],
-                      formats = ['MatlabReadable']
+                      formats = ['Plain']
                       )
 
         node = openwns.evaluation.createSourceNode(self.simulator, self.rxpProbeName)
@@ -159,8 +159,8 @@ baseStations.append(bsPosition)
 
 builder = ScannerScenarioBuilder(maxSimTime=100,
                                  scenarioSize=($scenario.xMin, $scenario.yMin, $scenario.xMax, $scenario.yMax),
-                                 xBins = $numXBins,
-                                 yBins = $numYBins,
+                                 xRes = $numXRes,
+                                 yRes = $numYRes,
                                  powerPerSubBand = "$powerPerSubBand dBm")
 
 for bs in baseStations:

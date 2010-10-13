@@ -464,6 +464,7 @@ class LineGraph(Graph, Observing):
         self.setScale(*(self.figureConfig.scale))
         if self.figureConfig.legend:
             self.setLegend(True)
+
         self.plottingStopped = False
         self.mainWindow.hideProgressBar()
         self.setInterfaceEnabled(True)

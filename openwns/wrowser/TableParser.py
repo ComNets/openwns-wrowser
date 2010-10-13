@@ -25,6 +25,12 @@
 #
 ###############################################################################
 
+class WrongDimensions(Exception):
+    """
+    Raised if table has too many dimensions
+    """
+    pass
+
 class TableParser:
     fileName = None
     header = None
@@ -75,7 +81,7 @@ class TableParser:
                             self.secondRowIdName = line.split(':')[1].strip().split('\'')[1]
                             self.secondRowContains = 'c'
                         else:
-                            raise "Encountered invalid number of dimensions in file " + self.fileName
+                            raise WrongDimensions("Encountered invalid number of dimensions in file " + self.fileName)
                 else:
                     if len(line.strip()) > 0:
                         self.trials+=1
@@ -123,6 +129,7 @@ class TableParser:
             for xv in self.xvalues:
                 valueArray[lineNo].append( self.valueMap[(xv,yv)] )
             lineNo +=1
+
         return valueArray
 
     def getXValues(self):

@@ -41,6 +41,8 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
 
 import scenario.plotterFactory
 import scenario.widgets
+import inspect
+import pprint
 
 import inspect
 import pprint
@@ -68,17 +70,20 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, calledFromDir, startMode, bzrInfo, *args):
+    def __init__(self, calledFromDir, directory, pythonDirectory , bzrInfo, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
+        self.showMaximized()
         self.reader = None
+
         self.readerStopped = False
         self.campaignId = None
+
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
-        self.directoryMode = (startMode==1)
-        self.pythonCampaignMode = (startMode==2)
+        self.directory = directory
+        self.pythonDirectory = pythonDirectory
         self.bzrInfo = bzrInfo
 
         self.workspace = QtGui.QWorkspace(self)
@@ -96,9 +101,16 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionCloseFigure.setVisible(False)
         self.actionConfigure.setVisible(False)
         self.actionRefresh.setVisible(False)
-        if self.directoryMode:
-            self.on_actionOpenDirectory_triggered()
-        elif self.pythonCampaignMode:
+        if directory is not None:
+            self.directoryNavigation = DirectoryNavigation(self.campaigns, directory, self)
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
+
+            self.menuSetAllOpen(False)
+
+            self.actionCloseDataSource.setEnabled(True)
+
+            self.directoryNavigation.widget().on_scanButton_clicked(True)
+        if pythonDirectory is not None:
             self.on_actionOpenPythonCampaign_triggered()
 
         global couchIsUsable
@@ -240,10 +252,12 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.campaignId = campaignId
             Campaigns.setCampaign([campaignId])
             self.campaignTitle = Campaigns.getCampaignInfo(campaignId)[0][1]
+
             windowTitleElements = self.windowTitle().split(' ')
             self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
             self.showProgressBar(self.on_cancelClicked)
             self.menuSetAllOpen(False)
+
             self.reader = PostgresReader.CampaignReader(campaignId,
                                                         None,
                                                         self.progressIndicator.setCurrentAndMaximum,
@@ -317,8 +331,12 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     def on_actionOpenPythonCampaign_triggered(self):
         from probeselector import PythonCampaignReader, Representations, Interface
 
+        if self.pythonDirectory is not None:
+            pythDir=self.pythonDirectory
+        else:
+            pythDir=self.calledFromDir
         dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
-                                                         self.calledFromDir,
+                                                         pythDir,
                                                          QtGui.QFileDialog.ShowDirsOnly
                                                          | QtGui.QFileDialog.DontResolveSymlinks))
         if dir == '':
@@ -399,6 +417,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
+
         figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
@@ -974,6 +993,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
     def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
+
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
         self.probeGraphControl.confidenceparameterframe.hide()
         self.campaignId = campaignId
@@ -1193,9 +1213,11 @@ class TableFigure(ProbeFigure, TableGraphs):
         return graphs
 
 class ParameterFigure(Figure, LineGraphs):
+
     def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
+
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
         self.campaignId = campaignId
