@@ -332,11 +332,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         from probeselector import PythonCampaignReader, Representations, Interface
 
         if self.pythonDirectory is not None:
-            pythDir=self.pythonDirectory
+            dir=self.pythonDirectory
         else:
-            pythDir=self.calledFromDir
-        dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
-                                                         pythDir,
+            dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
+                                                         self.calledFromDir,
                                                          QtGui.QFileDialog.ShowDirsOnly
                                                          | QtGui.QFileDialog.DontResolveSymlinks))
         if dir == '':
