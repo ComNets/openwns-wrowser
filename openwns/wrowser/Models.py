@@ -418,7 +418,10 @@ class ProbeData(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             key = self.headerNames[index.column()]
             if key in self.parameterNames:
-                return QtCore.QVariant(self.probeData[index.row()][0][key])
+                try:
+                    return QtCore.QVariant(self.probeData[index.row()][0][key])
+                except KeyError:
+                    return QtCore.QVariant(QtCore.QString("NA")) 
             elif key in self.probeInfoNames:
                 if self.probeData[index.row()][1].has_key(key):
                     return QtCore.QVariant(self.probeData[index.row()][1][key])

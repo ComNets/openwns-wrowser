@@ -165,7 +165,6 @@ class PythonCampaignCampaignReader:
 
         for fileName in os.listdir(self.directoryName):
             filePath = os.path.join(self.directoryName, fileName)
-            print filePath, self.parametersFileName
             if os.path.isdir(filePath):
                 try:
                     paramsFileName = os.path.join(filePath, self.parametersFileName)
@@ -189,5 +188,4 @@ class PythonCampaignCampaignReader:
                 except NoScenarioDir:
                     pass
 
-        print scenarioList, parametersDict
         return scenarioList, parametersDict

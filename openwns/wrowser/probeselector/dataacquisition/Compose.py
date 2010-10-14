@@ -47,6 +47,8 @@ class XY:
             x = self.acquireXData(scenario, probe)
         except Errors.ProbeNotFoundInSimulation, e:
             errors.append(e)
+        except KeyError:
+            pass
         else:
             try:
                 y = self.acquireYData(scenario, probe)
