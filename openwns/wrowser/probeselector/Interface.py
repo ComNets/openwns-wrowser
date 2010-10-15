@@ -126,7 +126,7 @@ class Facade:
         numericTypes = [type(bool()), type(int()), type(long()), type(float())]
         result = True
         for value in self.getValuesOfParameter(parameterName):
-            if type(value) not in numericTypes:
+            if type(value) not in numericTypes and value!="NA":
                 result = False
         return result
 
@@ -149,6 +149,14 @@ class Facade:
                 values.append("NA")
         return values
 
+    def getInitialValues(self):
+        result=dict()        
+        for scenario in self.campaign.scenarios :
+            for param in scenario.parameters:
+                if not result.has_key(param):
+                    result[param]=scenario.parameters[param]
+        return result
+            
     def getNotChangingParameterNames(self):
         """Return the names of the parameters that do not vary.
 
@@ -158,11 +166,8 @@ class Facade:
         if len(self.campaign.scenarios) == 0:
             return set()
         notChangingParameterNames = set(self.campaign.parameterNames)
-        initialValues = self.campaign.scenarios[0].parameters
-        for sc in self.campaign.scenarios[1:] :
-            if len(sc.parameters)>len(initialValues):
-                initialValues=sc.parameters
-                self.campaign.parameterNames=initialValues.keys()
+        initialValues=self.getInitialValues()
+        self.campaign.parameterNames=initialValues.keys() 
         for scenario in self.campaign.scenarios[1:]:
             # todo: refactor: do not iterate over already marked parameters
             for parameterName in self.campaign.parameterNames:

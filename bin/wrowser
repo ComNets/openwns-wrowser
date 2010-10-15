@@ -29,7 +29,6 @@
 import sys
 import os
 import traceback
-
 from PyQt4 import QtGui
 import optparse
 
@@ -37,7 +36,10 @@ usage = 'usage: %prog [options]'
 parser = optparse.OptionParser(usage)
 
 parser.add_option('-d','--directory', dest = 'directory',
-                  help = 'open wrowser in directorymode', metavar="DIR")
+                  help = 'open wrowser in directory mode', metavar="DIR")
+
+parser.add_option('-p','--python-campaign', dest = 'pythonDirectory',
+                  help = 'open wrowser in python campaign mode', metavar="DIR")
 
 options, args = parser.parse_args()
 if len(args):
@@ -49,6 +51,9 @@ if options.directory is not None:
     options.directory = os.path.abspath(options.directory)
     print "wrowser is started in directory mode (%s)" % (options.directory)
 
+if options.pythonDirectory is not None:
+    options.pythonDirectory = os.path.abspath(options.pythonDirectory)
+    print "wrowser is started in python campaign mode (%s)" % (options.pythonDirectory)
 
 # Path to this script
 p = sys.path[0]
@@ -63,6 +68,9 @@ calledFromDir = os.path.abspath(os.path.curdir)
 
 os.chdir(searchPath)
 import openwns.wrowser.Windows
+ 
+def getBzrInfo():
+    return ""
 
 def wrowserExceptHook(eType, eValue, eTraceback):
     message = "".join(traceback.format_exception(eType, eValue, eTraceback))
@@ -71,19 +79,24 @@ def wrowserExceptHook(eType, eValue, eTraceback):
     if response == 0:
         sys.exit(255)
     elif response == 1:
-        import pdb
-        pdb.set_trace()
+        '''Set a tracepoint in the Python debugger that works with Qt'''
+        from PyQt4.QtCore import pyqtRemoveInputHook
+        from pdb import set_trace
+        pyqtRemoveInputHook()
+        set_trace()
     else:
         pass
 
 if __name__ == "__main__":
+    #print "Wrowser revision: ",getBzrRevision()
+    bzrInfo = getBzrInfo()
     application = QtGui.QApplication(sys.argv)
     application.setQuitOnLastWindowClosed(True)
     application.setApplicationName("Wrowser")
     application.setWindowIcon(QtGui.QIcon(":/icons/icon.png"))
     application.setOrganizationName("RWTH Aachen University - ComNets")
     application.setOrganizationDomain("www.comnets.rwth-aachen.de")
-    widget = openwns.wrowser.Windows.Main(calledFromDir, options.directory)
+    widget = openwns.wrowser.Windows.Main(calledFromDir, options.directory, options.pythonDirectory ,bzrInfo)
     widget.show()
     sys.excepthook = wrowserExceptHook
     sys.exit(application.exec_())

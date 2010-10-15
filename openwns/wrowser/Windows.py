@@ -78,7 +78,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     class CancelFlag:
         cancelled = False
 
-    def __init__(self, calledFromDir, directory, *args):
+    def __init__(self, calledFromDir, directory, pythonDirectory , bzrInfo, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setupUi(self)
         self.campaigns = Observable()
@@ -91,6 +91,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
         self.directory = directory
+        self.pythonDirectory = pythonDirectory
+        self.bzrInfo = bzrInfo
 
         self.workspace = QtGui.QWorkspace(self)
         self.setCentralWidget(self.workspace)
@@ -116,6 +118,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.actionCloseDataSource.setEnabled(True)
 
             self.directoryNavigation.widget().on_scanButton_clicked(True)
+        if pythonDirectory is not None:
+            self.on_actionOpenPythonCampaign_triggered()
 
         global couchIsUsable
         global couchHasUsableKeyring
@@ -284,6 +288,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             self.simulationParameters = SimulationParameters(self.campaigns, self)
             self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
             self.menuNew.setEnabled(True)
+
+            self.actionRefresh.setVisible(True)
             self.actionCloseDataSource.setEnabled(True)
 
     def menuSetAllOpen(self,isEnabled):
@@ -321,6 +327,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                 self.simulationParameters = SimulationParameters(self.campaigns, self)
                 self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
                 self.menuNew.setEnabled(True)
+
                 self.menuSetAllOpen(False)
 
                 self.actionCloseDataSource.setEnabled(True)
@@ -332,6 +339,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.directoryNavigation)
 
         self.menuSetAllOpen(False)
+        self.actionRefresh.setVisible(True)
 
         self.actionCloseDataSource.setEnabled(True)
 
@@ -339,13 +347,17 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     def on_actionOpenPythonCampaign_triggered(self):
         from probeselector import PythonCampaignReader, Representations, Interface
 
-        dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
-                                                         os.getcwd(),
+        if self.pythonDirectory is not None:
+            dir=self.pythonDirectory
+        else:
+            dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
+                                                         self.calledFromDir,
                                                          QtGui.QFileDialog.ShowDirsOnly
                                                          | QtGui.QFileDialog.DontResolveSymlinks))
         if dir == '':
             return
-        campaign =  Representations.Campaign(*PythonCampaignReader.PythonCampaignCampaignReader(dir).read())
+        self.reader = PythonCampaignReader.PythonCampaignCampaignReader(dir)
+        campaign =  Representations.Campaign(*self.reader.read())
         self.campaigns.original = Interface.Facade(campaign)
 
         self.simulationParameters = SimulationParameters(self.campaigns, self)
@@ -353,11 +365,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.menuNew.setEnabled(True)
 
         self.menuSetAllOpen(False)
-
+        self.actionRefresh.setVisible(True)
         self.actionCloseDataSource.setEnabled(True)
 
-    QtCore.pyqtSignature("")
-    def on_actionCloseDataSource_triggered(self):
+    def closeDock(self):
         if hasattr(self, "simulationParameters"):
             self.simulationParameters.close()
         if hasattr(self, "directoryNavigation"):
@@ -369,6 +380,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         if hasattr(self, "viewCouchDBNavigation"):
             self.viewCouchDBNavigation.close()
 
+    QtCore.pyqtSignature("")
+    def on_actionCloseDataSource_triggered(self):
+        self.closeDock()
+
         if hasattr(self, "model"):
             del self.model
         for window in self.workspace.windowList():
@@ -379,6 +394,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.actionCloseDataSource.setEnabled(False)
         self.actionNewParameter.setEnabled(True)
+        self.actionRefresh.setVisible(False)
         self.menuNew.setEnabled(False)
 
     @QtCore.pyqtSignature("")
@@ -386,8 +402,22 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         from probeselector import Representations, Interface
 
         if self.reader != None:
-            self.campaigns.original = Interface.Facade(Representations.Campaign(*self.reader.read()))
-
+            self.closeDock()
+            self.showProgressBar(self.on_cancelClicked)
+            self.menuSetAllOpen(False)
+            campaign = Representations.Campaign(*self.reader.read())
+            self.hideProgressBar()
+            if self.readerStopped:
+                self.readerStopped = False
+                self.menuSetAllOpen(True)
+                return
+            self.campaigns.original = Interface.Facade(campaign)
+            self.simulationParameters = SimulationParameters(self.campaigns, self)
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
+            self.menuNew.setEnabled(True)
+            self.actionCloseDataSource.setEnabled(True)
+            self.actionRefresh.setVisible(True)
+ 
     @QtCore.pyqtSignature("")
     def on_actionNewLogEval_triggered(self):
         figureWindow = LogEvalFigure(self.campaigns, self.menuFigure, self, self.workspace)
@@ -427,9 +457,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
-
         figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
-
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -443,7 +471,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 				"About Wrowser",
 				"<h4>Wrowser - The WNS Result Browser</h4>"
 				"The Wrowser is a browsing and viewing utility "
-				"for results of the WNS simulator.")
+				"for results of the WNS simulator.<br>"+self.bzrInfo.replace("\n","<br>"))
 
     def showProgressBar(self, callBack):
         self.statusbar.addWidget(self.cancelButton)
@@ -615,9 +643,7 @@ class DirectoryNavigation(QtGui.QDockWidget,Observing):
         def on_scanButton_clicked(self, checked):
             from probeselector import DirectoryReaders, Representations, Interface
             dirIndex = self.directoryView.selectionModel().currentIndex()
-            if dirIndex.isValid():
-                self.rootEdit.setText(self.directoryModel.filePath(dirIndex))
-
+            self.rootEdit.setText(self.directoryModel.filePath(dirIndex))
             self.directoryView.setRootIndex(self.directoryModel.index(self.rootEdit.text()))
             directory = str(self.rootEdit.text())
             progressDialogue = Dialogues.Progress("Reading data", 0, self)
@@ -816,7 +842,17 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
 
     @QtCore.pyqtSignature("bool")
     def on_draw_clicked(self, checked):
-        self.graph.setGraphs(self.getGraphs())
+        debugMode = True #TODO: later this should be global, debug messages should only be printed in debugMode
+        if not debugMode:
+            try:
+                self.graph.setGraphs(self.getGraphs())
+            except:
+                print "in debug mode the wrowser would have thrown an exception, check on_draw_clicked in Windows.py"
+                self.mainWindow.hideProgressBar() 
+                self.setInterfaceEnabled(True)
+        else:
+            self.graph.setGraphs(self.getGraphs())
+
 
     def on_cancelClicked(self):
         self.readerStopped = True
@@ -1102,7 +1138,6 @@ class BatchMeansFigure(ProbeFigure, LineGraphs):
     def __init__(self, campaigns, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "BatchMeans Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
-
         self.probeGraphControl.aggregateframe.hide()
         
         self.graph.figureConfig.title = "BatchMeans Probe Figure"
@@ -1232,7 +1267,6 @@ class ParameterFigure(Figure, LineGraphs):
     def on_drawCampaign_changed(self, campaign):
         Debug.printCall(self, campaign)
         self.simulationParametersModel.setCampaign(self.campaigns.draw,True)
-
         selectedXProbes = self.parameterGraphControl.xProbeNames()
         selectedYProbes = self.parameterGraphControl.yProbeNames()
         selectionModelX = self.parameterGraphControl.xProbesView().selectionModel()
@@ -1289,7 +1323,6 @@ class ParameterFigure(Figure, LineGraphs):
             confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
             showConfidenceLevel = self.parameterGraphControl.isShowConfidenceLevels()
             scenarioDataAcquirer = dataacquisition.Scenario(probeDataAcquirers, parameterNames, dataacquisition.Aggregator.Mean(yProbeEntry, confidenceLevel, showConfidenceLevel))
-
 
             self.mainWindow.showProgressBar(self.on_cancelClicked)  
             self.setInterfaceEnabled(False) 
