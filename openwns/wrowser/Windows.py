@@ -47,6 +47,7 @@ import pprint
 import inspect
 import pprint
 
+# Check prerequisites
 try:
     import gnomekeyring
     import desktopcouch.records
@@ -63,6 +64,13 @@ if couchIsUsable:
     import tracing.frameplotter
     import tracing.model
 
+cheetahIsUsable = False
+
+try:
+    import Cheetah.Template
+    cheetahIsUsable = True
+except ImportError:
+    cheetahIsUsable = False
 
 from ui.Windows_Main_ui import Ui_Windows_Main
 class Main(QtGui.QMainWindow, Ui_Windows_Main):
@@ -115,15 +123,22 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
             Dialogues.Warning(self, "couchdbnotfound", "Missing CouchDB",
                               "<h4>I cannot find a running CouchDB instance</h4>"
                               "This usually happens if you execute wrowser on a remote machine."
-                              "The menu item will be disabled")
+                              "The menu item File > View CouchDB Trace will be disabled")
 
         elif not couchIsUsable:
             Dialogues.Warning(self, "couchdbnotinstalled", "No CouchDB installed",
                               "<h4>I cannot find a an installation of desktopcouch</h4>"
                               "The couchdb tracing view will only work with desktopcouch, which is preinstalled in Ubuntu Lucid Lynx."
-                              "The menu item will be disabled")
+                              "The menu item File > View CouchDB Trace will be disabled")
+
+        if not cheetahIsUsable:
+            Dialogues.Warning(self, "pythoncheetahnotfound", "Missing python-cheetah",
+                              "<h4>I cannot find an installation of python-cheetah</h4>"
+                              "Consider installing it by using 'sudo apt-get install python-cheetah' or similar"
+                              "The menu item 'File > View Scenario' will be disabled")
 
         self.actionView_CouchDB_Trace.setEnabled(couchIsUsable)
+        self.actionView_Scenario.setEnabled(cheetahIsUsable)
 
     @QtCore.pyqtSignature("")
     def on_actionPreferences_triggered(self):
@@ -273,11 +288,12 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     def menuSetAllOpen(self,isEnabled):
         global couchIsUsable   
+        global cheetahIsUsable
         self.actionOpenCampaignDatabase.setEnabled(isEnabled)
         self.actionOpenDSV.setEnabled(isEnabled)
         self.actionOpenDirectory.setEnabled(isEnabled)
         self.actionOpenPythonCampaign.setEnabled(isEnabled)
-        self.actionView_Scenario.setEnabled(isEnabled)
+        self.actionView_Scenario.setEnabled(isEnabled and cheetahIsUsable)
         self.actionView_CouchDB_Trace.setEnabled(isEnabled and couchIsUsable)
 
     def on_cancelClicked(self):
