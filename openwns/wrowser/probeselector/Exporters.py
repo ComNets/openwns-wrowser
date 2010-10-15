@@ -63,7 +63,7 @@ class PythExport:
 import sys
 import os
 from pylab import *
-sys.path.insert(0,\""""+ os.getcwd()+"\")\n"
+sys.path.insert(0,'"""+ os.getcwd()+"')\n"
 
         def createPlotAll(newlocation):
             plotAll = open(newlocation,"w")
@@ -239,8 +239,54 @@ end
                   )
         out.close()
 
+class Pylab:
 
+    formatName = "Pylab"
 
+    @staticmethod
+    def export(filename, export, progressNotify = None, progressReset = None):
+        graphs = export.graphs
+        if not filename.endswith('.py'):
+            filename += '.py'
+
+        out = open(filename, "w")
+        out.write("from pylab import *\n")
+        out.write("leg = [];\n")
+        maxIndex = len(graphs)
+        if callable(progressReset):
+            progressReset()
+        for index, graph in enumerate(graphs):
+            if callable(progressNotify):
+                msg = "Exporting " + str(graph.identity)
+                progressNotify(index, maxIndex, msg)
+
+            out.write("X%d = array([ " % index)
+            for point in graph.points:
+                out.write(repr(point[0]) + ", ")
+            out.write("])\n")
+            out.write("Y%d = array([ " % index)
+            for point in graph.points:
+                out.write(repr(point[1]) + ", ")
+            out.write("])\n")
+            if(isinstance(graph, Graphs.AggregatedGraph) and len(graph.confidenceIntervalDict) > 0):
+                out.write("ciX%d = array([ " % index)
+                values = []
+                for (k,v) in graph.confidenceIntervalDict.iteritems():
+                    out.write(repr(k) + ", ")
+                    values.append(v)
+                out.write("])\n")
+                out.write("ciY%d = array([ " % index)
+                for v in values:
+                    out.write(repr(v) + ", ")
+                out.write("])\n")
+            out.write("leg.append('%s')\n" % openwns.wrowser.Tools.dict2string(graph.identity.parameters).replace('_',' '))
+            out.write("plot(X%d,Y%d)\n" % (index, index))
+        out.write("legend(leg,loc='upper left')\n")
+        graphTitle = graphs[0].identity.probe.replace('_',' ')
+        out.write("title('%s')\n" % graphTitle)
+        out.write("grid()\n")
+        out.write("show()\n")
+        out.close()
 
 # Module support methods
 # Add additional exporters above
