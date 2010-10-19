@@ -336,7 +336,6 @@ def __getSimTime(fileName):
 
 
 def jobInfo(arg = 'unused'):
-    consistencyCheck()
     parameters = params.Parameters()
     parameterNames = parameters.parameterSet.keys()
     parameterNames.sort()
