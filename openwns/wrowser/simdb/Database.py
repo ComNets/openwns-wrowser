@@ -84,7 +84,9 @@ class Database:
 
         Database.__connection.close()
         Database.__connection = None
-
+        Database.__user = None
+        Database.__showAllCampaignsSelected = False
+        Database.__viewCampaignsSelected = False
 
     @staticmethod
     def getCursor():

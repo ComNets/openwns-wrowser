@@ -173,11 +173,13 @@ class OpenCouchDatabase(QtGui.QDialog, Ui_CouchDBDialog):
 from ui.Dialogues_OpenCampaignDb_ui import Ui_Dialogues_OpenCampaignDb
 class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
     def __init__(self, *args):
-        from openwns.wrowser.simdb import Campaigns
-
         QtGui.QDialog.__init__(self, *args)
         self.setupUi(self)
 
+        self.refresh()
+
+    def refresh(self):
+        from openwns.wrowser.simdb import Campaigns
         self.campaignsModel = Models.CampaignDb(Campaigns.getCampaignsDict())
         self.campaigns.setModel(self.campaignsModel)
 
@@ -198,6 +200,60 @@ class OpenCampaignDb(QtGui.QDialog, Ui_Dialogues_OpenCampaignDb):
 
     def getCampaign(self):
         return self.campaignsModel.getCampaign(self.campaigns.selectedIndexes()[0])
+
+    def contextMenuEvent(self, event):
+        items = self.campaigns.selectionModel().selectedIndexes()
+        model = self.campaigns.model()
+
+        campaignId = model.getCampaign(items[0])
+        dbname = model.data(items[1]).toString()
+        
+        menu = QtGui.QMenu(self)
+        deleteAction = menu.addAction("Delete")
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+
+        if action == deleteAction:
+            msg = QtGui.QMessageBox()
+            msg.setText("<b>%s (%d)</b> will be permanently deleted!" % (dbname, campaignId))
+            msg.setInformativeText("Do your really want to delete?")
+            msg.setStandardButtons(QtGui.QMessageBox.Yes|QtGui.QMessageBox.Cancel)
+            msg.setDefaultButton(QtGui.QMessageBox.Cancel)
+            ret = msg.exec_()
+
+            if ret == QtGui.QMessageBox.Yes:
+
+                from openwns.wrowser.simdb.Database import Database
+                cursor = Database.getCursor()
+                cursor.execute('SELECT * FROM campaigns WHERE id = %i' % campaignId)
+                if len(cursor.fetchall()) != 1:
+                    Warning(self, "Campaign not found", "Campaign %s not found" % dbname,
+                            "<h4>I cannot find the campaign</h4>")
+                    cursor.connection.commit()
+                    return
+
+
+                Database.disconnect()
+
+                import Configuration
+
+                c = Configuration.Configuration()
+                c.read()
+
+                Database.connectConf(c)
+
+                Database.deleteCampaign(campaignId)
+
+                Database.disconnect()
+
+                msg = QtGui.QMessageBox()
+                msg.setText("<b>%s (%d)</b> successfully deleted!" % (dbname, campaignId))
+                msg.setInformativeText("Deletion has finished")
+                msg.setStandardButtons(QtGui.QMessageBox.Ok)
+                msg.setDefaultButton(QtGui.QMessageBox.Ok)
+                ret = msg.exec_()
+
+                self.refresh()
+
 
 from ui.Dialogues_OpenDSV_ui import Ui_Dialogues_OpenDSV
 class OpenDSV(QtGui.QDialog, Ui_Dialogues_OpenDSV):
