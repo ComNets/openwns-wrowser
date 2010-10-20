@@ -1010,6 +1010,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
         LineGraphs.__init__(self, mainWindow)
 
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
+        self.graph.figureConfig.marker = ""
         self.probeGraphControl.confidenceparameterframe.hide()
         self.campaignId = campaignId
 
