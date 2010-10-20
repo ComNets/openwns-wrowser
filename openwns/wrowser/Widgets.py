@@ -128,6 +128,10 @@ class ProbeGraphControl(QtGui.QWidget, Ui_Widgets_ProbeGraphControl):
     def setAggregateParametersModel(self, model):
         self.aggregateParameter.setModelColumn(0)
         self.aggregateParameter.setModel(model)
+        index = self.aggregateParameter.findText("seed")
+        if index!=-1:
+            self.aggregateParameter.setCurrentIndex(index)
+
 
     def setProbeFunctions(self, probeFunctions, initialIndex = 0):
         if len(probeFunctions) == 0:
@@ -257,6 +261,9 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
     def setAggregateParametersModel(self, model):
         self.yProbesControl.aggregateParameter.setModelColumn(0)
         self.yProbesControl.aggregateParameter.setModel(model)
+        index = self.yProbesControl.aggregateParameter.findText("seed")
+        if index!=-1:
+            self.yProbesControl.aggregateParameter.setCurrentIndex(index)
 
     def setXProbesModel(self, model):
         self.xProbesControl.setModel(model)
