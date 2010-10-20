@@ -38,6 +38,7 @@ from Tools import Observable, Observing
 import Debug
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
+from Probe import MomentsProbeBase
 
 import scenario.plotterFactory
 import scenario.widgets
@@ -1248,12 +1249,11 @@ class ParameterFigure(Figure, LineGraphs):
         self.aggregateParametersModel.parameterNames.remove(parameterName)
         self.parameterGraphControl.setAggregateParametersModel(self.aggregateParametersModel)
 
-        self.xProbesModel = Models.ProbeNames(self.campaigns.draw)
+        self.xProbesModel = Models.ProbeNames(self.campaigns.draw, probeClasses=[MomentsProbeBase])
         self.parameterGraphControl.setXProbesModel(self.xProbesModel)
 
-        self.yProbesModel = Models.ProbeNames(self.campaigns.draw)
+        self.yProbesModel = Models.ProbeNames(self.campaigns.draw, probeClasses=[MomentsProbeBase])
         self.parameterGraphControl.setYProbesModel(self.yProbesModel)
-
         self.xProbeEntriesModel = Models.ProbeEntries(self.campaigns.draw)
         self.xProbeEntriesModel.changeProbes(self.parameterGraphControl.xProbeNames())
         self.parameterGraphControl.setXProbeEntriesModel(self.xProbeEntriesModel)
