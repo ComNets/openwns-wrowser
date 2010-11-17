@@ -44,7 +44,7 @@ def __writeMomentsProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, 
         cursor.execute('INSERT INTO moments (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials,'\
                        ' mean, variance, relative_variance, standard_deviation, relative_standard_deviation, skewness, moment2, moment3,'\
                        ' sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic)'\
-                       ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
+                       ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' , \
                        (campaignId, scenarioId, momProbe.filename, momProbe.name, momProbe.altName, momProbe.description,
                         momProbe.minimum, momProbe.maximum, momProbe.trials, momProbe.mean, momProbe.variance, momProbe.relativeVariance,
                         momProbe.standardDeviation, momProbe.relativeStandardDeviation, momProbe.skewness, momProbe.moment2, momProbe.moment3,
@@ -68,8 +68,8 @@ def __writePDFProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, curs
         cursor.execute('INSERT INTO pd_fs (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials,'\
                        ' mean, variance, relative_variance, standard_deviation, relative_standard_deviation, skewness, moment2, moment3,'\
                        ' sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, p01, p05, p50, p95, p99, min_x, max_x, number_of_bins, underflows, overflows)'\
-                       ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', '\
-                       ' \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', %d, %d, %d)' % \
+                        'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '\
+                        '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' , \
                        (campaignId, scenarioId, pdfProbe.filename, pdfProbe.name, pdfProbe.altName, pdfProbe.description,
                         pdfProbe.minimum, pdfProbe.maximum, pdfProbe.trials, pdfProbe.mean, pdfProbe.variance, pdfProbe.relativeVariance,
                         pdfProbe.standardDeviation, pdfProbe.relativeStandardDeviation, pdfProbe.skewness, pdfProbe.moment2, pdfProbe.moment3,
@@ -98,7 +98,7 @@ def __writeLogEvalProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, 
         cursor.execute('INSERT INTO log_evals (campaign_id, scenario_id, filename, name, alt_name, description, minimum, maximum, trials,'\
                        ' mean, variance, relative_variance, standard_deviation, relative_standard_deviation, skewness, moment2, moment3,'\
                        ' sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic)'\
-                       ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
+                       ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' , \
                        (campaignId, scenarioId, logEvalProbe.filename, logEvalProbe.name, logEvalProbe.altName, logEvalProbe.description,
                         logEvalProbe.minimum, logEvalProbe.maximum, logEvalProbe.trials, logEvalProbe.mean, logEvalProbe.variance, logEvalProbe.relativeVariance,
                         logEvalProbe.standardDeviation, logEvalProbe.relativeStandardDeviation, logEvalProbe.skewness, logEvalProbe.moment2, logEvalProbe.moment3,
@@ -129,8 +129,8 @@ def __writeBatchMeansProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignI
                        ' interval_size, size_of_groups, maximum_relative_error, evaluated_groups, '\
                        ' underflows, overflows, mean_bm, confidence_of_mean_absolute, confidence_of_mean_percent, relative_error_mean, variance_bm, '\
                        ' confidence_of_variance_absolute, confidence_of_variance_percent, relative_error_variance, sigma, first_order_correlation_coefficient)'\
-                       ' VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\','\
-                       ' \'%.10f\', \'%.10f\', \'%.10f\', %d, \'%.10f\', %d, \'%.10f\', %d, %d, %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
+                       ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'\
+                       ' %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' , \
                        (campaignId, scenarioId, batchMeansProbe.filename, batchMeansProbe.name, batchMeansProbe.altName, batchMeansProbe.description,
                         batchMeansProbe.minimum, batchMeansProbe.maximum, batchMeansProbe.trials, batchMeansProbe.mean, batchMeansProbe.variance, batchMeansProbe.relativeVariance,
                         batchMeansProbe.standardDeviation, batchMeansProbe.relativeStandardDeviation, batchMeansProbe.skewness, batchMeansProbe.moment2, batchMeansProbe.moment3,
@@ -170,9 +170,9 @@ def __writeLreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, curs
                        'deviation_from_mean_local_cc_standard_deviation, number_of_trials_per_interval_mean, number_of_trials_per_interval_variance, '\
                        'number_of_trials_per_interval_standard_deviation, number_of_transitions_per_interval_mean, number_of_transitions_per_interval_variance, '\
                        'number_of_transitions_per_interval_standard_deviation) '\
-                       'VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%s\', '\
-                       '\'%.10f\', \'%.10f\', \'%.10f\', \'%s\', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', '\
-                       '\'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\')' % \
+                       'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '\
+                       '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '\
+                       '%s, %s, %s, %s, %s, %s, %s)' , \
                        (campaignId, scenarioId, lreProbe.filename, lreProbe.name, lreProbe.altName, lreProbe.description,
                         lreProbe.minimum, lreProbe.maximum, lreProbe.trials, lreProbe.mean, lreProbe.variance, lreProbe.relativeVariance,
                         lreProbe.standardDeviation, lreProbe.relativeStandardDeviation, lreProbe.skewness, lreProbe.moment2, lreProbe.moment3,
@@ -216,9 +216,9 @@ def __writeDlreProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cur
                        'sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, dlre_type, lower_border, upper_border, '\
                        'number_of_intervals, interval_size, maximum_number_of_samples, maximum_relative_error_percent, '\
                        'evaluated_levels, underflows, overflows) '\
-                       'VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', '\
-                       '\'%.10f\', \'%.10f\', \'%.10f\', \'%.10f\', \'%s\', \'%.10f\', \'%.10f\', %d, \'%.10f\', '\
-                       '\'%s\', \'%.10f\', %d, %d, %d)' % \
+                       'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '\
+                       '%s, %s, %s, %s, %s, %s, %s, %s, %s, '\
+                       '%s, %s, %s, %s, %s)' , \
                        (campaignId, scenarioId, dlreProbe.filename, dlreProbe.name, dlreProbe.altName, dlreProbe.description,
                         dlreProbe.minimum, dlreProbe.maximum, dlreProbe.trials, dlreProbe.mean, dlreProbe.variance, dlreProbe.relativeVariance,
                         dlreProbe.standardDeviation, dlreProbe.relativeStandardDeviation, dlreProbe.skewness, dlreProbe.moment2, dlreProbe.moment3,
@@ -250,7 +250,7 @@ def __writeTableProbesIntoDB(dirname, scenarioId, skipNullTrials, campaignId, cu
         print "    Writing to database: " + tableProbe.name
         cursor.execute('INSERT INTO tables (campaign_id, scenario_id, filename, name, type, first_col_type, first_col_description, second_col_type, '\
                        'second_col_description, description, minimum, maximum) '\
-                       'VALUES (%d, %d, \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%.10f\', \'%.10f\')' % \
+                       'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' , \
                        (campaignId, scenarioId, tableProbe.filename, tableProbe.name, tableProbe.type, tableProbe.tableParser.firstRowContains,
                         tableProbe.tableParser.firstRowIdName, tableProbe.tableParser.secondRowContains, tableProbe.tableParser.secondRowIdName, tableProbe.description,
                         tableProbe.minimum, tableProbe.maximum))
