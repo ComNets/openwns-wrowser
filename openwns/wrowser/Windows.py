@@ -350,6 +350,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         if self.pythonDirectory is not None:
             dir=self.pythonDirectory
+            self.pythonDirectory=None
         else:
             dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
                                                          self.calledFromDir,
@@ -360,6 +361,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.reader = PythonCampaignReader.PythonCampaignCampaignReader(dir)
         campaign =  Representations.Campaign(*self.reader.read())
         self.campaigns.original = Interface.Facade(campaign)
+        self.setWindowTitle("Python Campaign: "+dir)
 
         self.simulationParameters = SimulationParameters(self.campaigns, self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
