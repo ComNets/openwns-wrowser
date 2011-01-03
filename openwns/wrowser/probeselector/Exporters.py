@@ -63,10 +63,12 @@ class JSON:
     @staticmethod
     def export(filename, export , progressNotify = None, progressReset = None):
         graphs = export.graphs
+        data = dict()
+
         out = open(filename, "w")
         for graph in export.graphs:
-            grph = graph.getDict()
-            out.write(" "+json.dumps(graph))
+            grph = [ graph.points, str(graph.identity)]
+            out.write(" "+json.dumps(grph))
         out.close()
 
 class PPRINT:
