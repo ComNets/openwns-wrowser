@@ -73,6 +73,13 @@ class Graph(Tools.Chameleon):
             self.points.reverse()
         self.points.sort(key = lambda x: x[0])
 
+    def getDict(self):
+        d = dict()
+        d['identity']=str(self.identity)
+        d['points']=self.points
+        d['axisLabels']=self.axisLabels
+        return d
+
 
 class AggregatedGraph(Graph):
 

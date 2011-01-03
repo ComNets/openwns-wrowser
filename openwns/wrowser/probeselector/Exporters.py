@@ -31,11 +31,69 @@ import os
 import Graphs
 import subprocess
 import stat
+import json
+import pprint 
+import pickle
 from Interface import Facade
 
 class CSV:
 
     formatName = "CSV"
+
+    @staticmethod
+    def export(filename, export , progressNotify = None, progressReset = None):
+        graphs = export.graphs
+        out = open(filename, "w")
+        maxIndex = len(graphs)
+        if callable(progressReset):
+            progressReset()
+        for index, graph in enumerate(graphs):
+            if callable(progressNotify):
+                msg = "Exporting " + str(graph.identity)
+                progressNotify(index, maxIndex, msg)
+            for point in graph.points:
+                out.write('"' + str(graph.identity) + '", ')
+                out.write(repr(point[0]) + ", " + repr(point[1]) + "\n")
+        out.close()
+
+class JSON:
+
+    formatName = "JSON"
+
+    @staticmethod
+    def export(filename, export , progressNotify = None, progressReset = None):
+        graphs = export.graphs
+        out = open(filename, "w")
+        for graph in export.graphs:
+            grph = graph.getDict()
+            out.write(" "+json.dumps(graph))
+        out.close()
+
+class PPRINT:
+
+    formatName = "PPRINT"
+
+    @staticmethod
+    def export(filename, export , progressNotify = None, progressReset = None):
+        graphs = export.graphs
+        out = open(filename, "w")
+        pprint.pprint(graphs,out)
+        out.close()
+
+class Pickle:
+
+    formatName = "Pickle"
+
+    @staticmethod
+    def export(filename, export , progressNotify = None, progressReset = None):
+        graphs = export.graphs
+        out = open(filename, "w")
+        pickle.dump(graphs,out)
+        out.close()
+
+class PythonCampaign:
+
+    formatName = "PythonCampaign"
 
     @staticmethod
     def export(filename, export , progressNotify = None, progressReset = None):
