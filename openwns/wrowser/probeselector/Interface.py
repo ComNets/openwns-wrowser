@@ -46,7 +46,8 @@ class Facade:
 
     def isEmpty(self):
         for parameterName in self.getParameterNames():
-            if len(self.getValuesOfParameter(parameterName)) > 0:
+            values = self.getValuesOfParameter(parameterName)
+            if len(values) > 0:
                    return False
         return True
 
@@ -62,8 +63,17 @@ class Facade:
         Raises Errors.InvalidFilterExpression, if 'filterExpression' is
         not a valid python filter expression.
         """
+      
         assert(type(filterExpression) == type(str()))
         try:
+            params = self.campaign.parameterNames 
+            scenarios = self.campaign.scenarios
+
+            for scenario in scenarios:
+                if len(scenario.parameters)<len(params):
+                    for param in params :
+                        if not scenario.parameters.has_key(param):
+                            scenario.parameters[param]="NA"
             return self.__class__(Representations.Campaign(objectFilter(filterExpression, self.campaign.scenarios, lambda x: x.parameters), self.campaign.parameterNames))
         except ObjectFilterError:
             raise Errors.InvalidFilterExpression(filterExpression)

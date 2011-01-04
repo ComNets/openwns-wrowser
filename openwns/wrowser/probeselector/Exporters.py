@@ -98,26 +98,6 @@ class Pickle:
         pickle.dump(graphs,out)
         out.close()
 
-class PythonCampaign:
-
-    formatName = "PythonCampaign"
-
-    @staticmethod
-    def export(filename, export , progressNotify = None, progressReset = None):
-        graphs = export.graphs
-        out = open(filename, "w")
-        maxIndex = len(graphs)
-        if callable(progressReset):
-            progressReset()
-        for index, graph in enumerate(graphs):
-            if callable(progressNotify):
-                msg = "Exporting " + str(graph.identity)
-                progressNotify(index, maxIndex, msg)
-            for point in graph.points:
-                out.write('"' + str(graph.identity) + '", ')
-                out.write(repr(point[0]) + ", " + repr(point[1]) + "\n")
-        out.close()
-
 class PythExport:
 
     formatName = "Python"
@@ -176,7 +156,12 @@ sys.path.insert(0,'"""+ os.getcwd()+"')\n"
         pw.write("aggrParam",export.aggrParam)
         pw.write("fileName",file)
         pw.write("type", export.graphType)
-        pw.write("campaignId", str(export.campaignId))
+        if export.pythonCampaignDir is not None:
+            out.write("  campaignId = None\n");
+            pw.write("pythonCampaignDir", export.pythonCampaignDir)
+        else:
+            out.write("  pythonCampaignDir = None\n");
+            pw.write("campaignId", str(export.campaignId))
         pw.write("xLabel",export.graphs[0].axisLabels[0])
         pw.write("yLabel",export.graphs[0].axisLabels[1])
         if typ == 'Param':

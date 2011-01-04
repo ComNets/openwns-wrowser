@@ -45,9 +45,6 @@ import scenario.widgets
 import inspect
 import pprint
 
-import inspect
-import pprint
-
 # Check prerequisites
 try:
     import gnomekeyring
@@ -88,6 +85,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.readerStopped = False
         self.campaignId = None
+        self.pythonCampaignDir = None
 
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
@@ -358,6 +356,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                                                          | QtGui.QFileDialog.DontResolveSymlinks))
         if dir == '':
             return
+        self.pythonCampaignDir=dir
         self.reader = PythonCampaignReader.PythonCampaignCampaignReader(dir)
         campaign =  Representations.Campaign(*self.reader.read())
         self.campaigns.original = Interface.Facade(campaign)
@@ -399,6 +398,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionNewParameter.setEnabled(True)
         self.actionRefresh.setVisible(False)
         self.menuNew.setEnabled(False)
+        self.pythonCampaignDir = None
+        self.campaignId = None
 
     @QtCore.pyqtSignature("")
     def on_actionRefresh_triggered(self):
@@ -436,7 +437,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
 
-        figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
+        figureWindow = XDFFigure(self.campaigns, self, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -460,7 +461,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
-        figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
+        figureWindow = ParameterFigure(self.campaigns, self, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -689,6 +690,7 @@ class Export:
     confidenceLevel = None
     graphType = None
     campaignId = None
+    pythonDirectory = None
     #config
     marker = None
     scale = None
@@ -1008,14 +1010,15 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
 class XDFFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
+    def __init__(self, campaigns, main, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
 
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
         self.graph.figureConfig.marker = ""
         self.probeGraphControl.confidenceparameterframe.hide()
-        self.campaignId = campaignId
+        self.campaignId = main.campaignId
+        self.pythonCampaignDir = main.pythonCampaignDir
 
         self.probeGraphControl.setProbeFunctions(["PDF", "CDF", "CCDF"], initialIndex = 1)
 
@@ -1084,6 +1087,7 @@ class XDFFigure(ProbeFigure, LineGraphs):
         exp.graphs = self.getGraphs()
         exp.graphType=self.probeGraphControl.probeFunction() #"XDF" #self.graph.figureConfig.title[0:5]
         exp.campaignId = self.campaignId
+        exp.pythonCampaignDir = self.pythonDirectory
         return exp
 
 class LREFigure(ProbeFigure, LineGraphs):
@@ -1233,13 +1237,15 @@ class TableFigure(ProbeFigure, TableGraphs):
 
 class ParameterFigure(Figure, LineGraphs):
 
-    def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
+    def __init__(self, campaigns, main, menu, mainWindow, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
 
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
-        self.campaignId = campaignId
+        self.campaignId = main.campaignId
+        self.pythonCampaignDir = main.pythonCampaignDir
+
         self.parameterGraphControl = Widgets.ParameterGraphControl(self.graphControl)
         self.graphControlLayout.addWidget(self.parameterGraphControl)
 
@@ -1407,6 +1413,7 @@ class ParameterFigure(Figure, LineGraphs):
         exp.graphType="Param" 
         exp.confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
         exp.campaignId = self.campaignId
+        exp.pythonCampaignDir = self.pythonCampaignDir
 
         return exp
 
