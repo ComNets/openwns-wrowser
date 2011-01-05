@@ -264,7 +264,8 @@ class SimulationParameters(QtCore.QAbstractItemModel):
                     if not self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
                         break
                     self.parameterValueCheckStates[toggleParam][value]=False
-        if 'NA' in self.parameterValueCheckStates[toggleParam]:
+        toggleParamKeyChecked = self.parameterValueCheckStates[toggleParam]
+        if 'NA' in toggleParamKeyChecked and not True in toggleParamKeyChecked.values():
             self.parameterValueCheckStates[toggleParam]['NA']=True
 
 
