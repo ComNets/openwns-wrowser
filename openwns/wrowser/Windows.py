@@ -360,7 +360,9 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.reader = PythonCampaignReader.PythonCampaignCampaignReader(dir)
         campaign =  Representations.Campaign(*self.reader.read())
         self.campaigns.original = Interface.Facade(campaign)
-        self.setWindowTitle("Python Campaign: "+dir)
+        self.campaignTitle="Python Campaign: "+dir
+        windowTitleElements = self.windowTitle().split(' ')
+        self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
 
         self.simulationParameters = SimulationParameters(self.campaigns, self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
@@ -400,6 +402,8 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.menuNew.setEnabled(False)
         self.pythonCampaignDir = None
         self.campaignId = None
+        windowTitleElements = self.windowTitle().split(' ')
+        self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1])
 
     @QtCore.pyqtSignature("")
     def on_actionRefresh_triggered(self):
