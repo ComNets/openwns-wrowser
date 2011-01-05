@@ -36,6 +36,17 @@ import pprint
 import pickle
 from Interface import Facade
 
+def getExportData(export):
+        data = dict()
+        data['title']=export.title
+        data['type']=export.graphType
+        data['labels']=[export.graphs[0].axisLabels[0],export.graphs[0].axisLabels[1]]
+        grphs = dict()
+        for i,graph in enumerate(export.graphs):
+            grphs[i] = {'points': graph.points,'identity': str(graph.identity)}
+        data['graphs']=grphs
+        return data
+
 class CSV:
 
     formatName = "CSV"
@@ -82,14 +93,14 @@ class PPRINT:
 
     @staticmethod
     def export(filename, export , progressNotify = None, progressReset = None):
-        graphs = export.graphs
+        data = getExportData(export)
         out = open(filename, "w")
-        pprint.pprint(graphs,out)
+        pprint.pprint(data,out)
         out.close()
 
 class Pickle:
 
-    formatName = "Pickle"
+#    formatName = "Pickle"
 
     @staticmethod
     def export(filename, export , progressNotify = None, progressReset = None):
