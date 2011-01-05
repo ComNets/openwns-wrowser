@@ -812,7 +812,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
     @QtCore.pyqtSignature("")
     def on_export_clicked(self):
         from probeselector import Exporters
-        export = self.getExport()
 
         formatDialogue = Dialogues.SelectItem("Export Format", "Select format", Exporters.directory.keys(), self, Dialogues.SelectItem.RadioButtons)
         if formatDialogue.exec_() == QtGui.QDialog.Accepted:
@@ -821,6 +820,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
             fileDialogue.setAcceptMode(QtGui.QFileDialog.AcceptSave)
             fileDialogue.setFileMode(QtGui.QFileDialog.AnyFile)
             if fileDialogue.exec_() == QtGui.QDialog.Accepted:
+                export = self.getExport(format)
                 filename = str(fileDialogue.selectedFiles()[0])
                 self.mainWindow.exportDir=os.path.dirname(filename)
                 progressDialogue = Dialogues.Progress("Exporting to " + filename, 0)
@@ -1081,10 +1081,13 @@ class XDFFigure(ProbeFigure, LineGraphs):
  
         return graphs
 
-    def getExport(self):
+    def getExport(self,format=""):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
         exp = Export(self.probeGraphControl,simParams,self.graph)
-        exp.graphs = self.getGraphs()
+        if len(self.graph.figureConfig.graphs)>0: 
+            exp.graphs = self.graph.figureConfig.graphs
+        else:
+            exp.graphs = self.getGraphs()
         exp.graphType=self.probeGraphControl.probeFunction() #"XDF" #self.graph.figureConfig.title[0:5]
         exp.campaignId = self.campaignId
         exp.pythonCampaignDir = self.pythonCampaignDir
@@ -1399,12 +1402,15 @@ class ParameterFigure(Figure, LineGraphs):
 
         return graphs
 
-    def getExport(self):
+    def getExport(self,format=""):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
         exp = Export(self.parameterGraphControl,simParams,self.graph)
         exp.paramName=self.parameterGraphControl.parameterName()
         exp.probeEntry=self.parameterGraphControl.yProbeEntryName()
-        exp.graphs = self.getGraphs()
+        if len(self.graph.figureConfig.graphs)>0: 
+            exp.graphs = self.graph.figureConfig.graphs
+        else:
+            exp.graphs = self.getGraphs()
         exp.useXProbe = self.parameterGraphControl.isXUseProbeEntry()
         exp.useYProbe = self.parameterGraphControl.isYUseProbeEntry() 
         if exp.useXProbe :
