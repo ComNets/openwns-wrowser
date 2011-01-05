@@ -74,16 +74,8 @@ class JSON:
     @staticmethod
     def export(filename, export , progressNotify = None, progressReset = None):
         graphs = export.graphs
-        data = dict()
-        data['title']=export.title
-        data['type']=export.graphType
-        data['labels']=[export.graphs[0].axisLabels[0],export.graphs[0].axisLabels[1]]
+        data = getExportData(export)
         out = open(filename, "w")
-        grphs = dict()
-        for i,graph in enumerate(export.graphs):
-            grphs[i] = {'points': graph.points,'identity': str(graph.identity)}
-
-        data['graphs']=grphs
         out.write(" "+json.dumps(data))
         out.close()
 
