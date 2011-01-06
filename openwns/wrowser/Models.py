@@ -256,13 +256,17 @@ class SimulationParameters(QtCore.QAbstractItemModel):
         for value in self.parameterValues[toggleParam] :
             newValue = not self.parameterValueCheckStates[toggleParam][value] 
             self.parameterValueCheckStates[toggleParam][value] = newValue
-        if self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
+        selection=self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates))
+        if selection.isEmpty():
             for value in self.parameterValues[toggleParam] :
                 if self.parameterValueCheckStates[toggleParam][value]==False :
                     self.parameterValueCheckStates[toggleParam][value]=True 
                     if not self.campaign.filteredBySelection(self.__getValueSelection(self.parameterValueCheckStates)).isEmpty():
                         break
                     self.parameterValueCheckStates[toggleParam][value]=False
+        toggleParamKeyChecked = self.parameterValueCheckStates[toggleParam]
+        if 'NA' in toggleParamKeyChecked and not True in toggleParamKeyChecked.values():
+            self.parameterValueCheckStates[toggleParam]['NA']=True
 
 
 class ProbeNames(QtCore.QAbstractListModel):

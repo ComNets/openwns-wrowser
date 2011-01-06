@@ -7,6 +7,7 @@ import openwns.wrowser.simdb.Database as simDb
 from openwns.wrowser.simdb.Campaigns import setCampaign as simDbSetCampaign
 
 from openwns.wrowser.probeselector import PostgresReader
+from openwns.wrowser.probeselector import PythonCampaignReader
 from openwns.wrowser.probeselector import Interface
 from openwns.wrowser.probeselector import Representations
 from openwns.wrowser.probeselector import Errors
@@ -41,13 +42,19 @@ def loadCampaignAndPlotGraphs(PlotParameters):
         for hatch in ['/','\\','|','-','+','x','.','//','\\' ]:
             yield hatch
 
-    ## Get the campaign
-    dbConfig = simDbConf.Configuration()
-    dbConfig.read()
-    simDb.Database.connectConf(dbConfig)
-    simDbSetCampaign([int(PlotParameters.campaignId)])
-    campaignReader = PostgresReader.CampaignReader(int(PlotParameters.campaignId), Interface.DoNotSelectProbeSelectUI())
-    print 'Accessing charts from database server with campaignId: ' + str(PlotParameters.campaignId)
+    if PlotParameters.campaignId is not None:
+        ## Get the campaign
+        dbConfig = simDbConf.Configuration()
+        dbConfig.read()
+        simDb.Database.connectConf(dbConfig)
+        simDbSetCampaign([int(PlotParameters.campaignId)])
+        campaignReader = PostgresReader.CampaignReader(int(PlotParameters.campaignId), Interface.DoNotSelectProbeSelectUI())
+        print 'Accessing charts from database server with campaignId: ' + str(PlotParameters.campaignId)
+    elif PlotParameters.pythonCampaignDir is not None:
+        print 'Accessing charts directory: ' + PlotParameters.pythonCampaignDir
+        campaignReader = PythonCampaignReader.PythonCampaignCampaignReader(PlotParameters.pythonCampaignDir)
+    else:
+        print 'Data source is not specified'
 
 
     print "Reading Campaign"

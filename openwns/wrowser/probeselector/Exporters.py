@@ -31,7 +31,21 @@ import os
 import Graphs
 import subprocess
 import stat
+import json
+import pprint 
+import pickle
 from Interface import Facade
+
+def getExportData(export):
+        data = dict()
+        data['title']=export.title
+        data['type']=export.graphType
+        data['labels']=[export.graphs[0].axisLabels[0],export.graphs[0].axisLabels[1]]
+        grphs = dict()
+        for i,graph in enumerate(export.graphs):
+            grphs[i] = {'points': graph.points,'identity': str(graph.identity)}
+        data['graphs']=grphs
+        return data
 
 class CSV:
 
@@ -51,6 +65,40 @@ class CSV:
             for point in graph.points:
                 out.write('"' + str(graph.identity) + '", ')
                 out.write(repr(point[0]) + ", " + repr(point[1]) + "\n")
+        out.close()
+
+class JSON:
+
+    formatName = "JSON"
+
+    @staticmethod
+    def export(filename, export , progressNotify = None, progressReset = None):
+        graphs = export.graphs
+        data = getExportData(export)
+        out = open(filename, "w")
+        out.write(" "+json.dumps(data))
+        out.close()
+
+class PPRINT:
+
+    formatName = "PPRINT"
+
+    @staticmethod
+    def export(filename, export , progressNotify = None, progressReset = None):
+        data = getExportData(export)
+        out = open(filename, "w")
+        pprint.pprint(data,out)
+        out.close()
+
+class Pickle:
+
+#    formatName = "Pickle"
+
+    @staticmethod
+    def export(filename, export , progressNotify = None, progressReset = None):
+        graphs = export.graphs
+        out = open(filename, "w")
+        pickle.dump(graphs,out)
         out.close()
 
 class PythExport:
@@ -111,7 +159,12 @@ sys.path.insert(0,'"""+ os.getcwd()+"')\n"
         pw.write("aggrParam",export.aggrParam)
         pw.write("fileName",file)
         pw.write("type", export.graphType)
-        pw.write("campaignId", str(export.campaignId))
+        if export.pythonCampaignDir is not None:
+            out.write("  campaignId = None\n");
+            pw.write("pythonCampaignDir", export.pythonCampaignDir)
+        else:
+            out.write("  pythonCampaignDir = None\n");
+            pw.write("campaignId", str(export.campaignId))
         pw.write("xLabel",export.graphs[0].axisLabels[0])
         pw.write("yLabel",export.graphs[0].axisLabels[1])
         if typ == 'Param':

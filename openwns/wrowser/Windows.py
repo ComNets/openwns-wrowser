@@ -45,9 +45,6 @@ import scenario.widgets
 import inspect
 import pprint
 
-import inspect
-import pprint
-
 # Check prerequisites
 try:
     import gnomekeyring
@@ -88,6 +85,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         self.readerStopped = False
         self.campaignId = None
+        self.pythonCampaignDir = None
 
         self.calledFromDir = calledFromDir
         self.exportDir= calledFromDir
@@ -350,6 +348,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
         if self.pythonDirectory is not None:
             dir=self.pythonDirectory
+            self.pythonDirectory=None
         else:
             dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Open Directory",
                                                          self.calledFromDir,
@@ -357,9 +356,13 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
                                                          | QtGui.QFileDialog.DontResolveSymlinks))
         if dir == '':
             return
+        self.pythonCampaignDir=dir
         self.reader = PythonCampaignReader.PythonCampaignCampaignReader(dir)
         campaign =  Representations.Campaign(*self.reader.read())
         self.campaigns.original = Interface.Facade(campaign)
+        self.campaignTitle="Python Campaign: "+dir
+        windowTitleElements = self.windowTitle().split(' ')
+        self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1]+" "+self.campaignTitle)
 
         self.simulationParameters = SimulationParameters(self.campaigns, self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.simulationParameters)
@@ -397,6 +400,10 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
         self.actionNewParameter.setEnabled(True)
         self.actionRefresh.setVisible(False)
         self.menuNew.setEnabled(False)
+        self.pythonCampaignDir = None
+        self.campaignId = None
+        windowTitleElements = self.windowTitle().split(' ')
+        self.setWindowTitle(windowTitleElements[0]+" "+windowTitleElements[1])
 
     @QtCore.pyqtSignature("")
     def on_actionRefresh_triggered(self):
@@ -434,7 +441,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
 
-        figureWindow = XDFFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
+        figureWindow = XDFFigure(self.campaigns, self, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -458,7 +465,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
-        figureWindow = ParameterFigure(self.campaigns, self.campaignId, self.menuFigure, self, self.workspace)
+        figureWindow = ParameterFigure(self.campaigns, self, self.menuFigure, self, self.workspace)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -687,6 +694,7 @@ class Export:
     confidenceLevel = None
     graphType = None
     campaignId = None
+    pythonDirectory = None
     #config
     marker = None
     scale = None
@@ -808,7 +816,6 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
     @QtCore.pyqtSignature("")
     def on_export_clicked(self):
         from probeselector import Exporters
-        export = self.getExport()
 
         formatDialogue = Dialogues.SelectItem("Export Format", "Select format", Exporters.directory.keys(), self, Dialogues.SelectItem.RadioButtons)
         if formatDialogue.exec_() == QtGui.QDialog.Accepted:
@@ -817,6 +824,7 @@ class Figure(QtGui.QWidget, Ui_Windows_Figure, Observing):
             fileDialogue.setAcceptMode(QtGui.QFileDialog.AcceptSave)
             fileDialogue.setFileMode(QtGui.QFileDialog.AnyFile)
             if fileDialogue.exec_() == QtGui.QDialog.Accepted:
+                export = self.getExport(format)
                 filename = str(fileDialogue.selectedFiles()[0])
                 self.mainWindow.exportDir=os.path.dirname(filename)
                 progressDialogue = Dialogues.Progress("Exporting to " + filename, 0)
@@ -1006,14 +1014,15 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
 class XDFFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
+    def __init__(self, campaigns, main, menu, mainWindow, *qwidgetArgs):
         ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
 
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
         self.graph.figureConfig.marker = ""
         self.probeGraphControl.confidenceparameterframe.hide()
-        self.campaignId = campaignId
+        self.campaignId = main.campaignId
+        self.pythonCampaignDir = main.pythonCampaignDir
 
         self.probeGraphControl.setProbeFunctions(["PDF", "CDF", "CCDF"], initialIndex = 1)
 
@@ -1076,12 +1085,16 @@ class XDFFigure(ProbeFigure, LineGraphs):
  
         return graphs
 
-    def getExport(self):
+    def getExport(self,format=""):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
         exp = Export(self.probeGraphControl,simParams,self.graph)
-        exp.graphs = self.getGraphs()
+        if len(self.graph.figureConfig.graphs)>0: 
+            exp.graphs = self.graph.figureConfig.graphs
+        else:
+            exp.graphs = self.getGraphs()
         exp.graphType=self.probeGraphControl.probeFunction() #"XDF" #self.graph.figureConfig.title[0:5]
         exp.campaignId = self.campaignId
+        exp.pythonCampaignDir = self.pythonCampaignDir
         return exp
 
 class LREFigure(ProbeFigure, LineGraphs):
@@ -1231,13 +1244,15 @@ class TableFigure(ProbeFigure, TableGraphs):
 
 class ParameterFigure(Figure, LineGraphs):
 
-    def __init__(self, campaigns, campaignId, menu, mainWindow, *qwidgetArgs):
+    def __init__(self, campaigns, main, menu, mainWindow, *qwidgetArgs):
         Figure.__init__(self, campaigns, menu, "Parameter Figure", mainWindow, *qwidgetArgs)
         LineGraphs.__init__(self, mainWindow)
 
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
-        self.campaignId = campaignId
+        self.campaignId = main.campaignId
+        self.pythonCampaignDir = main.pythonCampaignDir
+
         self.parameterGraphControl = Widgets.ParameterGraphControl(self.graphControl)
         self.graphControlLayout.addWidget(self.parameterGraphControl)
 
@@ -1391,12 +1406,15 @@ class ParameterFigure(Figure, LineGraphs):
 
         return graphs
 
-    def getExport(self):
+    def getExport(self,format=""):
         simParams=Models.SimulationParameters(self.campaigns.draw, onlyNumeric = False).getValueSelection()
         exp = Export(self.parameterGraphControl,simParams,self.graph)
         exp.paramName=self.parameterGraphControl.parameterName()
         exp.probeEntry=self.parameterGraphControl.yProbeEntryName()
-        exp.graphs = self.getGraphs()
+        if len(self.graph.figureConfig.graphs)>0: 
+            exp.graphs = self.graph.figureConfig.graphs
+        else:
+            exp.graphs = self.getGraphs()
         exp.useXProbe = self.parameterGraphControl.isXUseProbeEntry()
         exp.useYProbe = self.parameterGraphControl.isYUseProbeEntry() 
         if exp.useXProbe :
@@ -1405,6 +1423,7 @@ class ParameterFigure(Figure, LineGraphs):
         exp.graphType="Param" 
         exp.confidenceLevel = self.parameterGraphControl.getConfidenceLevel()
         exp.campaignId = self.campaignId
+        exp.pythonCampaignDir = self.pythonCampaignDir
 
         return exp
 
