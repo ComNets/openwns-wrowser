@@ -32,8 +32,8 @@ class PDFPythonCampaign(Probe.PDFProbeBase):
 
     valueNames = []
 
-    def __init__(self, histogramData, name):
-        self.histogramData = histogramData
+    def __init__(self, path, name):
+        self.path = path
         self.__histogram = []
         self.__histogramRead = False
         self.description = name
@@ -41,7 +41,13 @@ class PDFPythonCampaign(Probe.PDFProbeBase):
     def __getHistogram(self):
         if self.__histogramRead == False:
             self.__histogram = []
-            for histoBin in self.histogramData:
+            fh = open(self.path, 'r')
+            for line in fh.readlines():
+                if line.startswith(self.description):
+                    histogramData = eval(line.split('=')[1])
+                    break
+            fh.close()
+            for histoBin in histogramData:
                 self.__histogram.append(PDFPythonCampaignHistogramEntry(histoBin))
             self.__histogramRead = True
         return self.__histogram
@@ -103,30 +109,34 @@ class PythonCampaignScenario:
     def getProbes(self):
         if self.__probesDict == None:
             probesDict = {}
-            globals = {}
             results = {}
 
             resultsFileName = os.path.join(self.directoryName, self.resultsFileName)
             if os.path.exists(resultsFileName):
                 try:
-                    execfile(resultsFileName, globals, results)
+                    fh = open(resultsFileName, 'r')
+                    for line in fh.readlines():
+                        results[line.split('=')[0].strip(' ')] = eval(line.split('=')[1])
+                    fh.close()
                 except Exception:
                     raise NoScenarioDir(self.directoryName)
 
             for key, value in results.iteritems():
                 probesDict[key] = Representations.Probe(Probe(key, MomentsPythonCampaign, MomentsPythonCampaign(value, key)))
 
-            globals = {}
-            pdfs = {}
+            pdfs = []
             pdfsFileName = os.path.join(self.directoryName, self.pdfsFileName)
             if os.path.exists(pdfsFileName):
                 try:
-                    execfile(pdfsFileName, globals, pdfs)
+                    fh = open(pdfsFileName, 'r')
+                    for line in fh.readlines():
+                        pdfs.append(line.split('=')[0].strip(' '))
+                    fh.close()
                 except Exception:
                     raise NoScenarioDir(self.directoryName)
 
-            for key, value in pdfs.iteritems():
-                probesDict[key] = Representations.Probe(Probe(key, PDFPythonCampaign, PDFPythonCampaign(value, key)))
+            for key in pdfs:
+                probesDict[key] = Representations.Probe(Probe(key, PDFPythonCampaign, PDFPythonCampaign(pdfsFileName, key)))
 
 
             globals = {}
@@ -170,17 +180,21 @@ class PythonCampaignCampaignReader:
                     paramsFileName = os.path.join(filePath, self.parametersFileName)
                     if os.path.exists(paramsFileName):
                         try:
-                            globals = {}
                             parameters = {}
-                            execfile(paramsFileName, globals, parameters)
+                            fh = open(paramsFileName, 'r')
+                            for line in fh.readlines():
+                                parameters[line.split('=')[0].strip(' ')] = eval(line.split('=')[1])
+                            fh.close()
+
+                            if len(parameters) != 0:
+                                scenarioList.append(Representations.Scenario(PythonCampaignScenario(filePath,
+                                                                                                    self.resultsFileName,
+                                                                                                    self.pdfsFileName,
+                                                                                                    self.timeSeries),
+                                                                             parameters))
+
                         except Exception:
                             raise NoScenarioDir(filePath)
-
-                        scenarioList.append(Representations.Scenario(PythonCampaignScenario(filePath,
-                                                                                            self.resultsFileName,
-                                                                                            self.pdfsFileName,
-                                                                                            self.timeSeries),
-                                                                    parameters))
 
                         for paramName, paramValue in parameters.iteritems():
                             if paramValue not in parametersDict[paramName]:

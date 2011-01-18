@@ -107,14 +107,19 @@ def objectFilter(stringexpression, objectList, viewGetter = classAndInstanceDict
     Or if you want to check against the attributes of the attribute foo (which
     then is a class instance), use 'viewGetter = lambda x: classAndInstanceDict(x.foo)'.
     """
-    # filter by doing list comprehension with eval
-    try:
-        return [instance for instance in objectList if eval(stringexpression,
-                                                            # we don't want globals...
-                                                            {},
-                                                            viewGetter(instance))]
-    except:
-        raise ObjectFilterError(stringexpression)
+    instanceList = []
+    for instance in objectList:
+        try:
+            if eval(stringexpression,
+                    # we don't want globals...
+                    {},
+                    viewGetter(instance)):
+                instanceList.append(instance)
+        except NameError:
+            instanceList.append(instance)
+        except:
+            raise ObjectFilterError(stringexpression)
+    return instanceList
 
 def convert(expression):
     """Convert the string 'expression' to its best python representation.
