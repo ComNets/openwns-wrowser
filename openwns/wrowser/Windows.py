@@ -441,7 +441,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
     @QtCore.pyqtSignature("")
     def on_actionNewXDF_triggered(self):
 
-        figureWindow = XDFFigure(self.campaigns, self, self.menuFigure, self, self.workspace)
+        figureWindow = XDFFigure(self)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -465,7 +465,7 @@ class Main(QtGui.QMainWindow, Ui_Windows_Main):
 
     @QtCore.pyqtSignature("")
     def on_actionNewParameter_triggered(self):
-        figureWindow = ParameterFigure(self.campaigns, self, self.menuFigure, self, self.workspace)
+        figureWindow = ParameterFigure(self)
         self.workspace.addWindow(figureWindow)
         figureWindow.showMaximized()
 
@@ -1014,9 +1014,9 @@ class TimeSeriesFigure(ProbeFigure, LineGraphs):
 
 class XDFFigure(ProbeFigure, LineGraphs):
 
-    def __init__(self, campaigns, main, menu, mainWindow, *qwidgetArgs):
-        ProbeFigure.__init__(self, campaigns, menu, "PDF/CDF/CCDF Probe Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self, mainWindow)
+    def __init__(self, main):
+        ProbeFigure.__init__(self, main.campaigns, main.menuFigure, "PDF/CDF/CCDF Probe Figure", main, main.workspace)
+        LineGraphs.__init__(self, main)
 
         self.graph.figureConfig.title = "PDF/CDF/CCDF Probe Figure"
         self.graph.figureConfig.marker = ""
@@ -1244,9 +1244,9 @@ class TableFigure(ProbeFigure, TableGraphs):
 
 class ParameterFigure(Figure, LineGraphs):
 
-    def __init__(self, campaigns, main, menu, mainWindow, *qwidgetArgs):
-        Figure.__init__(self, campaigns, menu, "Parameter Figure", mainWindow, *qwidgetArgs)
-        LineGraphs.__init__(self, mainWindow)
+    def __init__(self, main):
+        Figure.__init__(self, main.campaigns, main.menuFigure, "Parameter Figure", main, main.workspace)
+        LineGraphs.__init__(self, main)
 
         self.observe(self.on_figureConfig_scale_changed, self.graph.figureConfig, "scale")
         self.graph.figureConfig.title = "Parameter Figure "
