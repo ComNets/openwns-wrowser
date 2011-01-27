@@ -97,7 +97,7 @@ class CampaignProbes:
         index = 0
         maxIndex = len(tables) + 1
         for table in tables:
-            if callable(progressNotify):
+            if callable(progressNotify) and ((index % 10) == 0 or index==(maxIndex-1)):
                 progressNotify(index, maxIndex, "reading probes of table '" + table[0] + "'")
             cursor.execute("SELECT DISTINCT alt_name, scenario_id FROM %s WHERE campaign_id=%d" % (table[0], self.campaignId))
             for it in cursor.fetchall():
@@ -105,8 +105,6 @@ class CampaignProbes:
                     self.scenarios[it[1]] = []
                 self.scenarios[it[1]].append((it[0], table[1]))
             index += 1
-            if callable(progressNotify):
-                progressNotify(index, maxIndex, "read probes of table '" + table[0] + "'")
         if callable(progressNotify):
              progressNotify(index, maxIndex, "reading probes of table 'tables'")
         cursor.execute("SELECT DISTINCT name, type, scenario_id FROM tables WHERE campaign_id=%d" % (self.campaignId))
