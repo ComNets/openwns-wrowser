@@ -193,7 +193,7 @@ class ParameterGraphControl(QtGui.QWidget, Ui_Widgets_ParameterGraphControl):
         QtGui.QWidget.__init__(self, *qwidgetArgs)
         self.setupUi(self)
 
-        self.connect(self.simulationParameter , QtCore.SIGNAL("activated(parameterName)"), self.on_simulationParameter_activated)
+        self.connect(self.simulationParameter , QtCore.SIGNAL("activated(QString)"), self.on_simulationParameter_activated)
 
         self.xUseParameterValue.setChecked(True)
         self.on_xUseProbeEntry_toggled(False)
