@@ -196,10 +196,11 @@ class PrepareCampaignCommand(wnsbase.playground.plugins.Command.Command):
         arch32String = " "
         if self.options.arch32:
             arch32String = " --arch32 "
-            commonArgs.append(arch32String)
+            commonArgs.append('--arch32')
 
         # install fresh version
         print "running ./playground.py install --flavour=dbg" + arch32String + "-f " + self.options.configFile
+        print commonArgs
         installCommand.startup(commonArgs + ["--flavour=dbg"])
 
         installCommand.run()
