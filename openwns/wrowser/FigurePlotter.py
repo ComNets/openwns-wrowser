@@ -122,11 +122,24 @@ def loadCampaignAndPlotGraphs(PlotParameters):
             if PlotParameters.confidence :
                 for i in range(len(X)):
                     e = graph.confidenceIntervalDict[X[i]]
-                    errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i]*PlotParameters.scaleFactorY+PlotParameters.moveY, yerr=e , fmt=style)
+                    errorbar(X[i]*PlotParameters.scaleFactorX+PlotParameters.moveX, Y[i], yerr=e*PlotParameters.scaleFactorY, fmt=style)
         except: None
         i+=1
     for additional in PlotParameters.additional_plots :
         plot(additional['x'], additional['y'] , additional['style'] , label=additional['label'])
+
+    
+    
+    a = gca()
+    a.get_xaxis().grid(PlotParameters.grid[0], which="major")
+    a.get_xaxis().grid(PlotParameters.grid[1], which="minor")
+    a.get_yaxis().grid(PlotParameters.grid[2], which="major")
+    a.get_yaxis().grid(PlotParameters.grid[3], which="minor")
+
+    if PlotParameters.showTitle :
+        title(PlotParameters.figureTitle)
+
+    PlotParameters.postFunction()
 
     if PlotParameters.doClip:
         axis([PlotParameters.minX,PlotParameters.maxX,PlotParameters.minY,PlotParameters.maxY])
@@ -138,15 +151,7 @@ def loadCampaignAndPlotGraphs(PlotParameters):
     if scaley != 'linear' :
         ybase= PlotParameters.scale[3]
         yscale('log',basey=ybase)
-    a = gca()
-    a.get_xaxis().grid(PlotParameters.grid[0], which="major")
-    a.get_xaxis().grid(PlotParameters.grid[1], which="minor")
-    a.get_yaxis().grid(PlotParameters.grid[2], which="major")
-    a.get_yaxis().grid(PlotParameters.grid[3], which="minor")
 
-    if PlotParameters.showTitle :
-        title(PlotParameters.figureTitle)
-    PlotParameters.postFunction()
     if PlotParameters.legend:
         legend(prop = font, loc=PlotParameters.legendPosition) # (0.9, 0.01))
     print 'Plotting: ',PlotParameters.fileName
