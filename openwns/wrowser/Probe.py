@@ -191,7 +191,7 @@ class PDFProbeBase:
 class PDFProbe(Probe, PDFProbeBase):
 
     fileNameSig = "_PDF.dat"
-    valueNames = ["P01","P05","P50","P95","P99","minX", "maxX", "numberOfBins", "underflows", "overflows"] + Probe.valueNames
+    valueNames = ["P01","P05","P50","P95","P98","P99","minX", "maxX", "numberOfBins", "underflows", "overflows"] + Probe.valueNames
     histogram = None
 
     def __init__(self, filename):
@@ -202,6 +202,7 @@ class PDFProbe(Probe, PDFProbeBase):
         self.P05 = self.getValue("P05")
         self.P50 = self.getValue("P50")
         self.P95 = self.getValue("P95")
+        self.P98 = self.getValue("P98")
         self.P99 = self.getValue("P99")
 
         # These parameters have not been measured but configured ...
