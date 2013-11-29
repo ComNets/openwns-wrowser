@@ -122,55 +122,55 @@ BEGIN
 
 	EXECUTE 'SELECT user_name FROM administration.users JOIN administration.campaigns ON users.id = campaigns.user_id WHERE campaigns.id = ' || campaign_id INTO user_name;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.scenarios_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.scenarios_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.files_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.files_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.parameters_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.parameters_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.jobs_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.jobs_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.pd_fs_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.pd_fs_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.pdf_histograms_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.pdf_histograms_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.log_evals_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.log_evals_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.log_eval_entries_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.log_eval_entries_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.moments_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.moments_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.batch_means_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.batch_means_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.batch_means_histograms_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.batch_means_histograms_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.lres_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.lres_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.lre_histograms_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.lre_histograms_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.dlres_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.dlres_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.dlre_histograms_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.dlre_histograms_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.tables_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.tables_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
-	EXECUTE 'SELECT pg_total_relation_size(\'' || user_name || '.table_rows_' || campaign_id || '\')' INTO campaign_size_help;
+	EXECUTE 'SELECT pg_total_relation_size(''' || user_name || '.table_rows_' || campaign_id || ''')' INTO campaign_size_help;
 	campaign_size := campaign_size + campaign_size_help;
 
 	RETURN campaign_size;
@@ -381,7 +381,7 @@ BEGIN
 			type_bool bool DEFAULT FALSE,
 			type_integer integer DEFAULT 0,
 			type_float double precision DEFAULT 0.0,
-			type_string text DEFAULT \'\'
+			type_string text DEFAULT ''''
 		)';
 
 	EXECUTE 'ALTER TABLE ' || quote_ident(user_name) || '.parameters OWNER TO administrator';
@@ -716,13 +716,13 @@ BEGIN
 		DECLARE
 			db_size bigint;
 		BEGIN
-			IF (TG_OP = \'INSERT\') THEN
-				NEW.id := nextval(\'administration.campaigns_id_seq\'::regclass);
+			IF (TG_OP = ''INSERT'') THEN
+				NEW.id := nextval(''administration.campaigns_id_seq''::regclass);
 				NEW.db_size := 0;
 				RETURN NEW;
-			ELSIF (TG_OP = \'UPDATE\') THEN
+			ELSIF (TG_OP = ''UPDATE'') THEN
 				NEW.id := OLD.id;
-				EXECUTE \'SELECT administration.calculate_campaign_size(\' || OLD.id || \')\' INTO db_size;
+				EXECUTE ''SELECT administration.calculate_campaign_size('' || OLD.id || '')'' INTO db_size;
 				NEW.db_size := db_size;
 				RETURN NEW;
 			END IF;
@@ -739,178 +739,178 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.campaign() RETURNS trigger AS $campaign_trigger$
 		BEGIN
-			IF (TG_OP = \'INSERT\') THEN
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.authorizations)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' ADD CONSTRAINT campaignsfk FOREIGN KEY (campaign_id) REFERENCES ' || quote_ident(user_name) || '.campaigns (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' ADD UNIQUE (user_id, authorized_id)\';
-				EXECUTE \'GRANT SELECT, DELETE ON TABLE ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' TO PUBLIC\';
-				EXECUTE \'CREATE TRIGGER delete_authorizations_trigger_\' || NEW.id || \' BEFORE DELETE ON ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' FOR EACH ROW EXECUTE PROCEDURE ' || quote_ident(user_name) || '.delete_authorizations()\';
+			IF (TG_OP = ''INSERT'') THEN
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.authorizations)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' ADD CONSTRAINT campaignsfk FOREIGN KEY (campaign_id) REFERENCES ' || quote_ident(user_name) || '.campaigns (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' ADD UNIQUE (user_id, authorized_id)'';
+				EXECUTE ''GRANT SELECT, DELETE ON TABLE ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' TO PUBLIC'';
+				EXECUTE ''CREATE TRIGGER delete_authorizations_trigger_'' || NEW.id || '' BEFORE DELETE ON ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' FOR EACH ROW EXECUTE PROCEDURE ' || quote_ident(user_name) || '.delete_authorizations()'';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.scenarios)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' ADD CONSTRAINT campaignsfk FOREIGN KEY (campaign_id) REFERENCES ' || quote_ident(user_name) || '.campaigns (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE TRIGGER scenarios_update_trigger_\' || NEW.id || \' AFTER UPDATE ON ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' FOR EACH ROW EXECUTE PROCEDURE ' || quote_ident(user_name) || '.scenarios_update()\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.scenarios)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' ADD CONSTRAINT campaignsfk FOREIGN KEY (campaign_id) REFERENCES ' || quote_ident(user_name) || '.campaigns (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE TRIGGER scenarios_update_trigger_'' || NEW.id || '' AFTER UPDATE ON ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' FOR EACH ROW EXECUTE PROCEDURE ' || quote_ident(user_name) || '.scenarios_update()'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.files_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.files)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.files_\' || NEW.id || \' ADD CONSTRAINT campaignsfk FOREIGN KEY (campaign_id) REFERENCES ' || quote_ident(user_name) || '.campaigns (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.files_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.files_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.files_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.files_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.files_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.files)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.files_'' || NEW.id || '' ADD CONSTRAINT campaignsfk FOREIGN KEY (campaign_id) REFERENCES ' || quote_ident(user_name) || '.campaigns (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.files_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.files_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.files_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.files_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.parameters)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' ADD UNIQUE (campaign_id, scenario_id, parameter_name)\';
-				EXECUTE \'CREATE INDEX parameters_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.parameters)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' ADD UNIQUE (campaign_id, scenario_id, parameter_name)'';
+				EXECUTE ''CREATE INDEX parameters_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.jobs_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.jobs)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.jobs_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.jobs_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.jobs_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.jobs_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX jobs_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.jobs_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.jobs_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.jobs_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.jobs)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.jobs_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.jobs_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.jobs_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.jobs_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX jobs_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.jobs_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.jobs_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.pd_fs)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX pd_fs_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.pd_fs)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX pd_fs_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.pdf_histograms)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.id || \' ADD CONSTRAINT pd_fsfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.pd_fs_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX pdf_histograms_probe_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.id || \' (probe_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.pdf_histograms)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.id || '' ADD CONSTRAINT pd_fsfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.pd_fs_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX pdf_histograms_probe_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.id || '' (probe_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.log_evals)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX log_evals_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.log_evals)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX log_evals_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.log_eval_entries)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.id || \' ADD CONSTRAINT log_evalsfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.log_evals_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX log_eval_entries_probe_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.id || \' (probe_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.log_eval_entries)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.id || '' ADD CONSTRAINT log_evalsfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.log_evals_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX log_eval_entries_probe_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.id || '' (probe_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.moments_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.moments)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.moments_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.moments_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.moments_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.moments_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX moments_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.moments_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.moments_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.moments_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.moments)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.moments_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.moments_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.moments_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.moments_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX moments_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.moments_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.moments_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.batch_means)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX batch_means_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.batch_means)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX batch_means_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.batch_means_histograms)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.id || \' ADD CONSTRAINT batch_meansfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.batch_means_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX batch_means_histograms_probe_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.id || \' (probe_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.batch_means_histograms)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.id || '' ADD CONSTRAINT batch_meansfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.batch_means_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX batch_means_histograms_probe_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.id || '' (probe_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.lres)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX lres_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.lres)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX lres_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.lre_histograms)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.id || \' ADD CONSTRAINT lresfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.lres_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX lre_histograms_probe_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.id || \' (probe_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.lre_histograms)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.id || '' ADD CONSTRAINT lresfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.lres_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX lre_histograms_probe_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.id || '' (probe_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.dlres)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX dlres_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.dlres)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX dlres_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.dlre_histograms)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.id || \' ADD CONSTRAINT dlresfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.dlres_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX dlre_histograms_probe_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.id || \' (probe_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.dlre_histograms)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.id || '' ADD CONSTRAINT dlresfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.dlres_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX dlre_histograms_probe_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.id || '' (probe_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.tables)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX tables_scenario_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' (scenario_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.tables)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' ADD CONSTRAINT scenariosfk FOREIGN KEY (scenario_id) REFERENCES ' || quote_ident(user_name) || '.scenarios_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX tables_scenario_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' (scenario_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'CREATE TABLE ' || quote_ident(user_name) || '.table_rows_\' || NEW.id || \' () INHERITS(' || quote_ident(user_name) || '.table_rows)\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.table_rows_\' || NEW.id || \' ADD CONSTRAINT tablesfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.tables_\' || NEW.id || \' (id) ON DELETE CASCADE\';
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.table_rows_\' || NEW.id || \' ALTER campaign_id SET DEFAULT \' || NEW.id;
-				EXECUTE \'ALTER TABLE ' || quote_ident(user_name) || '.table_rows_\' || NEW.id || \' ADD CONSTRAINT campaignid CHECK (campaign_id = \' || NEW.id || \')\';
-				EXECUTE	\'ALTER TABLE ' || quote_ident(user_name) || '.table_rows_\' || NEW.id || \' ADD PRIMARY KEY (id)\';
-				EXECUTE \'CREATE INDEX table_rows_probe_id_index_\' || NEW.id || \' ON ' || quote_ident(user_name) || '.table_rows_\' || NEW.id || \' (probe_id)\';
-				EXECUTE \'GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.table_rows_\' || NEW.id || \' TO ' || quote_ident(user_name) || '\';
+				EXECUTE ''CREATE TABLE ' || quote_ident(user_name) || '.table_rows_'' || NEW.id || '' () INHERITS(' || quote_ident(user_name) || '.table_rows)'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.table_rows_'' || NEW.id || '' ADD CONSTRAINT tablesfk FOREIGN KEY (probe_id) REFERENCES ' || quote_ident(user_name) || '.tables_'' || NEW.id || '' (id) ON DELETE CASCADE'';
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.table_rows_'' || NEW.id || '' ALTER campaign_id SET DEFAULT '' || NEW.id;
+				EXECUTE ''ALTER TABLE ' || quote_ident(user_name) || '.table_rows_'' || NEW.id || '' ADD CONSTRAINT campaignid CHECK (campaign_id = '' || NEW.id || '')'';
+				EXECUTE	''ALTER TABLE ' || quote_ident(user_name) || '.table_rows_'' || NEW.id || '' ADD PRIMARY KEY (id)'';
+				EXECUTE ''CREATE INDEX table_rows_probe_id_index_'' || NEW.id || '' ON ' || quote_ident(user_name) || '.table_rows_'' || NEW.id || '' (probe_id)'';
+				EXECUTE ''GRANT SELECT, UPDATE, DELETE ON TABLE ' || quote_ident(user_name) || '.table_rows_'' || NEW.id || '' TO ' || quote_ident(user_name) || ''';
 
-				EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.authorizations_\' || NEW.id || \' (id, authorized_id) VALUES (nextval(\\\'administration.authorizations_id_seq\\\'::regclass), ' || user_id || ')\';
-				EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || NEW.id;
+				EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.authorizations_'' || NEW.id || '' (id, authorized_id) VALUES (nextval(''''administration.authorizations_id_seq''''::regclass), ' || user_id || ')'';
+				EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || NEW.id;
 
 				RETURN NEW;
-			ELSIF (TG_OP = \'UPDATE\') THEN
+			ELSIF (TG_OP = ''UPDATE'') THEN
 				UPDATE administration.users SET db_use = 0 WHERE id = ' || user_id || ';
 				RETURN NEW;
-			ELSIF (TG_OP = \'DELETE\') THEN
-				EXECUTE \'DROP TABLE ' || quote_ident(user_name) || '.authorizations_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.scenarios_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.files_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.parameters_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.jobs_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.pd_fs_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.pdf_histograms_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.log_evals_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.log_eval_entries_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.moments_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.batch_means_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.batch_means_histograms_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.lres_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.lre_histograms_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.dlres_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.dlre_histograms_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.tables_\' || OLD.id || \',
-						     ' || quote_ident(user_name) || '.table_rows_\' || OLD.id || \' CASCADE\';
+			ELSIF (TG_OP = ''DELETE'') THEN
+				EXECUTE ''DROP TABLE ' || quote_ident(user_name) || '.authorizations_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.scenarios_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.files_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.parameters_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.jobs_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.pd_fs_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.pdf_histograms_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.log_evals_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.log_eval_entries_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.moments_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.batch_means_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.batch_means_histograms_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.lres_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.lre_histograms_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.dlres_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.dlre_histograms_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.tables_'' || OLD.id || '',
+						     ' || quote_ident(user_name) || '.table_rows_'' || OLD.id || '' CASCADE'';
 
 				UPDATE administration.users SET db_use = 0 WHERE id = ' || user_id || ';
 
@@ -935,30 +935,30 @@ BEGIN
 			IF (NEW.user_id = NEW.authorized_id) THEN
 				RETURN NEW;
 			ELSE
-				EXECUTE \'SELECT user_name FROM administration.users WHERE id = \' || NEW.authorized_id INTO authorized_user;
+				EXECUTE ''SELECT user_name FROM administration.users WHERE id = '' || NEW.authorized_id INTO authorized_user;
 
-				EXECUTE \'GRANT USAGE ON SCHEMA ' || quote_ident(user_name) || ' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.scenarios_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.files_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.parameters_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.jobs_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.pd_fs_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.log_evals_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.moments_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.batch_means_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.lres_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.dlres_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.tables_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
-				EXECUTE \'GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.table_rows_\' || NEW.campaign_id || \' TO \' || quote_ident(authorized_user);
+				EXECUTE ''GRANT USAGE ON SCHEMA ' || quote_ident(user_name) || ' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.scenarios_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.files_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.parameters_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.jobs_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.pd_fs_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.log_evals_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.moments_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.batch_means_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.lres_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.dlres_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.tables_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
+				EXECUTE ''GRANT SELECT ON TABLE ' || quote_ident(user_name) || '.table_rows_'' || NEW.campaign_id || '' TO '' || quote_ident(authorized_user);
 
-				EXECUTE \'SELECT nextval(\\\'administration.authorizations_id_seq\\\'::regclass)\' INTO authorization_id;
-				EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.authorizations_\' || NEW.campaign_id || \' (id, campaign_id, authorized_id)
-					VALUES (\' || quote_literal(authorization_id) || \', \' || quote_literal(NEW.campaign_id) || \', \' || quote_literal(NEW.authorized_id) || \')\';
+				EXECUTE ''SELECT nextval(''''administration.authorizations_id_seq''''::regclass)'' INTO authorization_id;
+				EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.authorizations_'' || NEW.campaign_id || '' (id, campaign_id, authorized_id)
+					VALUES ('' || quote_literal(authorization_id) || '', '' || quote_literal(NEW.campaign_id) || '', '' || quote_literal(NEW.authorized_id) || '')'';
 				RETURN NULL;
 			END IF;
 		END;
@@ -980,25 +980,25 @@ BEGIN
 			IF (OLD.user_id = OLD.authorized_id) THEN
 				RETURN OLD;
 			ELSE
-				EXECUTE \'SELECT user_name FROM administration.users WHERE id = \' || OLD.authorized_id INTO authorized_user;
+				EXECUTE ''SELECT user_name FROM administration.users WHERE id = '' || OLD.authorized_id INTO authorized_user;
 
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.scenarios_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.files_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.parameters_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.jobs_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.pd_fs_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.pdf_histograms_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.log_evals_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.log_eval_entries_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.moments_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.batch_means_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.batch_means_histograms_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.lres_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.lre_histograms_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.dlres_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.dlre_histograms_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.tables_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
-				EXECUTE \'REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.table_rows_\' || OLD.campaign_id || \' FROM \' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.scenarios_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.files_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.parameters_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.jobs_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.pd_fs_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.pdf_histograms_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.log_evals_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.log_eval_entries_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.moments_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.batch_means_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.batch_means_histograms_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.lres_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.lre_histograms_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.dlres_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.dlre_histograms_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.tables_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
+				EXECUTE ''REVOKE ALL ON TABLE ' || quote_ident(user_name) || '.table_rows_'' || OLD.campaign_id || '' FROM '' || quote_ident(authorized_user);
 
 				RETURN OLD;
 			END IF;
@@ -1011,11 +1011,11 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.scenarios() RETURNS trigger AS $scenarios_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.scenarios_\' || NEW.campaign_id || \' (id, campaign_id, current_job_id, state, max_sim_time,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.scenarios_'' || NEW.campaign_id || '' (id, campaign_id, current_job_id, state, max_sim_time,
 					current_sim_time, sim_time_last_write)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.scenarios_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.current_job_id) || \', \' || quote_literal(NEW.state) || \', \' || quote_literal(NEW.max_sim_time) || \',
-					\' || quote_literal(NEW.current_sim_time) || \', \' || quote_literal(NEW.sim_time_last_write) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.scenarios_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.current_job_id) || '', '' || quote_literal(NEW.state) || '', '' || quote_literal(NEW.max_sim_time) || '',
+					'' || quote_literal(NEW.current_sim_time) || '', '' || quote_literal(NEW.sim_time_last_write) || '')'';
 			RETURN NULL;
 		END;
 		$scenarios_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1030,7 +1030,7 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.scenarios_update() RETURNS trigger AS $scenarios_update_trigger$
 		BEGIN
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || OLD.campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || OLD.campaign_id;
 			RETURN NEW;
 		END;
 		$scenarios_update_trigger$ LANGUAGE plpgsql SECURITY DEFINER';
@@ -1041,9 +1041,9 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.files() RETURNS trigger AS $files_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.files_\' || NEW.campaign_id || \' (id, campaign_id, name, date, file)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.files_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.name) || \', \' || quote_literal(NEW.date) || \', \' || quote_literal(NEW.file) || \')\';
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.files_'' || NEW.campaign_id || '' (id, campaign_id, name, date, file)
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.files_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.name) || '', '' || quote_literal(NEW.date) || '', '' || quote_literal(NEW.file) || '')'';
 			RETURN NULL;
 		END;
 		$files_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1059,15 +1059,15 @@ BEGIN
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.parameters() RETURNS trigger AS $parameters_trigger$
 		BEGIN
 			IF NEW.type_bool THEN
-				EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.parameters_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, parameter_type, parameter_name, type_bool, type_integer, type_float, type_string)
-					VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.parameters_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-						\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.parameter_type) || \', \' || quote_literal(NEW.parameter_name) || \',
-						TRUE, \' || NEW.type_integer || \', \' || NEW.type_float || \', \' || quote_literal(NEW.type_string) || \')\';
+				EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.parameters_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, parameter_type, parameter_name, type_bool, type_integer, type_float, type_string)
+					VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.parameters_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+						'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.parameter_type) || '', '' || quote_literal(NEW.parameter_name) || '',
+						TRUE, '' || NEW.type_integer || '', '' || NEW.type_float || '', '' || quote_literal(NEW.type_string) || '')'';
 			ELSE
-				EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.parameters_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, parameter_type, parameter_name, type_bool, type_integer, type_float, type_string)
-					VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.parameters_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-						\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.parameter_type) || \', \' || quote_literal(NEW.parameter_name) || \',
-						FALSE, \' || NEW.type_integer || \', \' || NEW.type_float || \', \' || quote_literal(NEW.type_string) || \')\';
+				EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.parameters_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, parameter_type, parameter_name, type_bool, type_integer, type_float, type_string)
+					VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.parameters_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+						'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.parameter_type) || '', '' || quote_literal(NEW.parameter_name) || '',
+						FALSE, '' || NEW.type_integer || '', '' || NEW.type_float || '', '' || quote_literal(NEW.type_string) || '')'';
 			END IF;
 			RETURN NULL;
 		END;
@@ -1083,12 +1083,12 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.jobs() RETURNS trigger AS $jobs_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.jobs_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, sge_job_id, queue_date, start_date, stop_date, hostname, stdout, stderr)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.jobs_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.sge_job_id) || \', \' || quote_literal(NEW.queue_date) || \',
-					\' || quote_literal(NEW.start_date) || \', \' || quote_literal(NEW.stop_date) || \', \' || quote_literal(NEW.hostname) || \',
-					\' || quote_literal(NEW.stdout) || \', \' || quote_literal(NEW.stderr) || \')\';
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.scenarios SET current_job_id = \' || NEW.sge_job_id || \' WHERE id = \' || NEW.scenario_id || \' AND campaign_id = \' || NEW.campaign_id;
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.jobs_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, sge_job_id, queue_date, start_date, stop_date, hostname, stdout, stderr)
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.jobs_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.sge_job_id) || '', '' || quote_literal(NEW.queue_date) || '',
+					'' || quote_literal(NEW.start_date) || '', '' || quote_literal(NEW.stop_date) || '', '' || quote_literal(NEW.hostname) || '',
+					'' || quote_literal(NEW.stdout) || '', '' || quote_literal(NEW.stderr) || '')'';
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.scenarios SET current_job_id = '' || NEW.sge_job_id || '' WHERE id = '' || NEW.scenario_id || '' AND campaign_id = '' || NEW.campaign_id;
 			RETURN NULL;
 		END;
 		$jobs_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1103,18 +1103,18 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.pd_fs() RETURNS trigger AS $pd_fs_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.pd_fs_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, skewness, description, moment3,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.pd_fs_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, skewness, description, moment3,
 					moment2, standard_deviation, relative_standard_deviation, minimum, alt_name, relative_variance, name, trials, maximum, filename, variance,
 					sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, mean, p01, p05, p50, p95, p99, min_x, max_x, number_of_bins, underflows, overflows)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.pd_fs_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.skewness) || \', \' || quote_literal(NEW.description) || \', \' || quote_literal(NEW.moment3) || \',
-					\' || quote_literal(NEW.moment2) || \', \' || quote_literal(NEW.standard_deviation) || \', \' || quote_literal(NEW.relative_standard_deviation) || \',
-					\' || quote_literal(NEW.minimum) || \', \' || quote_literal(NEW.alt_name) || \', \' || quote_literal(NEW.relative_variance) || \', \' || quote_literal(NEW.name) || \',
-					\' || quote_literal(NEW.trials) || \', \' || quote_literal(NEW.maximum) || \', \' || quote_literal(NEW.filename) || \', \' || quote_literal(NEW.variance) || \',
-					\' || quote_literal(NEW.sum_of_all_values) || \', \' || quote_literal(NEW.sum_of_all_values_square) || \', \' || quote_literal(NEW.sum_of_all_values_cubic) || \',
-					\' || quote_literal(NEW.mean) || \', \' || quote_literal(NEW.p01) || \', \' || quote_literal(NEW.p05) || \', \' || quote_literal(NEW.p50) || \',
-					\' || quote_literal(NEW.p95) || \', \' || quote_literal(NEW.p99) || \', \' || quote_literal(NEW.min_x) || \', \' || quote_literal(NEW.max_x) || \',
-					\' || quote_literal(NEW.number_of_bins) || \', \' || quote_literal(NEW.underflows) || \', \' || quote_literal(NEW.overflows) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.pd_fs_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.skewness) || '', '' || quote_literal(NEW.description) || '', '' || quote_literal(NEW.moment3) || '',
+					'' || quote_literal(NEW.moment2) || '', '' || quote_literal(NEW.standard_deviation) || '', '' || quote_literal(NEW.relative_standard_deviation) || '',
+					'' || quote_literal(NEW.minimum) || '', '' || quote_literal(NEW.alt_name) || '', '' || quote_literal(NEW.relative_variance) || '', '' || quote_literal(NEW.name) || '',
+					'' || quote_literal(NEW.trials) || '', '' || quote_literal(NEW.maximum) || '', '' || quote_literal(NEW.filename) || '', '' || quote_literal(NEW.variance) || '',
+					'' || quote_literal(NEW.sum_of_all_values) || '', '' || quote_literal(NEW.sum_of_all_values_square) || '', '' || quote_literal(NEW.sum_of_all_values_cubic) || '',
+					'' || quote_literal(NEW.mean) || '', '' || quote_literal(NEW.p01) || '', '' || quote_literal(NEW.p05) || '', '' || quote_literal(NEW.p50) || '',
+					'' || quote_literal(NEW.p95) || '', '' || quote_literal(NEW.p99) || '', '' || quote_literal(NEW.min_x) || '', '' || quote_literal(NEW.max_x) || '',
+					'' || quote_literal(NEW.number_of_bins) || '', '' || quote_literal(NEW.underflows) || '', '' || quote_literal(NEW.overflows) || '')'';
 			RETURN NULL;
 		END;
 		$pd_fs_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1129,9 +1129,9 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.pdf_histograms() RETURNS trigger AS $pdf_histograms_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.pdf_histograms_\' || NEW.campaign_id || \' (id, probe_id, x, cdf, ccdf, pdf)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.pdf_histograms_id_seq\'::regclass)) || \', \' || quote_literal(NEW.probe_id) || \',
-					\' || quote_literal(NEW.x) || \', \' || quote_literal(NEW.cdf) || \', \' || quote_literal(NEW.ccdf) || \', \' || quote_literal(NEW.pdf) || \')\';
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.pdf_histograms_'' || NEW.campaign_id || '' (id, probe_id, x, cdf, ccdf, pdf)
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.pdf_histograms_id_seq''::regclass)) || '', '' || quote_literal(NEW.probe_id) || '',
+					'' || quote_literal(NEW.x) || '', '' || quote_literal(NEW.cdf) || '', '' || quote_literal(NEW.ccdf) || '', '' || quote_literal(NEW.pdf) || '')'';
 			RETURN NULL;
 		END;
 		$pdf_histograms_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1146,16 +1146,16 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.log_evals() RETURNS trigger AS $log_evals_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.log_evals_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, skewness, description, moment3,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.log_evals_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, skewness, description, moment3,
 					moment2, standard_deviation, relative_standard_deviation, minimum, alt_name, relative_variance, name, trials, maximum, filename, variance,
 					sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, mean)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.log_evals_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.skewness) || \', \' || quote_literal(NEW.description) || \', \' || quote_literal(NEW.moment3) || \',
-					\' || quote_literal(NEW.moment2) || \', \' || quote_literal(NEW.standard_deviation) || \', \' || quote_literal(NEW.relative_standard_deviation) || \',
-					\' || quote_literal(NEW.minimum) || \', \' || quote_literal(NEW.alt_name) || \', \' || quote_literal(NEW.relative_variance) || \', \' || quote_literal(NEW.name) || \',
-					\' || quote_literal(NEW.trials) || \', \' || quote_literal(NEW.maximum) || \', \' || quote_literal(NEW.filename) || \', \' || quote_literal(NEW.variance) || \',
-					\' || quote_literal(NEW.sum_of_all_values) || \', \' || quote_literal(NEW.sum_of_all_values_square) || \', \' || quote_literal(NEW.sum_of_all_values_cubic) || \',
-					\' || quote_literal(NEW.mean) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.log_evals_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.skewness) || '', '' || quote_literal(NEW.description) || '', '' || quote_literal(NEW.moment3) || '',
+					'' || quote_literal(NEW.moment2) || '', '' || quote_literal(NEW.standard_deviation) || '', '' || quote_literal(NEW.relative_standard_deviation) || '',
+					'' || quote_literal(NEW.minimum) || '', '' || quote_literal(NEW.alt_name) || '', '' || quote_literal(NEW.relative_variance) || '', '' || quote_literal(NEW.name) || '',
+					'' || quote_literal(NEW.trials) || '', '' || quote_literal(NEW.maximum) || '', '' || quote_literal(NEW.filename) || '', '' || quote_literal(NEW.variance) || '',
+					'' || quote_literal(NEW.sum_of_all_values) || '', '' || quote_literal(NEW.sum_of_all_values_square) || '', '' || quote_literal(NEW.sum_of_all_values_cubic) || '',
+					'' || quote_literal(NEW.mean) || '')'';
 			RETURN NULL;
 		END;
 		$log_evals_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1170,9 +1170,9 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.log_eval_entries() RETURNS trigger AS $log_eval_entries_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.log_eval_entries_\' || NEW.campaign_id || \' (id, probe_id, x, y)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.log_eval_entries_id_seq\'::regclass)) || \', \' || quote_literal(NEW.probe_id) || \',
-					\' || quote_literal(NEW.x) || \', \' || quote_literal(NEW.y) || \')\';
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.log_eval_entries_'' || NEW.campaign_id || '' (id, probe_id, x, y)
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.log_eval_entries_id_seq''::regclass)) || '', '' || quote_literal(NEW.probe_id) || '',
+					'' || quote_literal(NEW.x) || '', '' || quote_literal(NEW.y) || '')'';
 			RETURN NULL;
 		END;
 		$log_eval_entries_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1187,16 +1187,16 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.moments() RETURNS trigger AS $moments_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.moments_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, skewness, description, moment3,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.moments_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, skewness, description, moment3,
 					moment2, standard_deviation, relative_standard_deviation, minimum, alt_name, relative_variance, name, trials, maximum, filename, variance,
 					sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, mean)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.moments_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.skewness) || \', \' || quote_literal(NEW.description) || \', \' || quote_literal(NEW.moment3) || \',
-					\' || quote_literal(NEW.moment2) || \', \' || quote_literal(NEW.standard_deviation) || \', \' || quote_literal(NEW.relative_standard_deviation) || \',
-					\' || quote_literal(NEW.minimum) || \', \' || quote_literal(NEW.alt_name) || \', \' || quote_literal(NEW.relative_variance) || \', \' || quote_literal(NEW.name) || \',
-					\' || quote_literal(NEW.trials) || \', \' || quote_literal(NEW.maximum) || \', \' || quote_literal(NEW.filename) || \', \' || quote_literal(NEW.variance) || \',
-					\' || quote_literal(NEW.sum_of_all_values) || \', \' || quote_literal(NEW.sum_of_all_values_square) || \', \' || quote_literal(NEW.sum_of_all_values_cubic) || \',
-					\' || quote_literal(NEW.mean) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.moments_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.skewness) || '', '' || quote_literal(NEW.description) || '', '' || quote_literal(NEW.moment3) || '',
+					'' || quote_literal(NEW.moment2) || '', '' || quote_literal(NEW.standard_deviation) || '', '' || quote_literal(NEW.relative_standard_deviation) || '',
+					'' || quote_literal(NEW.minimum) || '', '' || quote_literal(NEW.alt_name) || '', '' || quote_literal(NEW.relative_variance) || '', '' || quote_literal(NEW.name) || '',
+					'' || quote_literal(NEW.trials) || '', '' || quote_literal(NEW.maximum) || '', '' || quote_literal(NEW.filename) || '', '' || quote_literal(NEW.variance) || '',
+					'' || quote_literal(NEW.sum_of_all_values) || '', '' || quote_literal(NEW.sum_of_all_values_square) || '', '' || quote_literal(NEW.sum_of_all_values_cubic) || '',
+					'' || quote_literal(NEW.mean) || '')'';
 			RETURN NULL;
 		END;
 		$moments_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1211,25 +1211,25 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.batch_means() RETURNS trigger AS $batch_means_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.batch_means_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, skewness, description, moment3,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.batch_means_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, skewness, description, moment3,
 					moment2, standard_deviation, relative_standard_deviation, minimum, alt_name, relative_variance, name, trials, maximum, filename, variance,
 					sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, mean,
 					lower_border, upper_border, number_of_intervals, interval_size, size_of_groups, maximum_relative_error, evaluated_groups, underflows, overflows,
 					mean_bm, confidence_of_mean_absolute, confidence_of_mean_percent, relative_error_mean, variance_bm, confidence_of_variance_absolute, confidence_of_variance_percent,
 					relative_error_variance, sigma, first_order_correlation_coefficient)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.batch_means_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.skewness) || \', \' || quote_literal(NEW.description) || \', \' || quote_literal(NEW.moment3) || \',
-					\' || quote_literal(NEW.moment2) || \', \' || quote_literal(NEW.standard_deviation) || \', \' || quote_literal(NEW.relative_standard_deviation) || \',
-					\' || quote_literal(NEW.minimum) || \', \' || quote_literal(NEW.alt_name) || \', \' || quote_literal(NEW.relative_variance) || \', \' || quote_literal(NEW.name) || \',
-					\' || quote_literal(NEW.trials) || \', \' || quote_literal(NEW.maximum) || \', \' || quote_literal(NEW.filename) || \', \' || quote_literal(NEW.variance) || \',
-					\' || quote_literal(NEW.sum_of_all_values) || \', \' || quote_literal(NEW.sum_of_all_values_square) || \',
-					\' || quote_literal(NEW.sum_of_all_values_cubic) || \',	\' || quote_literal(NEW.mean) || \', \' || quote_literal(NEW.lower_border) || \',
-					\' || quote_literal(NEW.upper_border) || \', \' || quote_literal(NEW.number_of_intervals) || \', \' || quote_literal(NEW.interval_size) || \',
-					\' || quote_literal(NEW.size_of_groups) || \', \' || quote_literal(NEW.maximum_relative_error) || \', \' || quote_literal(NEW.evaluated_groups) || \',
-					\' || quote_literal(NEW.underflows) || \', \' || quote_literal(NEW.overflows) || \', \' || quote_literal(NEW.mean_bm) || \', \' || quote_literal(NEW.confidence_of_mean_absolute) || \',
-					\' || quote_literal(NEW.confidence_of_mean_percent) || \', \' || quote_literal(NEW.relative_error_mean) || \', \' || quote_literal(NEW.variance_bm) || \',
-					\' || quote_literal(NEW.confidence_of_variance_absolute) || \', \' || quote_literal(NEW.confidence_of_variance_percent) || \', \' || quote_literal(NEW.relative_error_variance) || \',
-					\' || quote_literal(NEW.sigma) || \', \' || quote_literal(NEW.first_order_correlation_coefficient) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.batch_means_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.skewness) || '', '' || quote_literal(NEW.description) || '', '' || quote_literal(NEW.moment3) || '',
+					'' || quote_literal(NEW.moment2) || '', '' || quote_literal(NEW.standard_deviation) || '', '' || quote_literal(NEW.relative_standard_deviation) || '',
+					'' || quote_literal(NEW.minimum) || '', '' || quote_literal(NEW.alt_name) || '', '' || quote_literal(NEW.relative_variance) || '', '' || quote_literal(NEW.name) || '',
+					'' || quote_literal(NEW.trials) || '', '' || quote_literal(NEW.maximum) || '', '' || quote_literal(NEW.filename) || '', '' || quote_literal(NEW.variance) || '',
+					'' || quote_literal(NEW.sum_of_all_values) || '', '' || quote_literal(NEW.sum_of_all_values_square) || '',
+					'' || quote_literal(NEW.sum_of_all_values_cubic) || '',	'' || quote_literal(NEW.mean) || '', '' || quote_literal(NEW.lower_border) || '',
+					'' || quote_literal(NEW.upper_border) || '', '' || quote_literal(NEW.number_of_intervals) || '', '' || quote_literal(NEW.interval_size) || '',
+					'' || quote_literal(NEW.size_of_groups) || '', '' || quote_literal(NEW.maximum_relative_error) || '', '' || quote_literal(NEW.evaluated_groups) || '',
+					'' || quote_literal(NEW.underflows) || '', '' || quote_literal(NEW.overflows) || '', '' || quote_literal(NEW.mean_bm) || '', '' || quote_literal(NEW.confidence_of_mean_absolute) || '',
+					'' || quote_literal(NEW.confidence_of_mean_percent) || '', '' || quote_literal(NEW.relative_error_mean) || '', '' || quote_literal(NEW.variance_bm) || '',
+					'' || quote_literal(NEW.confidence_of_variance_absolute) || '', '' || quote_literal(NEW.confidence_of_variance_percent) || '', '' || quote_literal(NEW.relative_error_variance) || '',
+					'' || quote_literal(NEW.sigma) || '', '' || quote_literal(NEW.first_order_correlation_coefficient) || '')'';
 			RETURN NULL;
 		END;
 		$batch_means_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1244,10 +1244,10 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.batch_means_histograms() RETURNS trigger AS $batch_means_histograms_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.batch_means_histograms_\' || NEW.campaign_id || \' (id, probe_id, x, cdf, pdf, relative_error, confidence, number_of_trials_per_interval)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.batch_means_histograms_id_seq\'::regclass)) || \', \' || quote_literal(NEW.probe_id) || \',
-					\' || quote_literal(NEW.x) || \', \' || quote_literal(NEW.cdf) || \', \' || quote_literal(NEW.pdf) || \', \' || quote_literal(NEW.relative_error) || \',
-					\' || quote_literal(NEW.confidence) || \', \' || quote_literal(NEW.number_of_trials_per_interval) || \')\';
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.batch_means_histograms_'' || NEW.campaign_id || '' (id, probe_id, x, cdf, pdf, relative_error, confidence, number_of_trials_per_interval)
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.batch_means_histograms_id_seq''::regclass)) || '', '' || quote_literal(NEW.probe_id) || '',
+					'' || quote_literal(NEW.x) || '', '' || quote_literal(NEW.cdf) || '', '' || quote_literal(NEW.pdf) || '', '' || quote_literal(NEW.relative_error) || '',
+					'' || quote_literal(NEW.confidence) || '', '' || quote_literal(NEW.number_of_trials_per_interval) || '')'';
 			RETURN NULL;
 		END;
 		$batch_means_histograms_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1262,7 +1262,7 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.lres() RETURNS trigger AS $lres_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.lres_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, skewness, description, moment3,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.lres_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, skewness, description, moment3,
 					moment2, standard_deviation, relative_standard_deviation, minimum, alt_name, relative_variance, name, trials, maximum, filename, variance,
 					sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, mean,
 					lre_type, maximum_relative_error, f_max, f_min, scaling, maximum_number_of_trials_per_level, rho_n60, rho_n50, rho_n40, rho_n30, rho_n20, rho_n10, rho_00,
@@ -1272,25 +1272,25 @@ BEGIN
 					deviation_from_mean_local_cc_standard_deviation, number_of_trials_per_interval_mean, number_of_trials_per_interval_variance,
 					number_of_trials_per_interval_standard_deviation, number_of_transitions_per_interval_mean, number_of_transitions_per_interval_variance,
 					number_of_transitions_per_interval_standard_deviation)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.lres_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.skewness) || \', \' || quote_literal(NEW.description) || \', \' || quote_literal(NEW.moment3) || \',
-					\' || quote_literal(NEW.moment2) || \', \' || quote_literal(NEW.standard_deviation) || \', \' || quote_literal(NEW.relative_standard_deviation) || \',
-					\' || quote_literal(NEW.minimum) || \', \' || quote_literal(NEW.alt_name) || \', \' || quote_literal(NEW.relative_variance) || \', \' || quote_literal(NEW.name) || \',
-					\' || quote_literal(NEW.trials) || \', \' || quote_literal(NEW.maximum) || \', \' || quote_literal(NEW.filename) || \', \' || quote_literal(NEW.variance) || \',
-					\' || quote_literal(NEW.sum_of_all_values) || \', \' || quote_literal(NEW.sum_of_all_values_square) || \', \' || quote_literal(NEW.sum_of_all_values_cubic) || \',
-					\' || quote_literal(NEW.mean) || \', \' || quote_literal(NEW.lre_type) || \', \' || quote_literal(NEW.maximum_relative_error) || \', \' || quote_literal(NEW.f_max) || \',
-					\' || quote_literal(NEW.f_min) || \', \' || quote_literal(NEW.scaling) || \', \' || quote_literal(NEW.maximum_number_of_trials_per_level) || \', \' || quote_literal(NEW.rho_n60) || \',
-					\' || quote_literal(NEW.rho_n50) || \', \' || quote_literal(NEW.rho_n40) || \', \' || quote_literal(NEW.rho_n30) || \', \' || quote_literal(NEW.rho_n20) || \',
-					\' || quote_literal(NEW.rho_n10) || \', \' || quote_literal(NEW.rho_00) || \', \' || quote_literal(NEW.rho_p25) || \', \' || quote_literal(NEW.rho_p50) || \',
-					\' || quote_literal(NEW.rho_p75) || \', \' || quote_literal(NEW.rho_p90) || \', \' || quote_literal(NEW.rho_p95) || \', \' || quote_literal(NEW.rho_p99) || \',
-					\' || quote_literal(NEW.peak_number_of_sorting_elements) || \', \' || quote_literal(NEW.level_index) || \', \' || quote_literal(NEW.number_of_levels) || \',
-					\' || quote_literal(NEW.relative_error_mean) || \', \' || quote_literal(NEW.relative_error_variance) || \',
-					\' || quote_literal(NEW.relative_error_standard_deviation) || \', \' || quote_literal(NEW.mean_local_correlation_coefficient_mean) || \', \' || quote_literal(NEW.mean_local_correlation_coefficient_variance) || \',
-					\' || quote_literal(NEW.mean_local_correlation_coefficient_standard_deviation) || \', \' || quote_literal(NEW.deviation_from_mean_local_cc_mean) || \',
-					\' || quote_literal(NEW.deviation_from_mean_local_cc_variance) || \', \' || quote_literal(NEW.deviation_from_mean_local_cc_standard_deviation) || \',
-					\' || quote_literal(NEW.number_of_trials_per_interval_mean) || \', \' || quote_literal(NEW.number_of_trials_per_interval_variance) || \',
-					\' || quote_literal(NEW.number_of_trials_per_interval_standard_deviation) || \', \' || quote_literal(NEW.number_of_transitions_per_interval_mean) || \',
-					\' || quote_literal(NEW.number_of_transitions_per_interval_variance) || \', \' || quote_literal(NEW.number_of_transitions_per_interval_standard_deviation) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.lres_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.skewness) || '', '' || quote_literal(NEW.description) || '', '' || quote_literal(NEW.moment3) || '',
+					'' || quote_literal(NEW.moment2) || '', '' || quote_literal(NEW.standard_deviation) || '', '' || quote_literal(NEW.relative_standard_deviation) || '',
+					'' || quote_literal(NEW.minimum) || '', '' || quote_literal(NEW.alt_name) || '', '' || quote_literal(NEW.relative_variance) || '', '' || quote_literal(NEW.name) || '',
+					'' || quote_literal(NEW.trials) || '', '' || quote_literal(NEW.maximum) || '', '' || quote_literal(NEW.filename) || '', '' || quote_literal(NEW.variance) || '',
+					'' || quote_literal(NEW.sum_of_all_values) || '', '' || quote_literal(NEW.sum_of_all_values_square) || '', '' || quote_literal(NEW.sum_of_all_values_cubic) || '',
+					'' || quote_literal(NEW.mean) || '', '' || quote_literal(NEW.lre_type) || '', '' || quote_literal(NEW.maximum_relative_error) || '', '' || quote_literal(NEW.f_max) || '',
+					'' || quote_literal(NEW.f_min) || '', '' || quote_literal(NEW.scaling) || '', '' || quote_literal(NEW.maximum_number_of_trials_per_level) || '', '' || quote_literal(NEW.rho_n60) || '',
+					'' || quote_literal(NEW.rho_n50) || '', '' || quote_literal(NEW.rho_n40) || '', '' || quote_literal(NEW.rho_n30) || '', '' || quote_literal(NEW.rho_n20) || '',
+					'' || quote_literal(NEW.rho_n10) || '', '' || quote_literal(NEW.rho_00) || '', '' || quote_literal(NEW.rho_p25) || '', '' || quote_literal(NEW.rho_p50) || '',
+					'' || quote_literal(NEW.rho_p75) || '', '' || quote_literal(NEW.rho_p90) || '', '' || quote_literal(NEW.rho_p95) || '', '' || quote_literal(NEW.rho_p99) || '',
+					'' || quote_literal(NEW.peak_number_of_sorting_elements) || '', '' || quote_literal(NEW.level_index) || '', '' || quote_literal(NEW.number_of_levels) || '',
+					'' || quote_literal(NEW.relative_error_mean) || '', '' || quote_literal(NEW.relative_error_variance) || '',
+					'' || quote_literal(NEW.relative_error_standard_deviation) || '', '' || quote_literal(NEW.mean_local_correlation_coefficient_mean) || '', '' || quote_literal(NEW.mean_local_correlation_coefficient_variance) || '',
+					'' || quote_literal(NEW.mean_local_correlation_coefficient_standard_deviation) || '', '' || quote_literal(NEW.deviation_from_mean_local_cc_mean) || '',
+					'' || quote_literal(NEW.deviation_from_mean_local_cc_variance) || '', '' || quote_literal(NEW.deviation_from_mean_local_cc_standard_deviation) || '',
+					'' || quote_literal(NEW.number_of_trials_per_interval_mean) || '', '' || quote_literal(NEW.number_of_trials_per_interval_variance) || '',
+					'' || quote_literal(NEW.number_of_trials_per_interval_standard_deviation) || '', '' || quote_literal(NEW.number_of_transitions_per_interval_mean) || '',
+					'' || quote_literal(NEW.number_of_transitions_per_interval_variance) || '', '' || quote_literal(NEW.number_of_transitions_per_interval_standard_deviation) || '')'';
 			RETURN NULL;
 		END;
 		$lres_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1305,13 +1305,13 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.lre_histograms() RETURNS trigger AS $lre_histograms_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.lre_histograms_\' || NEW.campaign_id || \' (id, probe_id, abscissa, ordinate, relative_error, mean_local_correlation_coefficient,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.lre_histograms_'' || NEW.campaign_id || '' (id, probe_id, abscissa, ordinate, relative_error, mean_local_correlation_coefficient,
 					deviation_from_mean_local_cc, number_of_trials_per_interval, number_of_transitions_per_interval, relative_error_within_limit)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.lre_histograms_id_seq\'::regclass)) || \', \' || quote_literal(NEW.probe_id) || \',
-					\' || quote_literal(NEW.abscissa) || \', \' || quote_literal(NEW.ordinate) || \', \' || quote_literal(NEW.relative_error) || \',
-					\' || quote_literal(NEW.mean_local_correlation_coefficient) || \', \' || quote_literal(NEW.deviation_from_mean_local_cc) || \',
-					\' || quote_literal(NEW.number_of_trials_per_interval) || \', \' || quote_literal(NEW.number_of_transitions_per_interval) || \',
-					\' || quote_literal(NEW.relative_error_within_limit) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.lre_histograms_id_seq''::regclass)) || '', '' || quote_literal(NEW.probe_id) || '',
+					'' || quote_literal(NEW.abscissa) || '', '' || quote_literal(NEW.ordinate) || '', '' || quote_literal(NEW.relative_error) || '',
+					'' || quote_literal(NEW.mean_local_correlation_coefficient) || '', '' || quote_literal(NEW.deviation_from_mean_local_cc) || '',
+					'' || quote_literal(NEW.number_of_trials_per_interval) || '', '' || quote_literal(NEW.number_of_transitions_per_interval) || '',
+					'' || quote_literal(NEW.relative_error_within_limit) || '')'';
 			RETURN NULL;
 		END;
 		$lre_histograms_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1326,21 +1326,21 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.dlres() RETURNS trigger AS $dlres_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.dlres_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, skewness, description, moment3,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.dlres_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, skewness, description, moment3,
 					moment2, standard_deviation, relative_standard_deviation, minimum, alt_name, relative_variance, name, trials, maximum, filename, variance,
 					sum_of_all_values, sum_of_all_values_square, sum_of_all_values_cubic, mean,
 					dlre_type, lower_border, upper_border, number_of_intervals, interval_size, maximum_number_of_samples, maximum_relative_error_percent, evaluated_levels,
 					underflows, overflows)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.dlres_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.skewness) || \', \' || quote_literal(NEW.description) || \', \' || quote_literal(NEW.moment3) || \',
-					\' || quote_literal(NEW.moment2) || \', \' || quote_literal(NEW.standard_deviation) || \', \' || quote_literal(NEW.relative_standard_deviation) || \',
-					\' || quote_literal(NEW.minimum) || \', \' || quote_literal(NEW.alt_name) || \', \' || quote_literal(NEW.relative_variance) || \', \' || quote_literal(NEW.name) || \',
-					\' || quote_literal(NEW.trials) || \', \' || quote_literal(NEW.maximum) || \', \' || quote_literal(NEW.filename) || \', \' || quote_literal(NEW.variance) || \',
-					\' || quote_literal(NEW.sum_of_all_values) || \', \' || quote_literal(NEW.sum_of_all_values_square) || \', \' || quote_literal(NEW.sum_of_all_values_cubic) || \',
-					\' || quote_literal(NEW.mean) || \', \' || quote_literal(NEW.dlre_type) || \', \' || quote_literal(NEW.lower_border) || \', \' || quote_literal(NEW.upper_border) || \',
-					\' || quote_literal(NEW.number_of_intervals) || \', \' || quote_literal(NEW.interval_size) || \', \' || quote_literal(NEW.maximum_number_of_samples) || \',
-					\' || quote_literal(NEW.maximum_relative_error_percent) || \', \' || quote_literal(NEW.evaluated_levels) || \', \' || quote_literal(NEW.underflows) || \',
-					\' || quote_literal(NEW.overflows) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.dlres_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.skewness) || '', '' || quote_literal(NEW.description) || '', '' || quote_literal(NEW.moment3) || '',
+					'' || quote_literal(NEW.moment2) || '', '' || quote_literal(NEW.standard_deviation) || '', '' || quote_literal(NEW.relative_standard_deviation) || '',
+					'' || quote_literal(NEW.minimum) || '', '' || quote_literal(NEW.alt_name) || '', '' || quote_literal(NEW.relative_variance) || '', '' || quote_literal(NEW.name) || '',
+					'' || quote_literal(NEW.trials) || '', '' || quote_literal(NEW.maximum) || '', '' || quote_literal(NEW.filename) || '', '' || quote_literal(NEW.variance) || '',
+					'' || quote_literal(NEW.sum_of_all_values) || '', '' || quote_literal(NEW.sum_of_all_values_square) || '', '' || quote_literal(NEW.sum_of_all_values_cubic) || '',
+					'' || quote_literal(NEW.mean) || '', '' || quote_literal(NEW.dlre_type) || '', '' || quote_literal(NEW.lower_border) || '', '' || quote_literal(NEW.upper_border) || '',
+					'' || quote_literal(NEW.number_of_intervals) || '', '' || quote_literal(NEW.interval_size) || '', '' || quote_literal(NEW.maximum_number_of_samples) || '',
+					'' || quote_literal(NEW.maximum_relative_error_percent) || '', '' || quote_literal(NEW.evaluated_levels) || '', '' || quote_literal(NEW.underflows) || '',
+					'' || quote_literal(NEW.overflows) || '')'';
 			RETURN NULL;
 		END;
 		$dlres_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1355,13 +1355,13 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.dlre_histograms() RETURNS trigger AS $dlre_histograms_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.dlre_histograms_\' || NEW.campaign_id || \' (id, probe_id, abscissa, ordinate, relative_error, mean_local_correlation_coefficient,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.dlre_histograms_'' || NEW.campaign_id || '' (id, probe_id, abscissa, ordinate, relative_error, mean_local_correlation_coefficient,
 					deviation_from_mean_local_cc, number_of_trials_per_interval, number_of_transitions_per_interval, relative_error_within_limit)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.lre_histograms_id_seq\'::regclass)) || \', \' || quote_literal(NEW.probe_id) || \',
-					\' || quote_literal(NEW.abscissa) || \', \' || quote_literal(NEW.ordinate) || \', \' || quote_literal(NEW.relative_error) || \',
-					\' || quote_literal(NEW.mean_local_correlation_coefficient) || \', \' || quote_literal(NEW.deviation_from_mean_local_cc) || \',
-					\' || quote_literal(NEW.number_of_trials_per_interval) || \', \' || quote_literal(NEW.number_of_transitions_per_interval) || \',
-					\' || quote_literal(NEW.relative_error_within_limit) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.lre_histograms_id_seq''::regclass)) || '', '' || quote_literal(NEW.probe_id) || '',
+					'' || quote_literal(NEW.abscissa) || '', '' || quote_literal(NEW.ordinate) || '', '' || quote_literal(NEW.relative_error) || '',
+					'' || quote_literal(NEW.mean_local_correlation_coefficient) || '', '' || quote_literal(NEW.deviation_from_mean_local_cc) || '',
+					'' || quote_literal(NEW.number_of_trials_per_interval) || '', '' || quote_literal(NEW.number_of_transitions_per_interval) || '',
+					'' || quote_literal(NEW.relative_error_within_limit) || '')'';
 			RETURN NULL;
 		END;
 		$dlre_histograms_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1376,13 +1376,13 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.tables() RETURNS trigger AS $tables_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.tables_\' || NEW.campaign_id || \' (id, campaign_id, scenario_id, filename, name, type,
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.tables_'' || NEW.campaign_id || '' (id, campaign_id, scenario_id, filename, name, type,
 					first_col_type, first_col_description, second_col_type, second_col_description, description, minimum, maximum)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.tables_id_seq\'::regclass)) || \', \' || quote_literal(NEW.campaign_id) || \',
-					\' || quote_literal(NEW.scenario_id) || \', \' || quote_literal(NEW.filename) || \', \' || quote_literal(NEW.name) || \', \' || quote_literal(NEW.type) || \',
-					\' || quote_literal(NEW.first_col_type) || \', \' || quote_literal(NEW.first_col_description) || \',
-					\' || quote_literal(NEW.second_col_type) || \', \' || quote_literal(NEW.second_col_description) || \', \' || quote_literal(NEW.description) || \',
-					\' || quote_literal(NEW.minimum) || \', \' || quote_literal(NEW.maximum) || \')\';
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.tables_id_seq''::regclass)) || '', '' || quote_literal(NEW.campaign_id) || '',
+					'' || quote_literal(NEW.scenario_id) || '', '' || quote_literal(NEW.filename) || '', '' || quote_literal(NEW.name) || '', '' || quote_literal(NEW.type) || '',
+					'' || quote_literal(NEW.first_col_type) || '', '' || quote_literal(NEW.first_col_description) || '',
+					'' || quote_literal(NEW.second_col_type) || '', '' || quote_literal(NEW.second_col_description) || '', '' || quote_literal(NEW.description) || '',
+					'' || quote_literal(NEW.minimum) || '', '' || quote_literal(NEW.maximum) || '')'';
 			RETURN NULL;
 		END;
 		$tables_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1397,9 +1397,9 @@ BEGIN
 
 	EXECUTE 'CREATE FUNCTION ' || quote_ident(user_name) || '.table_rows() RETURNS trigger AS $table_rows_trigger$
 		BEGIN
-			EXECUTE \'INSERT INTO ' || quote_ident(user_name) || '.table_rows_\' || NEW.campaign_id || \' (id, probe_id, first_col, second_col, value)
-				VALUES (\' || quote_literal(nextval(\'' || quote_ident(user_name) || '.table_rows_id_seq\'::regclass)) || \', \' || quote_literal(NEW.probe_id) || \',
-					\' || quote_literal(NEW.first_col) || \', \' || quote_literal(NEW.second_col) || \', \' || quote_literal(NEW.value) || \')\';
+			EXECUTE ''INSERT INTO ' || quote_ident(user_name) || '.table_rows_'' || NEW.campaign_id || '' (id, probe_id, first_col, second_col, value)
+				VALUES ('' || quote_literal(nextval(''' || quote_ident(user_name) || '.table_rows_id_seq''::regclass)) || '', '' || quote_literal(NEW.probe_id) || '',
+					'' || quote_literal(NEW.first_col) || '', '' || quote_literal(NEW.second_col) || '', '' || quote_literal(NEW.value) || '')'';
 			RETURN NULL;
 		END;
 		$table_rows_trigger$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -1446,208 +1446,208 @@ BEGIN
 			statement_where2 text;
 			parameters_record RECORD;
 		BEGIN
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.scenarios_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.scenarios_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.scenarios_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.scenarios_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW scenarios AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW scenarios AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.files_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.files_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.files_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.files_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW files AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW files AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.parameters_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.parameters_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.parameters_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.parameters_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW parameters AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW parameters AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.jobs_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.jobs_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.jobs_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.jobs_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW jobs AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW jobs AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.pd_fs_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.pd_fs_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.pd_fs_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.pd_fs_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW pd_fs AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW pd_fs AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.pdf_histograms_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.pdf_histograms_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.pdf_histograms_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.pdf_histograms_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW pdf_histograms AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW pdf_histograms AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.log_evals_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.log_evals_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.log_evals_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.log_evals_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW log_evals AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW log_evals AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.log_eval_entries_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.log_eval_entries_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.log_eval_entries_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.log_eval_entries_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW log_eval_entries AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW log_eval_entries AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.moments_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.moments_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.moments_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.moments_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW moments AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW moments AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.batch_means_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.batch_means_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.batch_means_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.batch_means_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW batch_means AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW batch_means AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.batch_means_histograms_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.batch_means_histograms_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.batch_means_histograms_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.batch_means_histograms_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW batch_means_histograms AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW batch_means_histograms AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.lres_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.lres_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.lres_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.lres_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW lres AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW lres AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.lre_histograms_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.lre_histograms_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.lre_histograms_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.lre_histograms_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW lre_histograms AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW lre_histograms AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.dlres_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.dlres_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.dlres_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.dlres_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW dlres AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW dlres AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.dlre_histograms_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.dlre_histograms_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.dlre_histograms_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.dlre_histograms_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW dlre_histograms AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW dlre_histograms AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.tables_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.tables_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.tables_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.tables_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW tables AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW tables AS '' || statement;
 
 
-			EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-					 WHERE campaigns.id = \' || arr_campaigns[1] INTO other_user;
-			statement := \'SELECT * FROM \' || other_user || \'.table_rows_\' || arr_campaigns[1];
+			EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+					 WHERE campaigns.id = '' || arr_campaigns[1] INTO other_user;
+			statement := ''SELECT * FROM '' || other_user || ''.table_rows_'' || arr_campaigns[1];
 			FOR campaign IN array_lower(arr_campaigns, 1)+1..array_upper(arr_campaigns, 1) LOOP
-				EXECUTE \'SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
-						 WHERE campaigns.id = \' || arr_campaigns[campaign] INTO other_user;
-				statement := statement || \' UNION ALL SELECT * FROM \' || other_user || \'.table_rows_\' || arr_campaigns[campaign];
+				EXECUTE ''SELECT user_name FROM administration.users INNER JOIN administration.campaigns ON users.id = campaigns.user_id
+						 WHERE campaigns.id = '' || arr_campaigns[campaign] INTO other_user;
+				statement := statement || '' UNION ALL SELECT * FROM '' || other_user || ''.table_rows_'' || arr_campaigns[campaign];
 			END LOOP;
-			EXECUTE \'CREATE OR REPLACE TEMPORARY VIEW table_rows AS \' || statement;
+			EXECUTE ''CREATE OR REPLACE TEMPORARY VIEW table_rows AS '' || statement;
 
 
-			EXECUTE \'SELECT parameter_name FROM parameters LIMIT 1\' INTO parameter_name;
+			EXECUTE ''SELECT parameter_name FROM parameters LIMIT 1'' INTO parameter_name;
 
-			statement_select := \'SELECT \' || quote_ident(parameter_name) || \'.campaign_id AS campaign_id, \' || quote_ident(parameter_name) || \'.scenario_id AS scenario_id, \';
-			statement_from := \' FROM\';
-			statement_where1 := \' WHERE\';
-			statement_where2 := \'\';
-			FOR parameters_record IN EXECUTE \'SELECT DISTINCT parameter_name, parameter_type FROM parameters\' LOOP
-				statement_select := statement_select || \' \' || quote_ident(parameters_record.parameter_name) || \'.\' || quote_ident(parameters_record.parameter_type) || \' AS \' || quote_ident(lower(parameters_record.parameter_name)) || \',\';
-				statement_from := statement_from || \' parameters \' || quote_ident(parameters_record.parameter_name) || \',\';
-				statement_where2 := statement_where2 || \' \' || quote_ident(parameters_record.parameter_name) || \'.parameter_name = \' || quote_literal(parameters_record.parameter_name) || \' AND\';
+			statement_select := ''SELECT '' || quote_ident(parameter_name) || ''.campaign_id AS campaign_id, '' || quote_ident(parameter_name) || ''.scenario_id AS scenario_id, '';
+			statement_from := '' FROM'';
+			statement_where1 := '' WHERE'';
+			statement_where2 := '''';
+			FOR parameters_record IN EXECUTE ''SELECT DISTINCT parameter_name, parameter_type FROM parameters'' LOOP
+				statement_select := statement_select || '' '' || quote_ident(parameters_record.parameter_name) || ''.'' || quote_ident(parameters_record.parameter_type) || '' AS '' || quote_ident(lower(parameters_record.parameter_name)) || '','';
+				statement_from := statement_from || '' parameters '' || quote_ident(parameters_record.parameter_name) || '','';
+				statement_where2 := statement_where2 || '' '' || quote_ident(parameters_record.parameter_name) || ''.parameter_name = '' || quote_literal(parameters_record.parameter_name) || '' AND'';
 				CONTINUE WHEN parameters_record.parameter_name = parameter_name;
-				statement_where1 := statement_where1 || \' \' || quote_ident(parameter_name) || \'.scenario_id = \' || quote_ident(parameters_record.parameter_name) || \'.scenario_id AND\';
+				statement_where1 := statement_where1 || '' '' || quote_ident(parameter_name) || ''.scenario_id = '' || quote_ident(parameters_record.parameter_name) || ''.scenario_id AND'';
 			END LOOP;
 
-			EXECUTE \'CREATE TEMPORARY VIEW parameter_sets AS \' || rtrim(statement_select, \',\') || rtrim(statement_from, \',\') || statement_where1 || rtrim(statement_where2, \'AND\');
+			EXECUTE ''CREATE TEMPORARY VIEW parameter_sets AS '' || rtrim(statement_select, '','') || rtrim(statement_from, '','') || statement_where1 || rtrim(statement_where2, ''AND'');
 		END;
 		$view_campaigns_function$ LANGUAGE plpgsql';
 
@@ -1686,8 +1686,8 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_pdf_histograms(campaign_id integer) RETURNS void AS $truncate_pdf_histograms$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.pdf_histograms_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.pdf_histograms_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_pdf_histograms$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1697,9 +1697,9 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_pd_fs(campaign_id integer) RETURNS void AS $truncate_pd_fs$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.pdf_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.pd_fs_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.pdf_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.pd_fs_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_pd_fs$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1709,8 +1709,8 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_log_eval_entries(campaign_id integer) RETURNS void AS $truncate_log_eval_entries$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.log_eval_entries_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.log_eval_entries_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_log_eval_entries$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1720,9 +1720,9 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_log_evals(campaign_id integer) RETURNS void AS $truncate_log_evals$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.log_eval_entries_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.log_evals_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.log_eval_entries_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.log_evals_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_log_evals$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1732,8 +1732,8 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_moments(campaign_id integer) RETURNS void AS $truncate_moments$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.moments_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.moments_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_moments$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1743,8 +1743,8 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_batch_means_histograms(campaign_id integer) RETURNS void AS $truncate_batch_means_histograms$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.batch_means_histograms_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.batch_means_histograms_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_batch_means_histograms$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1754,9 +1754,9 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_batch_means(campaign_id integer) RETURNS void AS $truncate_batch_means$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.batch_means_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.batch_means_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.batch_means_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.batch_means_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_batch_means$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1766,8 +1766,8 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_lre_histograms(campaign_id integer) RETURNS void AS $truncate_lre_histograms$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.lre_histograms_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.lre_histograms_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_lre_histograms$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1777,9 +1777,9 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_lres(campaign_id integer) RETURNS void AS $truncate_lres$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.lre_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.lres_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.lre_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.lres_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_lres$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1789,8 +1789,8 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_dlre_histograms(campaign_id integer) RETURNS void AS $truncate_dlre_histograms$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.dlre_histograms_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.dlre_histograms_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_dlre_histograms$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1800,9 +1800,9 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_dlres(campaign_id integer) RETURNS void AS $truncate_dlres$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.dlre_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.dlres_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.dlre_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.dlres_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_dlres$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1812,8 +1812,8 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_table_rows(campaign_id integer) RETURNS void AS $truncate_table_rows$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.table_rows_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.table_rows_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_table_rows$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1823,9 +1823,9 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_tables(campaign_id integer) RETURNS void AS $truncate_tables$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.table_rows_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.tables_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.table_rows_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.tables_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_tables$ LANGUAGE plpgsql SECURITY DEFINER';
 
@@ -1835,24 +1835,24 @@ BEGIN
 
 	EXECUTE 'CREATE OR REPLACE FUNCTION ' || quote_ident(user_name) || '.truncate_other_tables(campaign_id integer) RETURNS void AS $truncate_other_tables$
 		BEGIN
-			EXECUTE \'TRUNCATE ' || quote_ident(user_name) || '.pdf_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.pd_fs_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.log_eval_entries_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.log_evals_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.moments_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.batch_means_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.batch_means_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.lre_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.lres_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.dlre_histograms_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.dlres_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.table_rows_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.tables_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.scenarios_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.jobs_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.parameters_\' || campaign_id || \', '
-					     || quote_ident(user_name) || '.files_\' || campaign_id;
-			EXECUTE \'UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = \' || campaign_id;
+			EXECUTE ''TRUNCATE ' || quote_ident(user_name) || '.pdf_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.pd_fs_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.log_eval_entries_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.log_evals_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.moments_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.batch_means_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.batch_means_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.lre_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.lres_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.dlre_histograms_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.dlres_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.table_rows_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.tables_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.scenarios_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.jobs_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.parameters_'' || campaign_id || '', '
+					     || quote_ident(user_name) || '.files_'' || campaign_id;
+			EXECUTE ''UPDATE ' || quote_ident(user_name) || '.campaigns SET db_size = 0 WHERE id = '' || campaign_id;
 		END;
 		$truncate_other_tables$ LANGUAGE plpgsql SECURITY DEFINER';
 
