@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 ###############################################################################
 # This file is part of openWNS (open Wireless Network Simulator)
@@ -27,7 +27,7 @@
 #
 ###############################################################################
 
-#! /usr/bin/python
+#! /usr/bin/env python
 
 import os
 import sys
